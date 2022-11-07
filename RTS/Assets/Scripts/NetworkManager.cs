@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class NetworkManager : MonoBehaviour
 {
+    [SerializeField]
+    private bool connect = false;
+
     private void Start()
     {
-        return;
-
-        #pragma warning disable CS0162 // Code inaccessible détecté
+        if (!connect)
+            return;
 
         PlayerIO.Authenticate(
             "rts-q2tnacekgeylj7irzdg",
@@ -40,7 +42,5 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log("Error connecting: " + error.ToString());
             }
         );
-
-        #pragma warning restore CS0162
     }
 }
