@@ -14,7 +14,7 @@ public class UnitDrag : MonoBehaviour
 
     private Vector2 _startpos, _endpos, _boxSize, _boxCenter;
 
-    private bool _dragging, _shifting;
+    private bool _dragging, _shifting, _notClick;
 
     private void Start()
     {
@@ -24,10 +24,12 @@ public class UnitDrag : MonoBehaviour
 
         _dragging = false;
         _shifting = false;
+        _notClick = false;
 
         _unitSelection = new UnitSelection();
         _unitSelection.Enable();
         _unitSelection.Selection.DragSelect.started += InitVisualStartPos;
+        _unitSelection.Selection.DragSelect.performed += EnsureNotClick;
         _unitSelection.Selection.DragSelect.canceled += Reset;
         _unitSelection.Selection.ShiftSelect.started += Shifting;
         _unitSelection.Selection.ShiftSelect.canceled += NotShifting;
@@ -56,9 +58,15 @@ public class UnitDrag : MonoBehaviour
         _boxSize = new Vector2(Mathf.Abs(_startpos.x - _endpos.x), Mathf.Abs(_startpos.y - _endpos.y));
         _boxVisual.sizeDelta = _boxSize;
     }
+    private void EnsureNotClick(InputAction.CallbackContext ctx)
+    {
+        _notClick = true;
+    }
     private void Reset(InputAction.CallbackContext ctx)
     {
-        UnitSelectionManager.DragSelect(_selectionBox, _shifting);
+        // to avoid simple clicks being considered as drags
+        if(_notClick)
+            UnitSelectionManager.DragSelect(_selectionBox, _shifting);
 
         _startpos = Vector2.zero;
         _endpos = Vector2.zero;
@@ -66,6 +74,7 @@ public class UnitDrag : MonoBehaviour
         DrawVisual();
 
         _dragging = false;
+        _notClick = false;
     }
     private void DrawSelection()
     {
