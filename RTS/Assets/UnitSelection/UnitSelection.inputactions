@@ -1,0 +1,74 @@
+{
+    "name": "UnitSelection",
+    "maps": [
+        {
+            "name": "Selection",
+            "id": "b19c5584-85f2-4cba-b85c-e4e24a4a8b90",
+            "actions": [
+                {
+                    "name": "Click Select",
+                    "type": "Button",
+                    "id": "a6ba99e3-5134-4f7a-8ded-7b38997fb9b0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shift Select",
+                    "type": "Button",
+                    "id": "7ebd39ea-837a-4d73-a97e-0c7c6d7120b7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Drag Select",
+                    "type": "Button",
+                    "id": "bfcd5b73-bd5e-4f3f-9bac-cff64ccadca6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold(duration=0.1)",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "46c22b11-f29b-4090-8e57-ae8f4c71429d",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1601a41-c8dd-48ea-9219-fe4196e0f443",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9b47c8e-2b36-4dd5-ab32-666807c4ed17",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drag Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
