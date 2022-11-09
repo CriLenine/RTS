@@ -5379,6 +5379,7 @@ GameObject:
   - component: {fileID: 2045357343}
   - component: {fileID: 2045357346}
   - component: {fileID: 2045357347}
+  - component: {fileID: 2045357348}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5451,13 +5452,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a972c2b4692dcb447a15e96402adb06a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildings:
-  - BuildingName: 0
-    BluePrint: {fileID: 2630815731404552690, guid: 7b71f153d02245944aa360e6d382da22, type: 3}
-    Prefab: {fileID: 8107766285504365743, guid: 7ce10a96496de124d8948bbd66cb7396, type: 3}
-  - BuildingName: 1
-    BluePrint: {fileID: 2630815731404552690, guid: 7b71f153d02245944aa360e6d382da22, type: 3}
-    Prefab: {fileID: 8107766285504365743, guid: 7ce10a96496de124d8948bbd66cb7396, type: 3}
+--- !u!114 &2045357348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045357342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc21f9e1a38f32a4fbb5a50704cf0620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dataCharacters: []
+  _dataBuildings:
+  - {fileID: 11400000, guid: 64961bfed5fc95148bbdca7235acee00, type: 2}
 --- !u!1 &2049527959
 GameObject:
   m_ObjectHideFlags: 0

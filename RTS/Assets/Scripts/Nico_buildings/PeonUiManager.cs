@@ -16,7 +16,7 @@ public class PeonUiManager : MonoBehaviour
 {
     [SerializeField] private GameObject _depth0;
     [SerializeField] private GameObject _buildings;
-    [SerializeField] private BuildsManager _buildsManager;
+    [SerializeField] private BuildingBlueprintsManager _buildsManager;
 
 
     public void OnDepth0Click(int index)

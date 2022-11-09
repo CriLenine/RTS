@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,15 @@ using UnityEngine.InputSystem;
 
 public class Blueprint : MonoBehaviour
 {
-    private Vector3 _movePoint;
-    public GameObject Prefab;
-    void Start()
+    private static PeonBuilds _buildType;
+
+    internal static Blueprint InstantiateWorldPos(PeonBuilds buildType)
+    {
+        _buildType = buildType;
+        return Instantiate(PrefabManager.GetBuildingData(buildType).BuildingBlueprint, Vector2.zero, Quaternion.identity);
+    }
+
+    private void Start()
     {
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
@@ -18,7 +25,7 @@ public class Blueprint : MonoBehaviour
 
     }
 
-    void Update()
+    private void Update()
     {
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
@@ -29,7 +36,7 @@ public class Blueprint : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Instantiate(Prefab, transform.position, transform.rotation);
+            //----------------------------------------------------------------- transform.position & BuildType
             Destroy(gameObject);
         }
     }

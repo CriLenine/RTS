@@ -6,6 +6,9 @@ using UnityEngine;
 public class SpawnableDataCharacter : ScriptableObject
 {
     [SerializeField]
+    private Characters _type;
+
+    [SerializeField]
     private RCharacter _character;
 
     [SerializeField]
@@ -13,4 +16,8 @@ public class SpawnableDataCharacter : ScriptableObject
 
     [SerializeField]
     private GameManager.RessourceCost[] _cost;
+
+
+    public Characters Type => _type;
+    public RCharacter Character => _character;
 }
