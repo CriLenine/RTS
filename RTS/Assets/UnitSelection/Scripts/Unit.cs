@@ -4,11 +4,12 @@ public class Unit : MonoBehaviour
 {
     private void Start()
     {
-        UnitSelectionManager.AddUnit(this.gameObject);
+        TileMapManager.AddObstacleTile(gameObject.transform.position);
+        UnitSelectionManager.AddUnit(gameObject);
     }
 
     void OnDestroy()
     {
-        UnitSelectionManager.RemoveUnit(this.gameObject);
+        UnitSelectionManager.RemoveUnit(gameObject);
     }
 }
