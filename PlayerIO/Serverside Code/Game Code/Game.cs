@@ -2,7 +2,6 @@
 using PlayerIO.GameLibrary;
 using System.Diagnostics;
 using System;
-using System.Linq;
 
 public class Player : BasePlayer
 {
@@ -61,7 +60,7 @@ public class Player : BasePlayer
 [RoomType("Game")]
 public class GameRoom : Game<Player>
 {
-    const int maxPlayerCount = 2;
+    const int maxPlayerCount = 1;
 
     private List<Player> _players;
 
@@ -98,6 +97,7 @@ public class GameRoom : Game<Player>
 
     public override void UserLeft(Player player)
     {
+        _timer.Stop();
         if (_isRunning)
             _players.ForEach(p => p.Disconnect());
     }
@@ -124,7 +124,7 @@ public class GameRoom : Game<Player>
             case "Tick":
                 sender.Update();
 
-                //Console.WriteLine($"Tick {sender.Tick} : {sender.ConnectUserId} ({sender.Ping}ms)");
+                Console.WriteLine($"Tick {sender.Tick} : {sender.ConnectUserId} ({sender.Ping}ms)");
 
                 break;
         }
@@ -172,7 +172,7 @@ public class GameRoom : Game<Player>
 
     private void OnTick()
     {
-        //Console.WriteLine($"Start tick {_tick}");
+        Console.WriteLine($"Start tick {_tick}");
 
         Message message = Prepare(_tick);
 

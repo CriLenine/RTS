@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 
-
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
