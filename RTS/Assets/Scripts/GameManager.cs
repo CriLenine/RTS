@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
 
                     break;
 
-                case InputType.Move:
+                case InputType.Build:
                     TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position);
 
                     break;

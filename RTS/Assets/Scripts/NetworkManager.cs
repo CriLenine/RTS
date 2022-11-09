@@ -68,7 +68,9 @@ public partial class NetworkManager : MonoBehaviour
                     break;
 
                 case "Tick":
-                    _ticks.Add(message.GetInt(0), new Tick(message));
+                    Tick tick = new Tick(message);
+
+                    _ticks.Add(message.GetInt(0), tick);
 
                     break;
             }
@@ -104,7 +106,7 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Build:
-                message.Add(input.ID, input.Position);
+                message.Add(input.ID, input.Position.x, input.Position.y);
 
                 break;
         }
@@ -124,13 +126,16 @@ public partial class NetworkManager : MonoBehaviour
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 
+            if (_ticks[_tick].Inputs.Length > 0)
+                Debug.Log($"Input {_ticks[_tick].Inputs[0].Type} at {_tick}");
+
             byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
 
             _server.Send("Tick", hash);
 
             _ticks.Remove(_tick);
 
-            Debug.Log($"Tick {_tick}");
+            //Debug.Log($"Tick {_tick}");
 
             ++_tick;
         }

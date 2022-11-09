@@ -61,7 +61,7 @@ public class Player : BasePlayer
 [RoomType("Game")]
 public class GameRoom : Game<Player>
 {
-    const int maxPlayerCount = 1;
+    const int maxPlayerCount = 2;
 
     private List<Player> _players;
 
@@ -124,7 +124,7 @@ public class GameRoom : Game<Player>
             case "Tick":
                 sender.Update();
 
-                Console.WriteLine($"Tick {sender.Tick} : {sender.ConnectUserId} ({sender.Ping}ms)");
+                //Console.WriteLine($"Tick {sender.Tick} : {sender.ConnectUserId} ({sender.Ping}ms)");
 
                 break;
         }
@@ -142,10 +142,14 @@ public class GameRoom : Game<Player>
     {
         int tick = _tick + MaxPing() / Player.TickPeriod + 2;
 
+        Console.WriteLine($"Input from {performer} : {input.GetInt(0)} (Received at {_tick} but delayed to {tick})");
+
         Message message = Prepare(tick);
 
+        message.Add(performer);
+
         for (uint i = 0; i < input.Count; i++)
-            message.Add(performer, input[i]);
+            message.Add(input[i]);
     }
 
     private void Start()
@@ -168,7 +172,7 @@ public class GameRoom : Game<Player>
 
     private void OnTick()
     {
-        Console.WriteLine($"Start tick {_tick}");
+        //Console.WriteLine($"Start tick {_tick}");
 
         Message message = Prepare(_tick);
 
