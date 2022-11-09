@@ -124,11 +124,9 @@ public partial class NetworkManager : MonoBehaviour
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 
-            //byte[] hash = GameManager.Tick(_ticks[_tick]);
+            byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
 
-            _server.Send("Tick");
-
-            // TODO : Envoyer le hash
+            _server.Send("Tick", hash);
 
             _ticks.Remove(_tick);
 

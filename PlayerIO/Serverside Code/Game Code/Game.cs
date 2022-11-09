@@ -19,6 +19,7 @@ public class Player : BasePlayer
     
     public int Ping { get; private set; }
 
+    private readonly Dictionary<int, long> _timestamps = new Dictionary<int, long>();
     private readonly Stopwatch _stopwatch = new Stopwatch();
 
     public void Reset()
@@ -30,6 +31,8 @@ public class Player : BasePlayer
 
         Ping = TickPeriod;
         Tick = -1;
+
+        _stopwatch.Reset();
     }
 
     public void Update()

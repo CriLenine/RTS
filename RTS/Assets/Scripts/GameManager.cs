@@ -1,27 +1,42 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
 
-    private void Tick(List<(int type, int id, Vector2 position)> inputs)
+    private void Start()
     {
-        for(int i = 0; i < inputs.Count; i++)
+        _instance = this;
+
+        DontDestroyOnLoad(this);
+    }
+
+    public static byte[] Tick(TickInput[] inputs)
+    {
+        foreach (TickInput input in inputs)
         {
-            if (inputs[i].type == 0) //Buildings
-                TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)inputs[i].id).Building, inputs[i].position);
-            else //Characters
-                TickedBehaviour.Create(PrefabManager.GetCharacterData((Characters)inputs[i].id).Character, inputs[i].position);
+            switch (input.Type)
+            {
+                case InputType.Spawn:
+                    TickedBehaviour.Create(PrefabManager.GetCharacterData((Characters)input.ID).Character, input.Position);
+
+                    break;
+
+                case InputType.Move:
+                    TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position);
+
+                    break;
+            }
         }
+
+        return new byte[1];
     }
 
     [Serializable]
     public class RessourceCost
     {
-
         [SerializeField]
         private Ressource _ressource;
 
