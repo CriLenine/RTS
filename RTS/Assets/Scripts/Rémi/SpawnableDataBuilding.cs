@@ -6,6 +6,12 @@ using UnityEngine;
 public class SpawnableDataBuilding : ScriptableObject
 {
     [SerializeField]
+    private PeonBuilds _type;
+
+    [SerializeField]
+    private Blueprint _buildingBlueprint;
+
+    [SerializeField]
     private RBuilding _building;
 
     [SerializeField]
@@ -13,4 +19,9 @@ public class SpawnableDataBuilding : ScriptableObject
 
     [SerializeField]
     private GameManager.RessourceCost[] _cost;
+
+
+    public PeonBuilds Type => _type;
+    public Blueprint BuildingBlueprint => _buildingBlueprint;
+    public RBuilding Building => _building;
 }
