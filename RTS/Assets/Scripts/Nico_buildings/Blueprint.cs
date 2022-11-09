@@ -36,7 +36,7 @@ public class Blueprint : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            //----------------------------------------------------------------- transform.position & BuildType
+            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position));
             Destroy(gameObject);
         }
     }
