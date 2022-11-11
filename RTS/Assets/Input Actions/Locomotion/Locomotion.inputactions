@@ -1,0 +1,34 @@
+{
+    "name": "Locomotion",
+    "maps": [
+        {
+            "name": "Displacement",
+            "id": "a1d4170a-d0f2-4d7f-9eed-4aa870612b07",
+            "actions": [
+                {
+                    "name": "RightClick",
+                    "type": "Button",
+                    "id": "fcc24c4c-6cf7-4527-a202-9a7fce1573b8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "fe81acc9-0965-4b5a-a434-0e6d20459a5b",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

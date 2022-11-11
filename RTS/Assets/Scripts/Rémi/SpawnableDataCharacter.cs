@@ -9,7 +9,7 @@ public class SpawnableDataCharacter : ScriptableObject
     private Characters _type;
 
     [SerializeField]
-    private RCharacter _character;
+    private Character _character;
 
     [SerializeField]
     private int _neededBuildingLevel;
@@ -19,5 +19,5 @@ public class SpawnableDataCharacter : ScriptableObject
 
 
     public Characters Type => _type;
-    public RCharacter Character => _character;
+    public Character Character => _character;
 }
