@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RPeon : RCharacter
+public class Peon : Character
 {
     protected override Hash128 GetHash128()
     {

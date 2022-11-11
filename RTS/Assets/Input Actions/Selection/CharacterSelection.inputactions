@@ -6,42 +6,33 @@
             "id": "b19c5584-85f2-4cba-b85c-e4e24a4a8b90",
             "actions": [
                 {
-                    "name": "Click Select",
+                    "name": "Click",
                     "type": "Button",
-                    "id": "a6ba99e3-5134-4f7a-8ded-7b38997fb9b0",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Shift Select",
-                    "type": "Button",
-                    "id": "7ebd39ea-837a-4d73-a97e-0c7c6d7120b7",
+                    "id": "bfcd5b73-bd5e-4f3f-9bac-cff64ccadca6",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Hold",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Drag Select",
+                    "name": "Shift",
                     "type": "Button",
-                    "id": "bfcd5b73-bd5e-4f3f-9bac-cff64ccadca6",
+                    "id": "7ebd39ea-837a-4d73-a97e-0c7c6d7120b7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold(duration=0.1)",
+                    "interactions": "Hold",
                     "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "46c22b11-f29b-4090-8e57-ae8f4c71429d",
+                    "id": "a9b47c8e-2b36-4dd5-ab32-666807c4ed17",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click Select",
+                    "action": "Click",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -52,18 +43,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Shift Select",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a9b47c8e-2b36-4dd5-ab32-666807c4ed17",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Drag Select",
+                    "action": "Shift",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

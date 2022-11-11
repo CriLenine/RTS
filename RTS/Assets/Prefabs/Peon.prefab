@@ -177,10 +177,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4784162708814382637}
-  - component: {fileID: 4784162708814382642}
+  - component: {fileID: 6059221905173487255}
   - component: {fileID: 7973303478340177616}
   m_Layer: 8
-  m_Name: Unit
+  m_Name: Peon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -203,7 +203,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4784162708814382642
+--- !u!114 &6059221905173487255
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -212,9 +212,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4784162708814382643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c8030fcb17118944b17dd9484911b5b, type: 3}
+  m_Script: {fileID: 11500000, guid: eb0c414f5b20535419ecde38e9e54dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _data: {fileID: 0}
+  selectionMarker: {fileID: 3328235741507802003}
 --- !u!61 &7973303478340177616
 BoxCollider2D:
   m_ObjectHideFlags: 0

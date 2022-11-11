@@ -8,13 +8,19 @@ public class TileMapManager : MonoBehaviour
 {
     private static TileMapManager _instance;
 
-    [SerializeField] 
+    [SerializeField]
     private Tilemap _graphicGroundTilemap, _graphicObstaclesTilemap, _graphicPreviewTilemap;
+
+    [SerializeField]
+    private int _mapOutline;
 
     // Grid Related
     private static Grid _grid;
-    private static float _cellSize;
-    private static float _cellSizeInverse;
+    public static float _tileSize { get; private set; }
+    private static float _tileSizeInverse;
+    private static float _tilingOffset;
+
+    private static Vector3 _defaultPosition;
 
     // Map Dimensions
     private BoundsInt _mapBounds;
@@ -41,8 +47,9 @@ public class TileMapManager : MonoBehaviour
 
         // Retrieval of the grid component.
         _grid = _graphicGroundTilemap.GetComponentInParent<Grid>();
-        _cellSize = _grid.cellSize.x;
-        _cellSizeInverse = 1 / _cellSize;
+        _tileSize = _grid.cellSize.x;
+        _tileSizeInverse = 1 / _tileSize;
+        _tilingOffset = _tileSize / 2;
 
         // Retrieval of the tilemap's dimension properties.
         _mapBounds = _graphicGroundTilemap.cellBounds;
@@ -50,6 +57,9 @@ public class TileMapManager : MonoBehaviour
         _mapHeight = _mapBounds.yMax - _mapBounds.yMin;
         _mapDimensions = new Vector2Int(_mapWidth, _mapHeight);
         _halfMapDimensions = _mapDimensions / 2;
+
+        // Corresponds to the bottom left corner tile position (x,y,z) whose coordinates are (0,0).
+        _defaultPosition = new Vector3(_tilingOffset - _tileSize * _mapWidth * .5f, _tilingOffset - _tileSize * _mapHeight * .5f);
 
         // Initialization of the logic tilemap according to the ground graphic tilemap.
         _logicalTiles = new LogicalTile[_mapWidth, _mapHeight];
@@ -69,15 +79,36 @@ public class TileMapManager : MonoBehaviour
         }
     }
 
-    public static void AddObstacleTile(Vector3 position)
+    public static Vector2Int WorldToTilemapCoords(Vector3 position)
     {
-        Vector2Int pos = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _cellSizeInverse),
-                                                                Mathf.FloorToInt(position.y * _cellSizeInverse));
+        Vector2Int coords = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _tileSizeInverse),
+                                                                Mathf.FloorToInt(position.y * _tileSizeInverse));
+        return coords;
+    }
+
+    public static Vector3 TilemapCoordsToWorld(Vector2Int coords)
+    {
+        Vector3 pos = _defaultPosition + new Vector3(coords.x * _tileSize, coords.y * _tileSize);
+        return pos;
+    }
+
+    public static void AddObstacle(Vector2Int coords)
+    {
+        _logicalTiles[coords.x, coords.y].state = TileState.Obstacle;
+    }
+
+    public static void RemoveObstacle(Vector2Int coords)
+    {
+        _logicalTiles[coords.x, coords.y].state = TileState.Free;
     }
 
     public static LogicalTile GetTile(int x, int y)
     {
         return _logicalTiles[x, y];
+    }
+    public static LogicalTile GetTile(Vector2Int coords)
+    {
+        return _logicalTiles[coords.x, coords.y];
     }
 
     public static bool TilesAvailableForBuild(int outlinesCount)
@@ -97,8 +128,8 @@ public class TileMapManager : MonoBehaviour
             located at the bottom left corner of the graphic grid.
             It is then updated to take into account the position of the mouse according to the size of individual grid cells.
          */
-        _hoveredTilePos = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(_previousMousePos.x * _cellSizeInverse),
-                                                                Mathf.FloorToInt(_previousMousePos.y * _cellSizeInverse));
+        _hoveredTilePos = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(_previousMousePos.x * _tileSizeInverse),
+                                                                Mathf.FloorToInt(_previousMousePos.y * _tileSizeInverse));
 
         // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
         _previewMin = new Vector2Int(_hoveredTilePos.x - outlinesCount, _hoveredTilePos.y - outlinesCount);
