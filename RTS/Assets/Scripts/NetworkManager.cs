@@ -5,12 +5,17 @@ using UnityEngine;
 
 public partial class NetworkManager : MonoBehaviour
 {
-    public const float TickPeriod = 0.025f;
+    private const float _baseTickPeriod = 0.025f;
+    private const float _minTickPeriod = 0.005f;
+
+    public static float TickPeriod { get; private set; }
+
+    private int _lateness = 0;
 
     private static NetworkManager _instance;
 
     [SerializeField]
-    private bool connect = false;
+    private bool _connect = false;
 
     private Connection _server;
 
@@ -21,6 +26,8 @@ public partial class NetworkManager : MonoBehaviour
     private int _tick;
 
     private Dictionary<int, Tick> _ticks;
+
+    private bool _debug = false;
 
     private void Awake()
     {
@@ -34,7 +41,9 @@ public partial class NetworkManager : MonoBehaviour
         _messages = new Queue<Message>();
         _ticks = new Dictionary<int, Tick>();
 
-        if (!connect)
+        TickPeriod = _baseTickPeriod;
+
+        if (!_connect)
             return;
 
         Connect();
@@ -42,6 +51,11 @@ public partial class NetworkManager : MonoBehaviour
 
     private void Update()
     {
+        if (UnityEngine.Input.GetKeyDown(KeyCode.F3))
+            _debug = !_debug;
+
+        TickPeriod = Mathf.Lerp(TickPeriod, _lateness > 5 ? _minTickPeriod : _baseTickPeriod, Time.deltaTime);
+
         while (_messages.Count > 0 && !_wait)
         {
             Message message = _messages.Dequeue();
@@ -68,7 +82,11 @@ public partial class NetworkManager : MonoBehaviour
                     break;
 
                 case "Tick":
-                    _ticks.Add(message.GetInt(0), new Tick(message));
+                    Tick tick = new Tick(message);
+
+                    _ticks.Add(message.GetInt(0), tick);
+
+                    ++_lateness;
 
                     break;
             }
@@ -78,6 +96,8 @@ public partial class NetworkManager : MonoBehaviour
     public static void Input(TickInput input)
     {
         Message message = Message.Create("Input");
+
+        Debug.Log($"Input at {_instance._tick} : {input.Type}");
 
         message.Add((int)input.Type);
 
@@ -104,7 +124,7 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Build:
-                message.Add(input.ID, input.Position);
+                message.Add(input.ID, input.Position.x, input.Position.y);
 
                 break;
         }
@@ -118,24 +138,36 @@ public partial class NetworkManager : MonoBehaviour
 
         while (true)
         {
-            yield return new WaitUntil(() => connect);
+            yield return new WaitUntil(() => _connect);
 
             yield return new WaitForSeconds(TickPeriod);
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 
-            //byte[] hash = GameManager.Tick(_ticks[_tick]);
+            if (_ticks[_tick].Inputs.Length > 0)
+                Debug.Log($"Input {_ticks[_tick].Inputs[0].Type} at {_tick}");
 
-            _server.Send("Tick");
+            byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
 
-            // TODO : Envoyer le hash
+            _server.Send("Tick", hash);
 
             _ticks.Remove(_tick);
 
-            Debug.Log($"Tick {_tick}");
-
             ++_tick;
+            --_lateness;
         }
+    }
+
+    private void OnGUI()
+    {
+        if (!_debug)
+            return;
+
+        GUI.Box(
+            new Rect(10, 10, 125, 40),
+            $"Retard : {_lateness}\nTick Period : {TickPeriod:0.000}",
+            new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleLeft }
+        );
     }
 
     private void Connect()
