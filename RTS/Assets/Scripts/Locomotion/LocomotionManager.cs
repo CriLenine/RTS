@@ -37,11 +37,12 @@ public class LocomotionManager : MonoBehaviour
 
         if (characters.Count == 1 && TileMapManager.GetTile(_rallyPointCoords).state == TileState.Free)
         {
-            Character character = characters[0];
-            character.transform.position = TileMapManager.TilemapCoordsToWorld(_rallyPointCoords);
-            TileMapManager.GetTile(character.coords).state = TileState.Free;
-            character.coords = _rallyPointCoords;
-            TileMapManager.GetTile(_rallyPointCoords).state = TileState.Obstacle;
+            Stack<LogicalTile> path = TileMapManager.FindPath(characters[0].coords, _rallyPointCoords);
+            //Character character = characters[0];
+            //character.transform.position = TileMapManager.TilemapCoordsToWorld(_rallyPointCoords);
+            //TileMapManager.GetTile(character.coords).state = TileState.Free;
+            //character.coords = _rallyPointCoords;
+            //TileMapManager.GetTile(_rallyPointCoords).state = TileState.Obstacle;
         }
     }
 }

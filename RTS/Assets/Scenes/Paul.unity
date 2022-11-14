@@ -588,6 +588,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -694,6 +695,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198c2f26d8c86f34cbfa10b9f17b78c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _max_speed: 5
+  _acceleration: 10
+  _damping: 15
+  _stepSize: 2
+  _zoomDampening: 7.5
+  _minHeight: 5
+  _maxHeight: 50
+  _maxRotation_speed: 1
+  _edgeTolerance: 0.05
 --- !u!4 &597688859 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4784162708814382637, guid: 2d27dceb886f90548b235bfb83e7e23b, type: 3}
@@ -1180,7 +1202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26a2caef2e2854341bd30386366d68d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connect: 0
+  _connect: 0
 --- !u!114 &2045357344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1224,6 +1246,8 @@ MonoBehaviour:
   _graphicObstaclesTilemap: {fileID: 506916909}
   _graphicPreviewTilemap: {fileID: 0}
   _mapOutline: 4
+  _pathMarker: {fileID: 8839846287654581871, guid: 0a9c11a879be0d64b95bfa4720a7c623, type: 3}
+  _debug: 0
 --- !u!114 &2045357347
 MonoBehaviour:
   m_ObjectHideFlags: 0

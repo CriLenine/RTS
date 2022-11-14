@@ -29,7 +29,24 @@ public class TileMapManager : MonoBehaviour
     private static Vector2Int _mapDimensions;
     private static Vector2Int _halfMapDimensions;
 
+    private static Vector2Int _minPlayable;
+    private static Vector2Int _maxPlayable;
+
     private static LogicalTile[,] _logicalTiles;
+    private static Vector2Int[] _unitCardinalDisplacements = new Vector2Int[]
+    {
+        new Vector2Int(1, 0),
+        new Vector2Int(0, 1),
+        new Vector2Int(-1, 0),
+        new Vector2Int(0, -1),
+    };
+    private static Vector2Int[] _unitDiagonalDisplacements = new Vector2Int[]
+    {
+        new Vector2Int(1, 1),
+        new Vector2Int(-1, 1),
+        new Vector2Int(-1, -1),
+        new Vector2Int(1, -1),
+    };
 
     // Building Positionning Tests 
     private static bool _previousAvailability;
@@ -37,6 +54,13 @@ public class TileMapManager : MonoBehaviour
     private static Vector2Int _hoveredTilePos;
     private static Vector2Int _previewMin;
     private static Vector2Int _previewMax;
+
+    // Debug
+    [SerializeField]
+    private GameObject _pathMarker;
+    private List<GameObject> _pathMarkers = new List<GameObject>();
+    [SerializeField]
+    private bool _debug;
 
     private void Awake()
     {
@@ -58,6 +82,9 @@ public class TileMapManager : MonoBehaviour
         _mapDimensions = new Vector2Int(_mapWidth, _mapHeight);
         _halfMapDimensions = _mapDimensions / 2;
 
+        _minPlayable = new Vector2Int(_mapOutline, _mapOutline);
+        _maxPlayable = new Vector2Int(_mapWidth - _mapOutline - 1, _mapHeight - _mapOutline - 1);
+
         // Corresponds to the bottom left corner tile position (x,y,z) whose coordinates are (0,0).
         _defaultPosition = new Vector3(_tilingOffset - _tileSize * _mapWidth * .5f, _tilingOffset - _tileSize * _mapHeight * .5f);
 
@@ -65,7 +92,7 @@ public class TileMapManager : MonoBehaviour
         _logicalTiles = new LogicalTile[_mapWidth, _mapHeight];
         for (int x = 0; x < _mapWidth; ++x)
             for (int y = 0; y < _mapHeight; ++y)
-                _logicalTiles[x, y] = new LogicalTile(x, y);
+                _logicalTiles[x, y] = new LogicalTile(new Vector2Int(x, y));
 
         // Initialization of the obstacles in the logic tilemap according to the top layer tilemap.
         foreach (Vector3Int position in _graphicObstaclesTilemap.cellBounds.allPositionsWithin)
@@ -149,4 +176,130 @@ public class TileMapManager : MonoBehaviour
         _previousAvailability = true;
         return _previousAvailability;
     }
+
+    #region PathFinding
+
+    public static Stack<LogicalTile> FindPath(Vector2Int startCoords, Vector2Int endCoords)
+    {
+        Stack<LogicalTile> path = new Stack<LogicalTile>();
+        List<LogicalTile> open = new List<LogicalTile>();
+        List<LogicalTile> closed = new List<LogicalTile>();
+
+        LogicalTile startTile = _logicalTiles[startCoords.x, startCoords.y];
+        LogicalTile endTile = _logicalTiles[endCoords.x, endCoords.y];
+
+        if (_instance._debug)
+        {
+            Debug.Log($"start tile : {startTile.coords}");
+            Debug.Log($"end tile : {endTile.coords}");
+        }
+
+        LogicalTile currentTile = startTile;
+        closed.Add(currentTile);
+        currentTile.g = 0;
+        currentTile.h = 0;
+        currentTile.parent = null;
+
+        float weight;
+        Vector2Int[] displacementsToTest;
+
+        List<LogicalTile> validNeighbors = new List<LogicalTile>();
+
+        do
+        {
+            Vector2Int currentCoords = currentTile.coords;
+            displacementsToTest = _unitCardinalDisplacements;
+
+            for (int i = 0; i < 2; ++i, displacementsToTest = _unitDiagonalDisplacements)
+            {
+                weight = 1 + .4f * i;
+
+                foreach (Vector2Int displacement in displacementsToTest)
+                {
+                    Vector2Int neighborCoords = currentCoords + displacement;
+
+                    if (neighborCoords.x < _minPlayable.x || neighborCoords.y < _minPlayable.y 
+                        || neighborCoords.x > _maxPlayable.x || neighborCoords.y > _maxPlayable.y)
+                        continue;
+
+                    LogicalTile neighbor = _logicalTiles[neighborCoords.x, neighborCoords.y];
+
+                    if (neighbor.isObstacle || closed.Contains(neighbor))
+                        continue;
+
+                    if (open.Contains(neighbor))
+                    {
+                        float hypotheticG = currentTile.g + weight;
+                        if (hypotheticG < neighbor.g)
+                        {
+                            neighbor.parent = currentTile;
+                            validNeighbors.Add(neighbor);
+                        }
+                    }
+                    else
+                    {
+                        neighbor.h = (endTile.coords - neighbor.coords).sqrMagnitude;
+                        neighbor.g = currentTile.g + weight;
+                        neighbor.parent = currentTile;
+                        open.Add(neighbor);
+                        validNeighbors.Add(neighbor);
+                    }
+                }
+            }
+
+            if (validNeighbors.Count == 0)
+            {
+                if (currentTile == startTile)
+                    break;
+                currentTile = currentTile.parent;
+            }
+            else
+            {
+                LogicalTile bestTile = validNeighbors[0];
+                for (int i = 1; i < validNeighbors.Count; ++i)
+                    if (bestTile.f > validNeighbors[i].f)
+                        bestTile = validNeighbors[i];
+
+                bestTile.parent = currentTile;
+                currentTile = bestTile;
+                if(_instance._debug)
+                    Debug.Log($"path tile considered : {currentTile.coords}");
+                closed.Add(currentTile); 
+            }
+
+            validNeighbors.Clear();
+
+        } while (open.Count > 0 && currentTile != endTile);
+
+        while (currentTile.parent != null)
+        {
+            path.Push(currentTile);
+            currentTile = currentTile.parent;
+        }
+
+        if (_instance._debug)
+        {
+            if (path.Contains(endTile))
+                Debug.Log("path found!");
+            else
+                Debug.Log("no path found!");
+
+            foreach (GameObject go in _instance._pathMarkers)
+                Destroy(go);
+
+            _instance._pathMarkers.Clear();
+
+            foreach (LogicalTile tile in path)
+            {
+                GameObject GO = Instantiate(_instance._pathMarker);
+                GO.transform.position = TilemapCoordsToWorld(tile.coords);
+                _instance._pathMarkers.Add(GO);
+            }
+        }
+
+        return path;
+    }
+
+    #endregion
 }
+

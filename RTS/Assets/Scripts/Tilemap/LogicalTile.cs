@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public enum TileState
@@ -11,12 +10,17 @@ public enum TileState
 
 public class LogicalTile
 {
-    public int x, y;
+    public Vector2Int coords;
     public TileState state = TileState.Free;
+    public bool isObstacle => state == TileState.Obstacle;
+    public bool isBuildable => state == TileState.Free;
 
-    public LogicalTile(int ix, int iy)
+    public LogicalTile(Vector2Int iCoords)
     {
-        x = ix; 
-        y = iy;
+        coords = iCoords;
     }
+
+    public float f => g + h;
+    public float g, h;
+    public LogicalTile parent;
 }
