@@ -100,7 +100,7 @@ public class GameRoom : Game<Player>
         }
     }
 
-    private const int _maxPlayerCount = 1;
+    private const int _maxPlayerCount = 2;
 
     private List<Player> _players;
 
