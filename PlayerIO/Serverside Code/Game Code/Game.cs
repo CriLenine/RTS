@@ -5,7 +5,7 @@ using System;
 [RoomType("Game")]
 public partial class GameRoom : Game<Player>
 {
-    private const int MaxPlayerCount = 2;
+    private const int MaxPlayerCount = 4;
 
     #region Constructor & Variables
 
@@ -31,6 +31,20 @@ public partial class GameRoom : Game<Player>
 
     private Dictionary<int, TickHash> _hashes;
     private Dictionary<int, Message> _ticks;
+    
+    private void Reset()
+    {
+        _state = State.Hosting;
+
+        _timer?.Stop();
+        _tick = 0;
+
+        _hashes.Clear();
+        _ticks.Clear();
+
+        foreach (Player player in _players)
+            player.Reset();
+    }
 
     public override void GameStarted()
     {
@@ -132,19 +146,7 @@ public partial class GameRoom : Game<Player>
 
     #endregion
 
-    private void Reset()
-    {
-        _state = State.Hosting;
-
-        _timer?.Stop();
-        _tick = 0;
-
-        _hashes.Clear();
-        _ticks.Clear();
-
-        foreach (Player player in _players)
-            player.Reset();
-    }
+    #region Play / Pause
 
     private void Start()
     {
@@ -172,13 +174,17 @@ public partial class GameRoom : Game<Player>
         BroadcastState();
     }
 
+    #endregion
+
+    #region Messages
+
     public override void GotMessage(Player sender, Message message)
     {
         switch (message.Type)
         {
             case "Ready":
                 sender.IsReady = !sender.IsReady;
-                
+
                 sender.Send("Ready", sender.IsReady);
 
                 BroadcastPlayers();
@@ -218,6 +224,8 @@ public partial class GameRoom : Game<Player>
                 break;
         }
     }
+
+    #endregion
 
     #region Gameplay
 

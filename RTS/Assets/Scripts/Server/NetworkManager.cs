@@ -11,6 +11,8 @@ public partial class NetworkManager : MonoBehaviour
 
     private static NetworkManager _instance;
 
+    #region State
+
     private Player _me;
     private Room _room;
     private Connection _server;
@@ -26,6 +28,8 @@ public partial class NetworkManager : MonoBehaviour
     public static bool IsPlaying => _instance._isPlaying;
     public static bool IsRunning => _instance._isRunning;
 
+    #endregion
+
     #region GUI
 
     private bool _showGUI = true;
@@ -33,163 +37,6 @@ public partial class NetworkManager : MonoBehaviour
     private Room[] _rooms;
 
     private bool _loading;
-
-    #endregion
-
-    public static float TickPeriod { get; private set; }
-
-    private int _lateness = 0;
-
-    private Queue<Message> _messages;
-
-    private bool _wait = false;
-
-    private int _tick;
-
-    private Dictionary<int, Tick> _ticks;
-
-    private void Awake()
-    {
-        _instance = this;
-
-        DontDestroyOnLoad(this);
-    }
-
-    private void Start()
-    {
-        _me = new Player(SystemInfo.deviceName);
-
-        Connect();
-
-        _messages = new Queue<Message>();
-        _ticks = new Dictionary<int, Tick>();
-
-        TickPeriod = BaseTickPeriod;
-    }
-
-    private void Update()
-    {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.F3))
-            _showGUI = !_showGUI;
-
-        TickPeriod = Mathf.Lerp(TickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
-
-        while (_messages.Count > 0 && !_wait)
-        {
-            Message message = _messages.Dequeue();
-
-            switch (message.Type)
-            {
-                case "Joined":
-                    Debug.Log($"{message.GetString(0)} joined the game");
-
-                    break;
-
-                case "Ready":
-                    _me.IsReady = message.GetBoolean(0);
-
-                    break;
-
-                case "Players":
-                    _room.Update(message);
-
-                    _loading = false;
-
-                    break;
-
-                case "Start":
-                    _isPlaying = true;
-
-                    _tick = 0;
-
-                    StartCoroutine(Loop());
-
-                    Debug.Log($"Start Game");
-
-                    break;
-
-                case "State":
-                    _isRunning = message.GetBoolean(0);
-
-                    break;
-
-                case "Tick":
-                    Tick tick = new Tick(message);
-
-                    _ticks.Add(message.GetInt(0), tick);
-
-                    ++_lateness;
-
-                    break;
-            }
-        }
-    }
-
-    public static void Input(TickInput input)
-    {
-        Message message = Message.Create("Input");
-
-        Debug.Log($"Input at {_instance._tick} : {input.Type}");
-
-        message.Add((int)input.Type);
-
-        void Spread<T>(T[] array)
-        {
-            message.Add(array.Length);
-
-            for (int i = 0; i < array.Length; ++i)
-                message.Add(array[i]);
-        }
-
-        switch (input.Type)
-        {
-            case InputType.Spawn:
-                message.Add(input.ID, input.Position);
-
-                break;
-
-            case InputType.Move:
-                Spread(input.Targets);
-
-                message.Add(input.Position);
-
-                break;
-
-            case InputType.Build:
-                message.Add(input.ID, input.Position.x, input.Position.y);
-
-                break;
-        }
-
-        _instance._server.Send(message);
-    }
-
-    private IEnumerator Loop()
-    {
-        yield return new WaitUntil(() => _ticks.ContainsKey(1));
-
-        while (IsPlaying)
-        {
-            yield return new WaitForSeconds(TickPeriod);
-
-            yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
-
-            if (IsRunning)
-            {
-                if (_ticks[_tick].Inputs.Length > 0)
-                    Debug.Log($"Input {_ticks[_tick].Inputs[0].Type} at {_tick}");
-
-                byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
-
-                _server.Send("Tick", hash);
-
-                _ticks.Remove(_tick);
-
-                ++_tick;
-                --_lateness;
-            }
-        }
-    }
 
     private void OnGUI()
     {
@@ -247,7 +94,7 @@ public partial class NetworkManager : MonoBehaviour
 
             GUILayout.FlexibleSpace();
 
-            if(IsPlaying)
+            if (IsPlaying)
             {
                 if (IsRunning)
                 {
@@ -339,6 +186,165 @@ public partial class NetworkManager : MonoBehaviour
         GUILayout.EndArea();
     }
 
+    #endregion
+
+    #region Init & Variables
+
+    public static float TickPeriod { get; private set; }
+
+    private int _lateness = 0;
+
+    private bool _wait = false;
+
+    private int _tick;
+
+    private Dictionary<int, Tick> _ticks;
+
+    private Queue<Message> _messages;
+
+    private void Awake()
+    {
+        _instance = this;
+
+        DontDestroyOnLoad(this);
+    }
+
+    private void Start()
+    {
+        _messages = new Queue<Message>();
+        _ticks = new Dictionary<int, Tick>();
+
+        _me = new Player(SystemInfo.deviceName);
+
+        Connect();
+    }
+
+    #endregion
+
+    private void Update()
+    {
+        if (UnityEngine.Input.GetKeyDown(KeyCode.F3))
+            _showGUI = !_showGUI;
+
+        TickPeriod = Mathf.Lerp(TickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
+
+        #region Messages
+
+        while (_messages.Count > 0 && !_wait)
+        {
+            Message message = _messages.Dequeue();
+
+            switch (message.Type)
+            {
+                case "Ready":
+                    _me.IsReady = message.GetBoolean(0);
+
+                    break;
+
+                case "Players":
+                    _room.Update(message);
+
+                    _loading = false;
+
+                    break;
+
+                case "Start":
+                    _isPlaying = true;
+
+                    _tick = 0;
+
+                    TickPeriod = BaseTickPeriod;
+
+                    StartCoroutine(Loop());
+
+                    break;
+
+                case "State":
+                    _isRunning = message.GetBoolean(0);
+
+                    break;
+
+                case "Tick":
+                    Tick tick = new Tick(message);
+
+                    _ticks.Add(message.GetInt(0), tick);
+
+                    ++_lateness;
+
+                    break;
+            }
+        }
+
+        #endregion
+    }
+
+    #region Gameplay
+
+    public static void Input(TickInput input)
+    {
+        Message message = Message.Create("Input");
+
+        message.Add((int)input.Type);
+
+        void Spread<T>(T[] array)
+        {
+            message.Add(array.Length);
+
+            for (int i = 0; i < array.Length; ++i)
+                message.Add(array[i]);
+        }
+
+        switch (input.Type)
+        {
+            case InputType.Spawn:
+                message.Add(input.ID, input.Position);
+
+                break;
+
+            case InputType.Move:
+                Spread(input.Targets);
+
+                message.Add(input.Position);
+
+                break;
+
+            case InputType.Build:
+                message.Add(input.ID, input.Position.x, input.Position.y);
+
+                break;
+        }
+
+        _instance._server.Send(message);
+    }
+
+    private IEnumerator Loop()
+    {
+        yield return new WaitUntil(() => _ticks.ContainsKey(10));
+
+        while (IsPlaying)
+        {
+            yield return new WaitForSeconds(TickPeriod);
+
+            yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
+
+            if (IsRunning)
+            {
+                byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
+
+                _server.Send("Tick", hash);
+
+                _ticks.Remove(_tick);
+
+                ++_tick;
+                --_lateness;
+            }
+        }
+    }
+
+    #endregion
+
+    #region Play / Pause
+
     public static void Play()
     {
         if (IsPlaying && !IsRunning)
@@ -350,6 +356,8 @@ public partial class NetworkManager : MonoBehaviour
         if (IsRunning)
             _instance._server.Send("Pause");
     }
+
+    #endregion
 
     #region Connection & Host
 
@@ -369,17 +377,11 @@ public partial class NetworkManager : MonoBehaviour
             {
                 _instance._loading = false;
 
-                Debug.Log("Successfully connected to Player.IO");
-
-                client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
-
                 _instance._multiplayer = client.Multiplayer;
             },
             delegate (PlayerIOError error)
             {
                 _instance._loading = false;
-
-                Debug.Log("Error connecting: " + error.ToString());
             }
         );
     }
@@ -396,8 +398,6 @@ public partial class NetworkManager : MonoBehaviour
         _instance._multiplayer.CreateJoinRoom(id, "Game", true, null, null,
             delegate (Connection connection)
             {
-                Debug.Log($"Joined room \"{id}\"");
-
                 _instance._server = connection;
 
                 _instance._room = new Room(id);
@@ -409,8 +409,6 @@ public partial class NetworkManager : MonoBehaviour
             },
             delegate (PlayerIOError error)
             {
-                Debug.Log($"Error joining room : {error}");
-
                 callback(false);
             }
         );
