@@ -1,12 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 
 public class TileMapManager : MonoBehaviour
 {
     private static TileMapManager _instance;
+
+    private static Mouse _mouse;
+    private static Camera _camera;
 
     [SerializeField]
     private Tilemap _graphicGroundTilemap, _graphicObstaclesTilemap, _graphicPreviewTilemap;
@@ -51,7 +53,8 @@ public class TileMapManager : MonoBehaviour
     // Building Positionning Tests 
     private static bool _previousAvailability;
     private static Vector2 _previousMousePos;
-    private static Vector2Int _hoveredTilePos;
+    private static Vector3 _hoveredTilePos;
+    private static Vector2Int _hoveredTileCoords;
     private static Vector2Int _previewMin;
     private static Vector2Int _previewMax;
 
@@ -68,6 +71,9 @@ public class TileMapManager : MonoBehaviour
             Destroy(this.gameObject);
         else
             _instance = this;
+
+        _mouse = Mouse.current;
+        _camera = Camera.main;
 
         // Retrieval of the grid component.
         _grid = _graphicGroundTilemap.GetComponentInParent<Grid>();
@@ -106,6 +112,12 @@ public class TileMapManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        //TilesAvailableForBuild(2);
+        Debug.Log(TilesAvailableForBuild(2));
+    }
+
     public static Vector2Int WorldToTilemapCoords(Vector3 position)
     {
         Vector2Int coords = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _tileSizeInverse),
@@ -138,43 +150,43 @@ public class TileMapManager : MonoBehaviour
         return _logicalTiles[coords.x, coords.y];
     }
 
-    public static bool TilesAvailableForBuild(int outlinesCount)
+    public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
     {
         // Retrieval of the mouse position.
-        Vector2 currentMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 currentMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
 
         // If the mouse hasn't moved, avoid unnecessary operations : return last returnedvalue.
         if (_previousMousePos == currentMousePos)
-            return _previousAvailability;
+            return (_hoveredTilePos, _previousAvailability);
+
+        if (WorldToTilemapCoords(currentMousePos) == _hoveredTileCoords)
+            return (_hoveredTilePos, _previousAvailability);
 
         // Update of the "previous" variables according to the new entries.
         _previousAvailability = false;
         _previousMousePos = currentMousePos;
-        /*
-            The position of the hovered is set by default to half the map's dimension since the origin of the grid is 
-            located at the bottom left corner of the graphic grid.
-            It is then updated to take into account the position of the mouse according to the size of individual grid cells.
-         */
-        _hoveredTilePos = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(_previousMousePos.x * _tileSizeInverse),
-                                                                Mathf.FloorToInt(_previousMousePos.y * _tileSizeInverse));
+
+        _hoveredTileCoords = WorldToTilemapCoords(currentMousePos);
+        _hoveredTilePos = TilemapCoordsToWorld(_hoveredTileCoords);
 
         // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
-        _previewMin = new Vector2Int(_hoveredTilePos.x - outlinesCount, _hoveredTilePos.y - outlinesCount);
-        _previewMax = new Vector2Int(_hoveredTilePos.x + outlinesCount, _hoveredTilePos.y + outlinesCount);
+        _previewMin = new Vector2Int(_hoveredTileCoords.x - outlinesCount, _hoveredTileCoords.y - outlinesCount);
+        _previewMax = new Vector2Int(_hoveredTileCoords.x + outlinesCount, _hoveredTileCoords.y + outlinesCount);
 
         // If the building steps outside of the map.
-        if (_previewMin.x < 0 || _previewMin.y < 0 || _previewMax.x >= _mapWidth || _previewMax.y >= _mapHeight)
-            return _previousAvailability;
+        if (_previewMin.x < _minPlayable.x || _previewMin.y < _minPlayable.y 
+            || _previewMax.x > _maxPlayable.x || _previewMax.y > _maxPlayable.y)
+            return (_hoveredTilePos, _previousAvailability);
 
         // If any of the tiles located in the preview area are currently occupied by obstacles.
         for (int x = _previewMin.x; x <= _previewMax.x; ++x)
             for (int y = _previewMin.y; y <= _previewMax.y; ++y)
                 if (_logicalTiles[x, y].state != TileState.Free)
-                    return _previousAvailability;
+                    return (_hoveredTilePos, _previousAvailability);
 
         // Else the building can be placed at this location.
         _previousAvailability = true;
-        return _previousAvailability;
+        return (_hoveredTilePos, _previousAvailability);
     }
 
     #region PathFinding
