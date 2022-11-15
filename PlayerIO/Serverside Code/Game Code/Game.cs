@@ -21,6 +21,11 @@ public partial class GameRoom : Game<Player>
 
     private State _state;
 
+    private bool IsPaused => _state == State.Pause;
+    private bool IsRunning => _state == State.Playing;
+
+    private bool IsPlaying => IsRunning || IsPaused;
+
     private Timer _timer;
     private int _tick;
 
@@ -35,6 +40,11 @@ public partial class GameRoom : Game<Player>
         _ticks = new Dictionary<int, Message>();
 
         Reset();
+    }
+
+    public override void GameClosed()
+    {
+        DisconnectAll();
     }
 
     #endregion
@@ -52,18 +62,21 @@ public partial class GameRoom : Game<Player>
 
         newcomer.Index = _players.Count;
 
-        foreach (Player player in _players)
-            player.Send("Joined", player.ConnectUserId);
+        BroadcastPlayers();
     }
 
     public override void UserLeft(Player player)
     {
-        _timer.Stop();
-
         if (_state != State.Hosting)
-            _players.ForEach(p => p.Disconnect());
+            DisconnectAll();
 
         _players.Remove(player);
+    }
+
+    private void DisconnectAll()
+    {
+        foreach (Player player in _players)
+            player.Disconnect();
     }
 
     #endregion
@@ -79,7 +92,7 @@ public partial class GameRoom : Game<Player>
     private bool IsReady()
     {
         foreach (Player player in _players)
-            if (player.IsReady)
+            if (!player.IsReady)
                 return false;
 
         return true;
@@ -94,6 +107,27 @@ public partial class GameRoom : Game<Player>
                 ++count;
 
         return count;
+    }
+
+    #endregion
+
+    #region Broadcast
+
+    private void BroadcastPlayers()
+    {
+        Message message = Message.Create("Players");
+
+        message.Add(_players.Count);
+
+        foreach (Player player in _players)
+            message.Add(player.ConnectUserId, player.IsReady);
+
+        Broadcast(message);
+    }
+
+    private void BroadcastState()
+    {
+        Broadcast("State", IsRunning);
     }
 
     #endregion
@@ -114,12 +148,28 @@ public partial class GameRoom : Game<Player>
 
     private void Start()
     {
-        Reset();
+        if (!IsPlaying)
+        {
+            Reset();
 
-        foreach (Player player in _players)
-            player.Send("Start");
+            foreach (Player player in _players)
+                player.Send("Start");
+        }
+
+        _state = State.Playing;
 
         _timer = AddTimer(OnTick, Player.TickPeriod);
+
+        BroadcastState();
+    }
+
+    private void Pause()
+    {
+        _state = State.Pause;
+
+        _timer.Stop();
+
+        BroadcastState();
     }
 
     public override void GotMessage(Player sender, Message message)
@@ -131,33 +181,45 @@ public partial class GameRoom : Game<Player>
                 
                 sender.Send("Ready", sender.IsReady);
 
-                if (_players.Count == MaxPlayerCount && IsReady())
-                    Start();
+                BroadcastPlayers();
 
-                break;
-
-            case "Count":
-                sender.Send("Count", GetReady(), _players.Count);
-
-                if (_players.Count == MaxPlayerCount && IsReady())
+                if (_state == State.Hosting && IsReady())
                     Start();
 
                 break;
 
             case "Input":
-                Prepare(sender.Index, message);
+                if (IsRunning)
+                    Prepare(sender.Index, message);
+
+                break;
+
+            case "Play":
+                if (IsPaused)
+                    Start();
+
+                break;
+
+            case "Pause":
+                if (IsRunning)
+                    Pause();
 
                 break;
 
             case "Tick":
-                sender.EndTick();
+                if (IsRunning)
+                {
+                    sender.EndTick();
 
-                if (!Compare(sender.Tick, message.GetByteArray(0)))
-                    Console.WriteLine($"Wrong hash {sender.Index}");
+                    if (!Compare(sender.Tick, message.GetByteArray(0)))
+                        Console.WriteLine($"Wrong hash {sender.Index}");
+                }
 
                 break;
         }
     }
+
+    #region Gameplay
 
     private Message Prepare(int tick)
     {
@@ -219,6 +281,8 @@ public partial class GameRoom : Game<Player>
 
         return max;
     }
+
+    #endregion
 
     #region Tools
 

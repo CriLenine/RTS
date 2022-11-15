@@ -9,13 +9,36 @@ public partial class NetworkManager : MonoBehaviour
     private const float BaseTickPeriod = 0.025f;
     private const float MinTickPeriod = 0.005f;
 
+    private static NetworkManager _instance;
+
+    private Player _me;
+    private Room _room;
+    private Connection _server;
+    private Multiplayer _multiplayer;
+
+    private bool _isPlaying = false;
+    private bool _isRunning = false;
+
+    public static bool Connected => _instance._multiplayer != null;
+    public static bool Hosted => _instance._server != null;
+
+    public static bool IsReady => _instance._me.IsReady;
+    public static bool IsPlaying => _instance._isPlaying;
+    public static bool IsRunning => _instance._isRunning;
+
+    #region GUI
+
+    private bool _showGUI = true;
+
+    private Room[] _rooms;
+
+    private bool _loading;
+
+    #endregion
+
     public static float TickPeriod { get; private set; }
 
     private int _lateness = 0;
-
-    private static NetworkManager _instance;
-
-    private Connection _server;
 
     private Queue<Message> _messages;
 
@@ -24,20 +47,6 @@ public partial class NetworkManager : MonoBehaviour
     private int _tick;
 
     private Dictionary<int, Tick> _ticks;
-
-    #region Connection
-
-    private bool _showGUI = true;
-
-    private Multiplayer _multiplayer;
-
-    private RoomInfo[] _rooms;
-
-    private bool _loading;
-    private bool _connected;
-    private int _playerCount;
-
-    #endregion
 
     private void Awake()
     {
@@ -48,6 +57,8 @@ public partial class NetworkManager : MonoBehaviour
 
     private void Start()
     {
+        _me = new Player(SystemInfo.deviceName);
+
         Connect();
 
         _messages = new Queue<Message>();
@@ -74,12 +85,31 @@ public partial class NetworkManager : MonoBehaviour
 
                     break;
 
+                case "Ready":
+                    _me.IsReady = message.GetBoolean(0);
+
+                    break;
+
+                case "Players":
+                    _room.Update(message);
+
+                    _loading = false;
+
+                    break;
+
                 case "Start":
-                    Debug.Log($"Start Game");
+                    _isPlaying = true;
 
                     _tick = 0;
 
                     StartCoroutine(Loop());
+
+                    Debug.Log($"Start Game");
+
+                    break;
+
+                case "State":
+                    _isRunning = message.GetBoolean(0);
 
                     break;
 
@@ -138,23 +168,26 @@ public partial class NetworkManager : MonoBehaviour
     {
         yield return new WaitUntil(() => _ticks.ContainsKey(1));
 
-        while (true)
+        while (IsPlaying)
         {
             yield return new WaitForSeconds(TickPeriod);
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 
-            if (_ticks[_tick].Inputs.Length > 0)
-                Debug.Log($"Input {_ticks[_tick].Inputs[0].Type} at {_tick}");
+            if (IsRunning)
+            {
+                if (_ticks[_tick].Inputs.Length > 0)
+                    Debug.Log($"Input {_ticks[_tick].Inputs[0].Type} at {_tick}");
 
-            byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
+                byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
 
-            _server.Send("Tick", hash);
+                _server.Send("Tick", hash);
 
-            _ticks.Remove(_tick);
+                _ticks.Remove(_tick);
 
-            ++_tick;
-            --_lateness;
+                ++_tick;
+                --_lateness;
+            }
         }
     }
 
@@ -165,56 +198,116 @@ public partial class NetworkManager : MonoBehaviour
 
         const int lineHeight = 15;
 
-        int lineCount;
+        int lineCount = 0;
 
         if (_loading)
-            lineCount = 1; // Loading...
-        else if (_server != null)
-            lineCount = 1; // Connected
-        else if (_rooms != null)
-            lineCount = _rooms.Length + 1; // List rooms
-        else if (_multiplayer != null)
-            lineCount = 2; // Host/ Join
-        else
-            lineCount = 1; // Connecting...
+            lineCount = 1;
+        else if (Hosted)
+        {
+            lineCount = 2;
 
-        /*
-        GUILayout.Label($"Retard : {_lateness}");
-        GUILayout.Label($"Tick Period : {TickPeriod:0.000}");
-        */
+            if (IsPlaying)
+                lineCount += 4;
+            else
+                lineCount += _room.Players != null ? _room.Players.Count : 1;
+
+            lineCount += 2;
+        }
+        else if (_rooms != null)
+            lineCount = 2 + _rooms.Length + 2;
+        else if (Connected)
+            lineCount = 2;
+
+        if (lineCount < 1)
+            return;
 
         GUILayout.BeginArea(new Rect(10, 10, 150, lineHeight * (3 * lineCount + 1) / 2), new GUIStyle(GUI.skin.box));
 
         if (_loading)
         {
-            GUILayout.Label("Chargement...");
+            GUILayout.Label(Connected ? "Chargement..." : "Connection...");
         }
-        else if (_server != null)
+        else if (Hosted)
         {
-            GUILayout.Label("Connected");
+            GUILayout.Label($"Room {_room.Name}");
+
+            GUILayout.FlexibleSpace();
+
+            if (IsPlaying)
+            {
+                GUILayout.Label($"Tick N° : {_tick}");
+                GUILayout.Label($"Retard : {_lateness}");
+                GUILayout.Label($"Tick Period : {TickPeriod:0.000}");
+            }
+            else
+            {
+                foreach (Player player in _room.Players)
+                    GUILayout.Label($"{player.Name} - {(player.IsReady ? "O" : "N")}");
+            }
+
+            GUILayout.FlexibleSpace();
+
+            if(IsPlaying)
+            {
+                if (IsRunning)
+                {
+                    if (GUILayout.Button("Pause"))
+                        Pause();
+                }
+                else
+                {
+                    if (GUILayout.Button("Play"))
+                        Play();
+                }
+            }
+            else
+            {
+                GUIStyle style = GUI.skin.button;
+
+                Color color = style.normal.textColor;
+
+                style.normal.textColor = IsReady ? Color.green : Color.red;
+
+                if (GUILayout.Button("Prêt", style))
+                    _server.Send("Ready");
+
+                style.normal.textColor = color;
+            }
+
+            if (GUILayout.Button("Quitter"))
+                QuitRoom();
         }
         else if (_rooms != null)
         {
-            GUILayout.Label("Liste de rooms : ");
+            GUILayout.Label("Liste des salons : ");
 
-            foreach (RoomInfo room in _rooms)
+            GUILayout.FlexibleSpace();
+
+            foreach (Room room in _rooms)
             {
-                if (GUILayout.Button($"Rejoindre {room.Id}"))
+                if (GUILayout.Button($"Rejoindre {room.Name}"))
                 {
                     _loading = true;
 
-                    JoinRoom(room.Id, delegate (bool success)
+                    JoinRoom(room.Name, delegate (bool success)
                     {
                         _loading = false;
+
+                        _room = room;
 
                         _rooms = null;
                     });
                 }
-            }   
+            }
+
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Retour"))
+                _rooms = null;
         }
-        else if (_multiplayer != null) // Host/ Join
+        else if (Connected)
         {
-            GUILayout.Label("Room menu");
+            GUILayout.Label("Menu de connection");
 
             GUILayout.BeginHorizontal();
 
@@ -222,7 +315,7 @@ public partial class NetworkManager : MonoBehaviour
             {
                 _loading = true;
 
-                JoinRoom(SystemInfo.deviceName, delegate (bool success)
+                JoinRoom(_me.Name, delegate (bool success)
                 {
                     _loading = false;
                 });
@@ -236,32 +329,46 @@ public partial class NetworkManager : MonoBehaviour
                 {
                     _loading = false;
 
-                    _rooms = rooms;
+                    _rooms = Room.FromRoomInfos(rooms);
                 });
             }
 
             GUILayout.EndHorizontal();
         }
-        else // Connecting...
-        {
-            GUILayout.Label("Connecting...");
-        }
 
         GUILayout.EndArea();
     }
 
+    public static void Play()
+    {
+        if (IsPlaying && !IsRunning)
+            _instance._server.Send("Play");
+    }
+
+    public static void Pause()
+    {
+        if (IsRunning)
+            _instance._server.Send("Pause");
+    }
+
+    #region Connection & Host
+
     private static void Connect()
     {
+        _instance._loading = true;
+
         PlayerIO.Authenticate(
             "rts-q2tnacekgeylj7irzdg",
             "public",
             new Dictionary<string, string>
             {
-                { "userId", SystemInfo.deviceName }
+                { "userId", _instance._me.Name }
             },
             null,
             delegate (Client client)
             {
+                _instance._loading = false;
+
                 Debug.Log("Successfully connected to Player.IO");
 
                 client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
@@ -270,6 +377,8 @@ public partial class NetworkManager : MonoBehaviour
             },
             delegate (PlayerIOError error)
             {
+                _instance._loading = false;
+
                 Debug.Log("Error connecting: " + error.ToString());
             }
         );
@@ -291,6 +400,8 @@ public partial class NetworkManager : MonoBehaviour
 
                 _instance._server = connection;
 
+                _instance._room = new Room(id);
+
                 _instance._server.OnMessage += OnMessage;
                 _instance._server.OnDisconnect += OnDisconnect;
 
@@ -304,6 +415,25 @@ public partial class NetworkManager : MonoBehaviour
             }
         );
     }
+
+    public static void QuitRoom()
+    {
+        if (Hosted)
+        {
+            _instance._me.IsReady = false;
+
+            _instance._server.Disconnect();
+
+            _instance._server = null;
+
+            _instance._isRunning = false;
+            _instance._isPlaying = false;
+        }
+    }
+
+    #endregion
+
+    #region Events
 
     private static void OnMessage(object sender, Message message)
     {
@@ -319,8 +449,12 @@ public partial class NetworkManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        _server?.Disconnect();
+        QuitRoom();
     }
+
+    #endregion
+
+    #region Tools
 
     private T[] ExtractArray<T>(Message message, uint startIndex = 0)
     {
@@ -331,4 +465,6 @@ public partial class NetworkManager : MonoBehaviour
 
         return items;
     }
+
+    #endregion
 }
