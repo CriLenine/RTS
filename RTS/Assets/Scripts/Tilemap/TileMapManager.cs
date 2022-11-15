@@ -108,14 +108,8 @@ public class TileMapManager : MonoBehaviour
                 continue;
 
             // Else the state of the according logic tile is set to obstacle.
-            _logicalTiles[position.x - _mapBounds.xMin, position.y - _mapBounds.yMin].state = TileState.Obstacle;
+            _logicalTiles[position.x - _mapBounds.xMin, position.y - _mapBounds.yMin].State = TileState.Obstacle;
         }
-    }
-
-    private void Update()
-    {
-        //TilesAvailableForBuild(2);
-        Debug.Log(TilesAvailableForBuild(2));
     }
 
     public static Vector2Int WorldToTilemapCoords(Vector3 position)
@@ -133,12 +127,12 @@ public class TileMapManager : MonoBehaviour
 
     public static void AddObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].state = TileState.Obstacle;
+        _logicalTiles[coords.x, coords.y].State = TileState.Obstacle;
     }
 
     public static void RemoveObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].state = TileState.Free;
+        _logicalTiles[coords.x, coords.y].State = TileState.Free;
     }
 
     public static LogicalTile GetTile(int x, int y)
@@ -148,6 +142,11 @@ public class TileMapManager : MonoBehaviour
     public static LogicalTile GetTile(Vector2Int coords)
     {
         return _logicalTiles[coords.x, coords.y];
+    }
+
+    public static bool OutofMap(Vector2Int coords)
+    {
+        return coords.x < _minPlayable.x || coords.x > _maxPlayable.x || coords.y < _minPlayable.y || coords.y > _maxPlayable.y;
     }
 
     public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
@@ -181,7 +180,7 @@ public class TileMapManager : MonoBehaviour
         // If any of the tiles located in the preview area are currently occupied by obstacles.
         for (int x = _previewMin.x; x <= _previewMax.x; ++x)
             for (int y = _previewMin.y; y <= _previewMax.y; ++y)
-                if (_logicalTiles[x, y].state != TileState.Free)
+                if (_logicalTiles[x, y].State != TileState.Free)
                     return (_hoveredTilePos, _previousAvailability);
 
         // Else the building can be placed at this location.
@@ -202,8 +201,8 @@ public class TileMapManager : MonoBehaviour
 
         if (_instance._debug)
         {
-            Debug.Log($"start tile : {startTile.coords}");
-            Debug.Log($"end tile : {endTile.coords}");
+            Debug.Log($"start tile : {startTile.Coords}");
+            Debug.Log($"end tile : {endTile.Coords}");
         }
 
         LogicalTile currentTile = startTile;
@@ -219,7 +218,7 @@ public class TileMapManager : MonoBehaviour
 
         do
         {
-            Vector2Int currentCoords = currentTile.coords;
+            Vector2Int currentCoords = currentTile.Coords;
             displacementsToTest = _unitCardinalDisplacements;
 
             for (int i = 0; i < 2; ++i, displacementsToTest = _unitDiagonalDisplacements)
@@ -250,7 +249,7 @@ public class TileMapManager : MonoBehaviour
                     }
                     else
                     {
-                        neighbor.h = (endTile.coords - neighbor.coords).sqrMagnitude;
+                        neighbor.h = (endTile.Coords - neighbor.Coords).sqrMagnitude;
                         neighbor.g = currentTile.g + weight;
                         neighbor.parent = currentTile;
                         open.Add(neighbor);
@@ -275,7 +274,7 @@ public class TileMapManager : MonoBehaviour
                 bestTile.parent = currentTile;
                 currentTile = bestTile;
                 if(_instance._debug)
-                    Debug.Log($"path tile considered : {currentTile.coords}");
+                    Debug.Log($"path tile considered : {currentTile.Coords}");
                 closed.Add(currentTile); 
             }
 
@@ -304,7 +303,7 @@ public class TileMapManager : MonoBehaviour
             foreach (LogicalTile tile in path)
             {
                 GameObject GO = Instantiate(_instance._pathMarker);
-                GO.transform.position = TilemapCoordsToWorld(tile.coords);
+                GO.transform.position = TilemapCoordsToWorld(tile.Coords);
                 _instance._pathMarkers.Add(GO);
             }
         }

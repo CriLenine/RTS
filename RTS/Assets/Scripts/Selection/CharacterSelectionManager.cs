@@ -122,7 +122,7 @@ public class CharacterSelectionManager : MonoBehaviour
                 {
                     DeselectAll();
                     charactersSelected.Add(selectedCharacter);
-                    selectedCharacter.selectionMarker.SetActive(true);
+                    selectedCharacter.SelectionMarker.SetActive(true);
 
                     if (_instance._debug)
                         selectedCharacter.DebugCoordinates();
@@ -132,12 +132,12 @@ public class CharacterSelectionManager : MonoBehaviour
                     if (!charactersSelected.Contains(selectedCharacter)) // If the character is not already selected
                     {
                         charactersSelected.Add(selectedCharacter);
-                        selectedCharacter.selectionMarker.SetActive(true);
+                        selectedCharacter.SelectionMarker.SetActive(true);
                     }
                     else
                     {
                         charactersSelected.Remove(selectedCharacter);
-                        selectedCharacter.selectionMarker.SetActive(false);
+                        selectedCharacter.SelectionMarker.SetActive(false);
                     }
                 }
             }
@@ -155,7 +155,7 @@ public class CharacterSelectionManager : MonoBehaviour
                     if (!(_shifting && charactersSelected.Contains(character)))
                     {
                         charactersSelected.Add(character);
-                        character.selectionMarker.SetActive(true);
+                        character.SelectionMarker.SetActive(true);
                     }
         }
 
@@ -171,7 +171,7 @@ public class CharacterSelectionManager : MonoBehaviour
     private static void DeselectAll()
     {
         foreach (Character characterToRemove in charactersSelected)
-            characterToRemove.selectionMarker.SetActive(false);
+            characterToRemove.SelectionMarker.SetActive(false);
         charactersSelected.Clear();
     }
 

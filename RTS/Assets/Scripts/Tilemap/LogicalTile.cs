@@ -10,14 +10,14 @@ public enum TileState
 
 public class LogicalTile
 {
-    public Vector2Int coords;
-    public TileState state = TileState.Free;
-    public bool isObstacle => state == TileState.Obstacle;
-    public bool isBuildable => state == TileState.Free;
+    public Vector2Int Coords;
+    public TileState State = TileState.Free;
+    public bool isObstacle => State == TileState.Obstacle;
+    public bool isBuildable => State == TileState.Free;
 
     public LogicalTile(Vector2Int iCoords)
     {
-        coords = iCoords;
+        Coords = iCoords;
     }
 
     public float f => g + h;
