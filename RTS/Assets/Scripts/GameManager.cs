@@ -19,12 +19,12 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    TickedBehaviour.Create(PrefabManager.GetCharacterData((Characters)input.ID).Character, input.Position);
+                    TickedBehaviour.CreateCharacter(PrefabManager.GetCharacterData((Characters)input.ID).Character, input.Position);
 
                     break;
 
                 case InputType.Build:
-                    TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position);
+                    TickedBehaviour.CreateBuilding(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position);
 
                     break;
             }

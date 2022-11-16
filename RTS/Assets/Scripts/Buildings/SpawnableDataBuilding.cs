@@ -12,7 +12,7 @@ public class SpawnableDataBuilding : ScriptableObject
     private Blueprint _buildingBlueprint;
 
     [SerializeField]
-    private RBuilding _building;
+    private Building _building;
 
     [SerializeField]
     private int _neededPlayerLevel;
@@ -23,5 +23,5 @@ public class SpawnableDataBuilding : ScriptableObject
 
     public PeonBuilds Type => _type;
     public Blueprint BuildingBlueprint => _buildingBlueprint;
-    public RBuilding Building => _building;
+    public Building Building => _building;
 }

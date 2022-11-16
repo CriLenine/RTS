@@ -75,7 +75,7 @@ public class TileMapManager : MonoBehaviour
                 continue;
 
             // Else the state of the according logic tile is set to obstacle.
-            _logicalTiles[position.x - _mapBounds.xMin, position.y - _mapBounds.yMin].state = TileState.Obstacle;
+            _logicalTiles[position.x - _mapBounds.xMin, position.y - _mapBounds.yMin].State = TileState.Obstacle;
         }
     }
 
@@ -94,12 +94,12 @@ public class TileMapManager : MonoBehaviour
 
     public static void AddObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].state = TileState.Obstacle;
+        _logicalTiles[coords.x, coords.y].State = TileState.Obstacle;
     }
 
     public static void RemoveObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].state = TileState.Free;
+        _logicalTiles[coords.x, coords.y].State = TileState.Free;
     }
 
     public static LogicalTile GetTile(int x, int y)
@@ -142,7 +142,7 @@ public class TileMapManager : MonoBehaviour
         // If any of the tiles located in the preview area are currently occupied by obstacles.
         for (int x = _previewMin.x; x <= _previewMax.x; ++x)
             for (int y = _previewMin.y; y <= _previewMax.y; ++y)
-                if (_logicalTiles[x, y].state != TileState.Free)
+                if (_logicalTiles[x, y].State != TileState.Free)
                     return _previousAvailability;
 
         // Else the building can be placed at this location.

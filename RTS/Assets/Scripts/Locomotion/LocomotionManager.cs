@@ -35,13 +35,13 @@ public class LocomotionManager : MonoBehaviour
     {
         List<Character> characters = CharacterSelectionManager.charactersSelected;
 
-        if (characters.Count == 1 && TileMapManager.GetTile(_rallyPointCoords).state == TileState.Free)
+        if (characters.Count == 1 && TileMapManager.GetTile(_rallyPointCoords).State == TileState.Free)
         {
             Character character = characters[0];
             character.transform.position = TileMapManager.TilemapCoordsToWorld(_rallyPointCoords);
-            TileMapManager.GetTile(character.coords).state = TileState.Free;
-            character.coords = _rallyPointCoords;
-            TileMapManager.GetTile(_rallyPointCoords).state = TileState.Obstacle;
+            TileMapManager.GetTile(character.Coords).State = TileState.Free;
+            character.Coords = _rallyPointCoords;
+            TileMapManager.GetTile(_rallyPointCoords).State = TileState.Obstacle;
         }
     }
 }

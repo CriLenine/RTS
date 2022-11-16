@@ -2,8 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Farm : Building
+public class AggregateRessource : Ressource
 {
+    public override Vector2Int GetHarvestingPosition(Vector2Int clickPosition)
+    {
+        throw new System.NotImplementedException();
+    }
+
     protected override Hash128 GetHash128()
     {
         throw new System.NotImplementedException();
@@ -13,6 +18,4 @@ public class Farm : Building
     {
         throw new System.NotImplementedException();
     }
-
-
 }

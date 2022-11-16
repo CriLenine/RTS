@@ -8,21 +8,24 @@ public abstract class Character : TickedBehaviour, IDamageable
     protected CharacterData _data;
 
     public CharacterData Data => _data;
+
     public int MaxHealth => _data.MaxHealth;
 
-    public GameObject selectionMarker;
-    public Vector2Int coords;
+    public abstract bool Idle { get; }
+
+    public GameObject SelectionMarker;
+    public Vector2Int Coords;
 
     private void Start()
     {
-        coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
-        TileMapManager.AddObstacle(coords);
+        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
+        TileMapManager.AddObstacle(Coords);
         CharacterSelectionManager.AddCharacter(this);
     }
 
     public void DebugCoordinates()
     {
-        Debug.Log($"{gameObject.name} coords : ({coords.x}, {coords.y})");
+        Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
     }
 
     private void OnDestroy()

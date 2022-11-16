@@ -7,12 +7,13 @@ public enum TileState
     Free,
     BuildingOutline,
     Obstacle,
+    Tree
 }
 
 public class LogicalTile
 {
     public int x, y;
-    public TileState state = TileState.Free;
+    public TileState State = TileState.Free;
 
     public LogicalTile(int ix, int iy)
     {
