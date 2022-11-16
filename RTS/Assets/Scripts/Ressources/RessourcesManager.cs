@@ -2,36 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class RessourcesManager : MonoBehaviour
 {
-
-
     [SerializeField]
-    private List<ForestRessource> _forests;
+    private Tilemap _treesTilemap;
 
     private List<Vector2Int> _allTrees;
 
     [ContextMenu("Bake")]
     public void Bake()
     {
-        //_allTrees = TileMapManager.GetTreesPositions();
-        foreach (Vector2Int tree in _allTrees)
-            FindNearestForest(tree).AddTree(tree);
+        ForestRessource[] forests = FindObjectsOfType<ForestRessource>();
 
-        foreach (ForestRessource forest in _forests)
+        if (forests.Length < 1)
+            return;
+
+        foreach (ForestRessource forest in forests)
+            forest.Clear();
+
+        foreach (Vector3Int position in _treesTilemap.cellBounds.allPositionsWithin)
+        {
+            if (_treesTilemap.HasTile(position))
+                FindNearestForest(forests, (Vector2Int)position).AddTree((Vector2Int)position);
+        }
+
+        foreach (ForestRessource forest in forests)
             forest.Bake();
+
+        Debug.Log("Bake done");
     }
 
-    private ForestRessource FindNearestForest(Vector2Int position)
+    private ForestRessource FindNearestForest(ForestRessource[] forests, Vector2Int position)
     {
-        (int minMagnitude, int index) = ((_forests[0].Data.Position - position).sqrMagnitude, 0);
-        for (int i = 1; i < _forests.Count; i++)
+        (int minMagnitude, int index) = (int.MaxValue, 0);
+
+        for (int i = 0; i < forests.Length; ++i)
         {
-            int currentMagnitude = (_forests[i].Data.Position - position).sqrMagnitude;
+            int currentMagnitude = (Vector2Int.FloorToInt(forests[i].transform.position) - position).sqrMagnitude;
+
             if (currentMagnitude < minMagnitude)
                 (minMagnitude, index) = (currentMagnitude, i);
         }
-        return _forests[index];
+
+        return forests[index];
     }
 }

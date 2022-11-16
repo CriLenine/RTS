@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ForestRessource : Ressource
 {
@@ -14,7 +15,7 @@ public class ForestRessource : Ressource
 
         public T Value => _value;
 
-        public Node<T> this[System.Index i] => _children[i];
+        public Node<T> this[Index i] => _children[i];
 
         public List<Node<T>> Children => _children;
 
@@ -73,29 +74,33 @@ public class ForestRessource : Ressource
     [SerializeField]
     private List<Vector2Int> _trees;
 
-    [SerializeField]
-    private Vector2Int _holyTree;
-
     private Node<Vector2Int> _holyNode;
 
     public void AddTree(Vector2Int newTree) => _trees.Add(newTree);
 
-    private void Start()
+    public void Clear()
     {
-        _holyNode = new Node<Vector2Int>(_holyTree);
+        _trees.Clear();
+
+        // TODO : Finir
     }
 
     #region Baking
+
+    [ContextMenu("Bake")]
     public void Bake()
     {
-        _holyNode = new Node<Vector2Int>(_holyTree);
+        Vector2Int holyTree = Vector2Int.FloorToInt(transform.position);
 
-        _trees.Add(_holyTree);
+        _holyNode = new Node<Vector2Int>(holyTree);
+
+        _trees.Add(holyTree);
+
         RBuildTree(_holyNode, ^1, ySorted: _trees);
         //RPrintNode(_holyNode);
     }
 
-    private void RBuildTree(Node<Vector2Int> parent, System.Index index, List<Vector2Int> xSorted = null, List<Vector2Int> ySorted = null)
+    private void RBuildTree(Node<Vector2Int> parent, Index index, List<Vector2Int> xSorted = null, List<Vector2Int> ySorted = null)
     {
         if (xSorted == null)
         {
