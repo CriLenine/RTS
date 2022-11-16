@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -8,19 +9,23 @@ public abstract class Character : TickedBehaviour, IDamageable
     public CharacterData Data => _data;
     public int MaxHealth => _data.MaxHealth;
 
-    public GameObject selectionMarker;
-    public Vector2Int coords;
+    public GameObject SelectionMarker;
+    public Vector2Int Coords;
+
+    public Stack<LogicalTile> Path;
+    public LogicalTile RallyPoint;
+    public bool isInTroop;
 
     private void Start()
     {
-        coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
-        TileMapManager.AddObstacle(coords);
+        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
+        TileMapManager.AddObstacle(Coords);
         CharacterSelectionManager.AddCharacter(this);
     }
 
     public void DebugCoordinates()
     {
-        Debug.Log($"{gameObject.name} coords : ({coords.x}, {coords.y})");
+        Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
     }
 
     private void OnDestroy()
