@@ -49,7 +49,7 @@ public class ForestRessource : Ressource
             return newNode;
         }
 
-        /// <returns>The parent of the deleted node</returns>
+        /// <returns>The parent of the deleted node, which is <see langword="null"/> if the node was not found</returns>
         public Node<T> DeleteDescendant(T value)
         {
             if (_value.Equals(value))
@@ -59,13 +59,18 @@ public class ForestRessource : Ressource
                     child.Parent = Parent;
                     Parent._children.Add(child);
                 }
+                Parent.RemoveChild(this);
                 return Parent;
             }
             else
             {
                 Node<T> deletedNodeParent = null;
                 foreach (Node<T> child in _children)
+                {
                     deletedNodeParent ??= child.DeleteDescendant(value);
+                    if (deletedNodeParent != null)
+                        return deletedNodeParent;
+                }
                 return deletedNodeParent;                
             }
         }
@@ -82,16 +87,14 @@ public class ForestRessource : Ressource
     {
         _trees.Clear();
 
-        // TODO : Finir
+        _holyNode?.Children.Clear();
     }
 
     #region Baking
 
     [ContextMenu("Bake")]
-    public void Bake()
+    public void Bake(Vector2Int holyTree)
     {
-        Vector2Int holyTree = Vector2Int.FloorToInt(transform.position);
-
         _holyNode = new Node<Vector2Int>(holyTree);
 
         _trees.Add(holyTree);
@@ -104,6 +107,8 @@ public class ForestRessource : Ressource
     {
         if (xSorted == null)
         {
+            if (ySorted.Count == 0)
+                return;
             if (ySorted.Count == 1)
             {
                 parent.AddChild(ySorted[0]);
@@ -117,16 +122,18 @@ public class ForestRessource : Ressource
             ySorted.Sort((Vector2Int a, Vector2Int b) => a.x < b.x ? -1 : a.x > b.x ? 1 : 0);
 
             int newIndex = ySorted.FindIndex(x => x == nextValue);
-            List<Vector2Int> xSortedRight = ySorted.GetRange(newIndex + 1, ySorted.Count - newIndex);
+            List<Vector2Int> xSortedRight = ySorted.GetRange(newIndex + 1, ySorted.Count - newIndex - 1);
             List<Vector2Int> xSortedLeft = ySorted.GetRange(0, newIndex);
             RBuildTree(nextNode, 0, xSorted: xSortedRight);
             RBuildTree(nextNode, ^1, xSorted: xSortedLeft);
         }
         else
         {
-            if (ySorted.Count == 1)
+            if (xSorted.Count == 0)
+                return;
+            if (xSorted.Count == 1)
             {
-                parent.AddChild(ySorted[0]);
+                parent.AddChild(xSorted[0]);
                 return;
             }
 
@@ -137,23 +144,22 @@ public class ForestRessource : Ressource
             xSorted.Sort((Vector2Int a, Vector2Int b) => a.y < b.y ? -1 : a.y > b.y ? 1 : 0);
 
             int newIndex = xSorted.FindIndex(x => x == nextValue);
-            List<Vector2Int> ySortedRight = xSorted.GetRange(newIndex, xSorted.Count - newIndex + 1);
-            List<Vector2Int> ySortedLeft = xSorted.GetRange(0, newIndex + 1);
+            List<Vector2Int> ySortedRight = xSorted.GetRange(newIndex + 1, xSorted.Count - newIndex - 1);
+            List<Vector2Int> ySortedLeft = xSorted.GetRange(0, newIndex);
             RBuildTree(nextNode, 0, ySorted: ySortedRight);
             RBuildTree(nextNode, ^1, ySorted: ySortedLeft);
         }
     }
     #endregion
 
-    private void RPrintNode(Node<Vector2Int> node)
+    private void RPrintNode(Node<Vector2Int> node, string offset = "")
     {
+        Debug.Log($"{offset}{node.Value}");
         if (node.Children.Count == 0)
             return;
+        offset += "       ";
         foreach (Node<Vector2Int> child in node.Children)
-        {
-            Debug.Log($"Node : {node.Value} contains {child.Value} which holds : ");
-            RPrintNode(child);
-        }
+            RPrintNode(child, offset);
     }
     
     /// <returns>The destination of the peon to cut the tree at <paramref name="treePosition"/>.</returns>
@@ -187,7 +193,8 @@ public class ForestRessource : Ressource
                     if (currentMagnitude < minMagnitude)
                         (minMagnitude, index) = (currentMagnitude, i);
                     /*
-                     * TODO : À magnitudes égales, choisir le plus proche du joueur via pathfinding (optionnel)   
+                     * TODO : À magnitudes égales, choisir le plus proche du joueur via pathfinding (optionnel)  
+                     * Remarque : S'il y a un trou proche de l'arbre cible mais inaccessible, c'est cette tile qui sera retenue
                      */
                 }
                 return availableTiles[index];
@@ -220,11 +227,11 @@ public class ForestRessource : Ressource
 
     protected override void Tick()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     protected override Hash128 GetHash128()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

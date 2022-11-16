@@ -29,7 +29,7 @@ public class RessourcesManager : MonoBehaviour
         }
 
         foreach (ForestRessource forest in forests)
-            forest.Bake();
+            forest.Bake((Vector2Int)_treesTilemap.WorldToCell(forest.transform.position));
 
         Debug.Log("Bake done");
     }
@@ -40,7 +40,7 @@ public class RessourcesManager : MonoBehaviour
 
         for (int i = 0; i < forests.Length; ++i)
         {
-            int currentMagnitude = (Vector2Int.FloorToInt(forests[i].transform.position) - position).sqrMagnitude;
+            int currentMagnitude = ((Vector2Int)_treesTilemap.WorldToCell(forests[i].transform.position) - position).sqrMagnitude;
 
             if (currentMagnitude < minMagnitude)
                 (minMagnitude, index) = (currentMagnitude, i);
