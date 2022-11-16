@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
+using UnityEngine.EventSystems;
 
 public class CharacterSelectionManager : MonoBehaviour
 {
@@ -16,6 +18,7 @@ public class CharacterSelectionManager : MonoBehaviour
     public static List<Character> charactersSelected = new List<Character>();
 
     private bool _clicking, _shifting;
+    private View _actualView;
     /* ---------------------------------------------- */
 
 
@@ -82,6 +85,7 @@ public class CharacterSelectionManager : MonoBehaviour
 
     private void Update()
     {
+
         if (_clicking)
         {
             _endpos = _mouse.position.ReadValue();
@@ -101,6 +105,9 @@ public class CharacterSelectionManager : MonoBehaviour
 
     private void InitSelection(InputAction.CallbackContext _)
     {
+        if (EventSystem.current.IsPointerOverGameObject()) 
+            return;
+
         _startpos = _mouse.position.ReadValue();
         _clicking = true;
         _selectionBox = new Rect();
@@ -109,41 +116,50 @@ public class CharacterSelectionManager : MonoBehaviour
 
     private void ProceedSelection(InputAction.CallbackContext _)
     {
-        if (_selectionBox.size.sqrMagnitude < _minimumSelectionArea) // Selection Box is too small : click select
+        if (!_clicking) return;
+
+        if (_selectionBox.size.sqrMagnitude < _minimumSelectionArea ) // Selection Box is too small : click select
         {
             Vector2 worldPoint = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, _clickable);
 
             if (hit.collider != null) // if we hit a clickable object
             {
-                Character selectedCharacter = hit.collider.gameObject.GetComponent<Character>();
-
-                if (!_shifting) // Normal click
+                if(hit.collider.gameObject.TryGetComponent(out Character selectedCharacter))
                 {
-                    DeselectAll();
-                    charactersSelected.Add(selectedCharacter);
-                    selectedCharacter.SelectionMarker.SetActive(true);
-
-                    if (_instance._debug)
-                        selectedCharacter.DebugCoordinates();
-                }
-                else    // Shift click
-                {
-                    if (!charactersSelected.Contains(selectedCharacter)) // If the character is not already selected
+                    if (!_shifting) // Normal click
                     {
+                        DeselectAll();
+
+                        //CharaUIActivation
+                        _actualView = ViewManager.Show<PeonView>(); //-----------------------CHANGE TO GENERIC
+
                         charactersSelected.Add(selectedCharacter);
                         selectedCharacter.SelectionMarker.SetActive(true);
+
+
+                        if (_instance._debug)
+                            selectedCharacter.DebugCoordinates();
                     }
-                    else
+                    else    // Shift click
                     {
-                        charactersSelected.Remove(selectedCharacter);
-                        selectedCharacter.SelectionMarker.SetActive(false);
+                        if (!charactersSelected.Contains(selectedCharacter)) // If the character is not already selected
+                        {
+                            charactersSelected.Add(selectedCharacter);
+                            selectedCharacter.SelectionMarker.SetActive(true);
+                        }
+                        else
+                        {
+                            charactersSelected.Remove(selectedCharacter);
+                            selectedCharacter.SelectionMarker.SetActive(false);
+                        }
                     }
                 }
+               
             }
             else
                 if (!_shifting) // If we didn't hit anything and shift is not being held
-                DeselectAll();
+                    DeselectAll();
         }
         else    // Drag Select
         {
@@ -151,12 +167,26 @@ public class CharacterSelectionManager : MonoBehaviour
                 DeselectAll();
 
             foreach (Character character in _charactersList)
+            {
                 if (_selectionBox.Contains(_camera.WorldToScreenPoint(character.transform.position)))
+                {
                     if (!(_shifting && charactersSelected.Contains(character)))
                     {
                         charactersSelected.Add(character);
                         character.SelectionMarker.SetActive(true);
                     }
+                }
+            }
+
+
+
+            if(charactersSelected.Count > 0)
+            {
+
+                //CharaUIActivation
+                _actualView = ViewManager.Show<PeonView>(); //-----------------------CHANGE TO GENERIC
+            }
+
         }
 
         _startpos = Vector2.zero;
@@ -170,6 +200,9 @@ public class CharacterSelectionManager : MonoBehaviour
 
     private static void DeselectAll()
     {
+        if (_instance._actualView != null)
+            _instance._actualView.Hide();
+
         foreach (Character characterToRemove in charactersSelected)
             characterToRemove.SelectionMarker.SetActive(false);
         charactersSelected.Clear();
@@ -179,6 +212,7 @@ public class CharacterSelectionManager : MonoBehaviour
     public static void AddCharacter(Character characterToAdd) // Every time a new character is created
     {
         _charactersList.Add(characterToAdd);
+        GameManager.AddTickedBehaviour(characterToAdd);
     }
 
 

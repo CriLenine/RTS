@@ -42,6 +42,7 @@ public class PrefabManager : MonoBehaviour
         }
     }
 
+    public static List<SpawnableDataBuilding> GetBuildingDatas => _instance._dataBuildings;
     public static SpawnableDataBuilding GetBuildingData(PeonBuilds peonBuilds) => _instance._buildingsPairs[peonBuilds];
     public static SpawnableDataCharacter GetCharacterData(Characters character) => _instance._charactersPairs[character];
 }

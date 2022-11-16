@@ -215,8 +215,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb0c414f5b20535419ecde38e9e54dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _data: {fileID: 0}
-  selectionMarker: {fileID: 3328235741507802003}
+  _data: {fileID: 11400000, guid: 6af51e8e1fe6a34439a5104355b7f6c1, type: 2}
+  SelectionMarker: {fileID: 3328235741507802003}
+  Coords: {x: 0, y: 0}
+  RallyPointGoal: 0
+  isInTroop: 0
 --- !u!61 &7973303478340177616
 BoxCollider2D:
   m_ObjectHideFlags: 0

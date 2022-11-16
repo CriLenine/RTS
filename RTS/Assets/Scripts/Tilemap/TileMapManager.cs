@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -149,6 +150,7 @@ public class TileMapManager : MonoBehaviour
         return coords.x < _minPlayable.x || coords.x > _maxPlayable.x || coords.y < _minPlayable.y || coords.y > _maxPlayable.y;
     }
 
+    #region Buildings
     public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
     {
         // Retrieval of the mouse position.
@@ -188,6 +190,31 @@ public class TileMapManager : MonoBehaviour
         return (_hoveredTilePos, _previousAvailability);
     }
 
+    public static void AddBuilding(int outlinesCount)
+    {
+        //Set building tiles
+        var _buildingMin = new Vector2Int(_hoveredTileCoords.x - outlinesCount, _hoveredTileCoords.y - outlinesCount);
+        var _buildingMax = new Vector2Int(_hoveredTileCoords.x + outlinesCount, _hoveredTileCoords.y + outlinesCount);
+
+        for (int x = _buildingMin.x; x <= _buildingMax.x; ++x)
+            for (int y = _buildingMin.y; y <= _buildingMax.y; ++y)
+                _logicalTiles[x, y].State = TileState.BuildingOutline;
+
+        //Set obstacle tiles
+        int obstacleOutline = outlinesCount > 0 ? outlinesCount - 1 : 0;
+
+        var _obstacleMin = new Vector2Int(_hoveredTileCoords.x - obstacleOutline, _hoveredTileCoords.y - obstacleOutline);
+        var _obstacleMax = new Vector2Int(_hoveredTileCoords.x + obstacleOutline, _hoveredTileCoords.y + obstacleOutline);
+
+        for (int x = _obstacleMin.x; x <= _obstacleMax.x; ++x)
+            for (int y = _obstacleMin.y; y <= _obstacleMax.y; ++y)
+                _logicalTiles[x, y].State = TileState.Obstacle;  
+    }
+    public static void RemoveBuilding(Vector2Int coords)
+    {
+        throw new NotImplementedException("RemoveBuildingToImplement");
+    }
+    #endregion
     #region PathFinding
 
     public static Stack<LogicalTile> FindPath(Vector2Int startCoords, Vector2Int endCoords)

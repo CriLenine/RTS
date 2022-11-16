@@ -5,10 +5,17 @@ using UnityEngine.InputSystem;
 
 public class BuildingBlueprintsManager : MonoBehaviour
 {
+    private static BuildingBlueprintsManager _instance;
     private Blueprint _actualBlueprint = null;
 
-    public void SpawnBlueprint(PeonBuilds building)
+
+    private void Awake()
     {
-        _actualBlueprint = Blueprint.InstantiateWorldPos(building);
+        _instance = this;
+    }
+    public static void SpawnBlueprint(PeonBuilds building)
+    {
+        if(!_instance._actualBlueprint)
+            _instance._actualBlueprint = Blueprint.InstantiateWorldPos(building);
     }
 }

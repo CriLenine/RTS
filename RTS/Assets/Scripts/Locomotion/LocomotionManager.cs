@@ -1,7 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using System.Linq;
 
+public enum Goal
+{
+    None,
+    Build,
+    Attack
+}
 public class LocomotionManager : MonoBehaviour
 {
     private Mouse _mouse;
@@ -28,7 +35,7 @@ public class LocomotionManager : MonoBehaviour
         _camera = Camera.main;
 
         _locomotion = new Locomotion();
-        _locomotion.Enable();
+        _locomotion.Enable(); // DISABLE to test method technique
         _locomotion.Displacement.RightClick.performed += SetRallyPoint;
     }
 
@@ -179,6 +186,10 @@ public class LocomotionManager : MonoBehaviour
             {
                 if(_debug)
                     Debug.Log("RALLYPOINT REACHED");
+                Debug.Log(leader.RallyPointGoal);
+                if (leader.RallyPointGoal == Goal.Build)
+                    BuildingManager.StartBuild(leader.RallyPoint,troopCharacters.Cast<Peon>().ToList());
+
                 _troopsToRemove.Add(troop);
             }
 
@@ -261,4 +272,33 @@ public class LocomotionManager : MonoBehaviour
 
         _troopsToRemove.Clear();
     }
+
+    #region Test without input action but a method
+    public void SetRallyPointMethod(Vector2 position)
+    {
+        _rallyPointCoords = TileMapManager.WorldToTilemapCoords(position);
+
+        if (TileMapManager.OutofMap(_rallyPointCoords))
+            return;
+
+        LogicalTile rallyTile = TileMapManager.GetTile(_rallyPointCoords);
+
+        if (rallyTile.State == TileState.Obstacle) // if the rallypoint tile is an obstacle : nothing happens
+            return;
+
+        // else : go through all the characters selected to create troops whose purpose will be to reach the rallypoint.
+
+        List<Character> characters = CharacterSelectionManager.charactersSelected;
+
+        if (_debug)
+            Debug.Log($"RallyPoint coords : ({_rallyPointCoords.x}, {_rallyPointCoords.y})");
+
+        foreach (Character character in characters)
+            if (character.isInTroop)
+                return;
+
+
+        AssignTroops(characters, rallyTile);
+    }
+    #endregion
 }

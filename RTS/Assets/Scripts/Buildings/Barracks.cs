@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Farm : RBuilding
+public class Barracks : RBuilding
 {
     protected override Hash128 GetHash128()
     {

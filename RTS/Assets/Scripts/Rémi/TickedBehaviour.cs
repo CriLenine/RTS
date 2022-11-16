@@ -17,7 +17,8 @@ public abstract class TickedBehaviour : MonoBehaviour
 
         return tickedBehaviour;
     }
-    protected abstract void Tick();
+    public abstract void Tick();
 
     protected abstract Hash128 GetHash128();
+
 }
