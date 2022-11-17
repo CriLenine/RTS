@@ -13,7 +13,7 @@ public class SpawnableDataBuilding : ScriptableObject
     private Blueprint _buildingBlueprint;
 
     [SerializeField]
-    private RBuilding _building;
+    private Building _building;
 
     [Header("Data")]
     [SerializeField]
@@ -27,7 +27,7 @@ public class SpawnableDataBuilding : ScriptableObject
     private Sprite _buildingUiIcon;
     public PeonBuilds Type => _type;
     public Blueprint BuildingBlueprint => _buildingBlueprint;
-    public RBuilding Building => _building;
+    public Building Building => _building;
 
     public Sprite BuildingUiIcon => _buildingUiIcon;
 }

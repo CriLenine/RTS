@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingData : ScriptableObject
+public abstract class BuildingData : ScriptableObject
 {
     [SerializeField]
     [Min(0)]

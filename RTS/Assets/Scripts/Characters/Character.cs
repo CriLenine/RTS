@@ -7,6 +7,7 @@ public abstract class Character : TickedBehaviour, IDamageable
     protected CharacterData _data;
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
+
     public int MaxHealth => _data.MaxHealth;
 
     public GameObject SelectionMarker;

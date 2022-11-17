@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Farm : Building
+public class AggregateRessource : Ressource
 {
     protected override Hash128 GetHash128()
     {
@@ -13,5 +13,4 @@ public class Farm : Building
     {
         throw new System.NotImplementedException();
     }
-
 }

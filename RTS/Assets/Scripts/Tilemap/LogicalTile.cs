@@ -6,6 +6,7 @@ public enum TileState
     Free,
     BuildingOutline,
     Obstacle,
+    Tree
 }
 
 public class LogicalTile

@@ -299,6 +299,14 @@ public class LocomotionManager : MonoBehaviour
 
 
         AssignTroops(characters, rallyTile);
+        //if (characters.Count == 1 && TileMapManager.GetTile(_rallyPointCoords).State == TileState.Free)
+        //{
+        //    Character character = characters[0];
+        //    character.transform.position = TileMapManager.TilemapCoordsToWorld(_rallyPointCoords);
+        //    TileMapManager.GetTile(character.Coords).State = TileState.Free;
+        //    character.Coords = _rallyPointCoords;
+        //    TileMapManager.GetTile(_rallyPointCoords).State = TileState.Obstacle;
+        //}
     }
     #endregion
 }

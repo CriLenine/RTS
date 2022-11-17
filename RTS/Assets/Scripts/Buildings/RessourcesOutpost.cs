@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RessourcesOutpost : RBuilding
+public class RessourcesOutpost : Building
 {
     protected override Hash128 GetHash128()
     {

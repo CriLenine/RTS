@@ -137,7 +137,6 @@ public class CharacterSelectionManager : MonoBehaviour
                         charactersSelected.Add(selectedCharacter);
                         selectedCharacter.SelectionMarker.SetActive(true);
 
-
                         if (_instance._debug)
                             selectedCharacter.DebugCoordinates();
                     }

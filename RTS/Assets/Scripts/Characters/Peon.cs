@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Peon : Character
 {
-    private RBuilding _workedOnBuilding;
+    private Building _workedOnBuilding;
 
     private Ressource _recoltedRessource;
 
@@ -34,7 +34,7 @@ public class Peon : Character
         }
     }
 
-    public void SetBuild(RBuilding building)
+    public void SetBuild(Building building)
     {
         _workedOnBuilding = building;
     }
