@@ -1,12 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
-public enum Characters
-{
-    Peon,
-    Knight
-}
 public class PrefabManager : MonoBehaviour
 {
     private static PrefabManager _instance;
@@ -17,8 +12,8 @@ public class PrefabManager : MonoBehaviour
     [SerializeField]
     private List<SpawnableDataBuilding> _dataBuildings;
 
-    private Dictionary<PeonBuilds, SpawnableDataBuilding> _buildingsPairs;
-    private Dictionary<Characters, SpawnableDataCharacter> _charactersPairs;
+    private Dictionary<PeonBuilds, SpawnableDataBuilding> _buildingsPrefabs;
+    private Dictionary<Character.Type, SpawnableDataCharacter> _charactersPrefabs;
 
     private void Awake()
     {
@@ -28,20 +23,37 @@ public class PrefabManager : MonoBehaviour
     }
     private void Start()
     {
-        _buildingsPairs = new Dictionary<PeonBuilds, SpawnableDataBuilding>();
-        _charactersPairs = new Dictionary<Characters, SpawnableDataCharacter>();
+        _buildingsPrefabs = new Dictionary<PeonBuilds, SpawnableDataBuilding>();
+        _charactersPrefabs = new Dictionary<Character.Type, SpawnableDataCharacter>();
 
         foreach (var elem in _dataBuildings)
         {
-            _buildingsPairs.Add(elem.Type, elem);
+            _buildingsPrefabs.Add(elem.Type, elem);
         }
 
         foreach (var elem in _dataCharacters)
         {
-            _charactersPairs.Add(elem.Type, elem);
+            _charactersPrefabs.Add(elem.Type, elem);
         }
     }
 
-    public static SpawnableDataBuilding GetBuildingData(PeonBuilds peonBuilds) => _instance._buildingsPairs[peonBuilds];
-    public static SpawnableDataCharacter GetCharacterData(Characters character) => _instance._charactersPairs[character];
+    public static SpawnableDataBuilding GetBuildingData(PeonBuilds peonBuilds)
+    {
+        return _instance._buildingsPrefabs[peonBuilds];
+    }
+
+    public static SpawnableDataBuilding GetBuildingData(int peonBuilds)
+    {
+        return GetBuildingData((PeonBuilds)peonBuilds);
+    }
+
+    public static SpawnableDataCharacter GetCharacterData(Character.Type characterType)
+    {
+        return _instance._charactersPrefabs[characterType];
+    }
+
+    public static SpawnableDataCharacter GetCharacterData(int characterType)
+    {
+        return GetCharacterData((Character.Type)characterType);
+    }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -5,11 +6,30 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
 
-    private void Start()
+    #region Init & Variables
+
+    List<TickedBehaviour> _entities;
+
+    private void Awake()
     {
         _instance = this;
 
         DontDestroyOnLoad(this);
+    }
+
+    private void Start()
+    {
+        _entities = new List<TickedBehaviour>();
+    }
+
+    #endregion
+
+    public static void Clear()
+    {
+        foreach (TickedBehaviour entity in _instance._entities)
+            Destroy(entity.gameObject);
+
+        _instance._entities.Clear();
     }
 
     public static byte[] Tick(TickInput[] inputs)
@@ -19,16 +39,19 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    TickedBehaviour.Create(PrefabManager.GetCharacterData((Characters)input.ID).Character, input.Position);
+                    TickedBehaviour.Create(input.Performer, PrefabManager.GetCharacterData(input.ID).Character, input.Position);
 
                     break;
 
                 case InputType.Build:
-                    TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position);
+                    TickedBehaviour.Create(input.Performer, PrefabManager.GetBuildingData(input.ID).Building, input.Position);
 
                     break;
             }
         }
+
+        foreach (TickedBehaviour entity in _instance._entities)
+            entity.Tick();
 
         return new byte[1];
     }

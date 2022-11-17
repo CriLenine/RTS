@@ -112,12 +112,6 @@ public class TileMapManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        //TilesAvailableForBuild(2);
-        Debug.Log(TilesAvailableForBuild(2));
-    }
-
     public static Vector2Int WorldToTilemapCoords(Vector3 position)
     {
         Vector2Int coords = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _tileSizeInverse),

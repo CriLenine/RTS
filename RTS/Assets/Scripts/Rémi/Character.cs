@@ -1,7 +1,14 @@
 using UnityEngine;
+using System;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
+    public enum Type
+    {
+        Peon,
+        Knight
+    }
+
     [SerializeField]
     protected CharacterData _data;
 

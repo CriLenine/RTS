@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class Farm : RBuilding
 {
-    protected override Hash128 GetHash128()
+    public override Hash128 GetHash128()
     {
-        throw new System.NotImplementedException();
+        return new Hash128();
     }
 
-    protected override void Tick()
+    public override void Tick()
     {
-        throw new System.NotImplementedException();
+
     }
-
-
 }
