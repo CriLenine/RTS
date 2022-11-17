@@ -5,7 +5,7 @@ public abstract class Character : TickedBehaviour, IDamageable
 {
     [SerializeField]
     protected CharacterData _data;
-
+    public abstract bool Idle { get; }
     public CharacterData Data => _data;
     public int MaxHealth => _data.MaxHealth;
 
@@ -14,9 +14,10 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public Stack<LogicalTile> Path;
     public LogicalTile RallyPoint;
+    public Goal RallyPointGoal = Goal.None;
     public bool isInTroop;
 
-    private void Start()
+    protected virtual void Start()
     {
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
         TileMapManager.AddObstacle(Coords);

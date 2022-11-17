@@ -2,13 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PeonBuilds
+{
+    Farm,
+    Barracks,
+    Ressourcesoutpost
+}
+
 public abstract class RBuilding : TickedBehaviour, IDamageable
 {
     [SerializeField]
     private bool _isBuilt = false;
 
     [SerializeField]
-    private BuildingData _buildingData;
+    private BuildingData _buildingData; //USE ?
 
     [SerializeField]
     private int _currentWorkforce;
@@ -23,18 +30,62 @@ public abstract class RBuilding : TickedBehaviour, IDamageable
 
     public BuildingData Data => _buildingData;
     public int MaxHealth => _buildingData.MaxHealth;
-    public float CurrentWorkforce => _currentWorkforce / _buildingData.TotalWorkforce;
+    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
     public float CurrentHealth => _currentHealth / MaxHealth;
-    public void AddWorkforce(int amount)
+
+    //SpriteManagement
+    private SpriteRenderer _buildingRenderer;
+    private int _actualSpriteIndex;
+    private float _ratioStep;
+    //
+
+    private void Start()
+    {
+        _buildingRenderer = GetComponent<SpriteRenderer>();
+
+        _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
+        _actualSpriteIndex = 0;
+    }
+    /// <returns><see langword="true"/> if it finishes the building's construction,
+    /// <see langword="false"/> otherwise </returns>
+
+    public bool AddWorkforce(int amount)
     {
         if (_isBuilt)
-            Debug.LogError("Already Built !");
+            return true;
 
         _currentWorkforce += amount;
-        if (CurrentWorkforce >= 1f)
+
+        //Change sprite 
+        int spriteIndex=0;
+        
+        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
         {
+            spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
+        }
+
+        if(spriteIndex != _actualSpriteIndex)
+        {
+            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
+            _actualSpriteIndex = spriteIndex;
+        }
+
+        //
+
+        if (CurrentWorkforceRatio >= 1f)
+        {
+            //addBuildingToLogicalTileMap
+            int oC = 0;
+            for (float i = 0.5f * TileMapManager._tileSize; i < _buildingRenderer.bounds.extents.x; i += TileMapManager._tileSize)
+            {
+                oC++;
+            }
+            TileMapManager.AddBuilding(oC);
+            //
+
             _currentWorkforce = _buildingData.TotalWorkforce;
             _isBuilt = true;
         }
+        return _isBuilt;
     }
 }
