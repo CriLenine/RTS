@@ -19,7 +19,7 @@ public class PeonView : View
 
     public override void Initialize()
     {
-        foreach (var building in PrefabManager.GetBuildingDatas)
+        foreach (var building in PrefabManager.DataBuildings)
         {
             var bUI = Instantiate(_buildingUI);
             bUI.transform.SetParent(_buildinglayoutParent);

@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
+    public enum Type
+    {
+        Peon,
+        Knight
+    }
+
     [SerializeField]
     protected CharacterData _data;
     public abstract bool Idle { get; }

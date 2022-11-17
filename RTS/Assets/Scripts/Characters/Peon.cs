@@ -20,7 +20,7 @@ public class Peon : Character
         _specificData = (PeonData)_data;
     }
 
-    protected override Hash128 GetHash128()
+    public override Hash128 GetHash128()
     {
         return new Hash128();
     }

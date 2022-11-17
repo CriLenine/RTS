@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,13 +8,30 @@ public class GameManager : MonoBehaviour
 
     private static GameManager _instance;
 
-    private List<TickedBehaviour> _tickedBehaviours = new();
+    #region Init & Variables
+
+    List<TickedBehaviour> _entities;
 
     private void Awake()
     {
         _instance = this;
 
         DontDestroyOnLoad(this);
+    }
+
+    private void Start()
+    {
+        _entities = new List<TickedBehaviour>();
+    }
+
+    #endregion
+
+    public static void Clear()
+    {
+        foreach (TickedBehaviour entity in _instance._entities)
+            Destroy(entity.gameObject);
+
+        _instance._entities.Clear();
     }
 
     public static byte[] Tick(TickInput[] inputs)
@@ -24,7 +41,7 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    TickedBehaviour.Create(PrefabManager.GetCharacterData((Characters)input.ID).Character, input.Position);
+                    _instance._entities.Add(TickedBehaviour.Create(input.Performer, PrefabManager.GetCharacterData(input.ID).Character, input.Position));
 
                     break;
 
@@ -32,23 +49,23 @@ public class GameManager : MonoBehaviour
                     foreach (var chara in CharacterSelectionManager.charactersSelected)
                         chara.RallyPointGoal = Goal.Build;
 
-                    BuildingManager.AddBuilding(TickedBehaviour.Create(PrefabManager.GetBuildingData((PeonBuilds)input.ID).Building, input.Position));
+                    Building building = TickedBehaviour.Create(input.Performer, PrefabManager.GetBuildingData(input.ID).Building, input.Position);
+
+                    _instance._entities.Add(building);
+
+                    BuildingManager.AddBuilding(building);
                     _instance._locoManager.SetRallyPointMethod(input.Position) ;
+
+                    
 
                     break;
             }
         }
 
-        foreach (var tickedBehaviour in _instance._tickedBehaviours)
-        {
-            tickedBehaviour.Tick();
-        }
-        return new byte[1];
-    }
+        foreach (TickedBehaviour entity in _instance._entities)
+            entity.Tick();
 
-    public static void AddTickedBehaviour(TickedBehaviour tickedBehaviour)
-    {
-        _instance._tickedBehaviours.Add(tickedBehaviour);
+        return new byte[1];
     }
 
     [Serializable]

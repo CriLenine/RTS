@@ -1,24 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.Arm;
 
 public abstract class TickedBehaviour : MonoBehaviour
 {
-    public static int GetNextID => _globalID++;
+    #region Instantiation
 
     private static int _globalID = 0;
 
-    private int _id;
-    public static T Create<T>(T prefab, Vector3 position, Quaternion quaternion = new Quaternion()) where T : TickedBehaviour
+    public static int NextID => _globalID++;
+
+    public static T Create<T>(int performer, T prefab, Vector3 position, Quaternion quaternion) where T : TickedBehaviour
     {
         T tickedBehaviour = Instantiate(prefab, position, quaternion);
-        tickedBehaviour._id = GetNextID;
+
+        tickedBehaviour.ID = NextID;
+        tickedBehaviour.Performer = performer;
 
         return tickedBehaviour;
     }
+
+    public static T Create<T>(int performer, T prefab, Vector3 position) where T : TickedBehaviour
+    {
+        return Create(performer, prefab, position, Quaternion.identity);
+    }
+
+    #endregion
+
+    public int ID { get; private set; }
+    public int Performer { get; private set; }
+
     public abstract void Tick();
 
-    protected abstract Hash128 GetHash128();
-
+    public abstract Hash128 GetHash128();
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Barracks : Building
 {
-    protected override Hash128 GetHash128()
+    public override Hash128 GetHash128()
     {
         throw new System.NotImplementedException();
     }

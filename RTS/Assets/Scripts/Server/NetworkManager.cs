@@ -255,6 +255,8 @@ public partial class NetworkManager : MonoBehaviour
 
                     TickPeriod = BaseTickPeriod;
 
+                    GameManager.Clear();
+
                     StartCoroutine(Loop());
 
                     break;

@@ -211,7 +211,6 @@ public class CharacterSelectionManager : MonoBehaviour
     public static void AddCharacter(Character characterToAdd) // Every time a new character is created
     {
         _charactersList.Add(characterToAdd);
-        GameManager.AddTickedBehaviour(characterToAdd);
     }
 
 

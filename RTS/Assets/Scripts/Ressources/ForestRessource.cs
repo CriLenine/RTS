@@ -188,7 +188,7 @@ public class ForestRessource : Ressource
         throw new NotImplementedException();
     }
 
-    protected override Hash128 GetHash128()
+    public override Hash128 GetHash128()
     {
         throw new NotImplementedException();
     }
