@@ -45,11 +45,11 @@ public partial class NetworkManager
 
                     case InputType.Move:
                         {
+                            Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
+
                             int[] targets = Extract<int>(message, i);
 
                             i += (uint)targets.Length;
-
-                            Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
                             inputs.Add(TickInput.Move(targets, position, performer));
 

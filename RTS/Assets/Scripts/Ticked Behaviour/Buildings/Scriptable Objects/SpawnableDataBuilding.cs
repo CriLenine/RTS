@@ -15,6 +15,10 @@ public class SpawnableDataBuilding : ScriptableObject
     [SerializeField]
     private Building _building;
 
+    [SerializeField]
+    [Min(0)]
+    private int _outline;
+
     [Header("Data")]
     [SerializeField]
     private int _neededPlayerLevel;
@@ -25,9 +29,10 @@ public class SpawnableDataBuilding : ScriptableObject
     [Header("UI")]
     [SerializeField]
     private Sprite _buildingUiIcon;
+
     public Building.Type Type => _type;
     public Blueprint BuildingBlueprint => _buildingBlueprint;
     public Building Building => _building;
-
+    public int Outline => _outline;
     public Sprite BuildingUiIcon => _buildingUiIcon;
 }

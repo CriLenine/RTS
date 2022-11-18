@@ -15,6 +15,7 @@ MonoBehaviour:
   _type: 0
   _buildingBlueprint: {fileID: 7296661523523168018, guid: 7b71f153d02245944aa360e6d382da22, type: 3}
   _building: {fileID: 5671075261480275849, guid: 7ce10a96496de124d8948bbd66cb7396, type: 3}
+  _outline: 1
   _neededPlayerLevel: 0
   _cost: []
   _buildingUiIcon: {fileID: 469855509, guid: 201efe5873b99864a9bb9010a5e248ac, type: 3}

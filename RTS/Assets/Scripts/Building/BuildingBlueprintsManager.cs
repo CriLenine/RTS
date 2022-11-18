@@ -7,7 +7,10 @@ public class BuildingBlueprintsManager : MonoBehaviour
 
     private void Awake()
     {
-        _instance = this;
+        if( _instance == null )
+            _instance = this;
+        else
+            Destroy( _instance );
     }
 
     public static void SpawnBlueprint(Building.Type building)

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Peon
   m_EditorClassIdentifier: 
   _maxHealth: 0
-  _workPower: 0
+  _workPower: 1

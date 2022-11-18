@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private LocomotionManager _locoManager;
-
     private static GameManager _instance;
+
+    private LocomotionManager _locomotionManager;
 
     #region Init & Variables
 
@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _entities = new List<TickedBehaviour>();
+        _locomotionManager = GetComponent<LocomotionManager>();
     }
 
     #endregion
@@ -49,19 +50,30 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Build:
-                    foreach (int ID in input.Targets)
-                    {
-                        Character builder = (Character)_instance._entities[ID];
-                        builder.RallyPointGoal = Goal.Build;
-                    }
 
-                    Building building = TickedBehaviour.Create(input.Performer, PrefabManager.GetBuildingData(input.ID).Building, input.Position);
+                    SpawnableDataBuilding data = PrefabManager.GetBuildingData(input.ID);
+
+                    Building building = TickedBehaviour.Create(input.Performer, data.Building, input.Position);
+                    TileMapManager.AddBuilding(data.Outline, input.Position);
+
+                    foreach (int ID in input.Targets) 
+                    {
+                        Peon builder = (Peon)_instance._entities[ID];
+                        builder.SetAction(new Move(builder, input.Position));
+                        builder.AddAction(new Build(builder, building));
+                    }
 
                     _instance._entities.Add(building);
 
-                    BuildingManager.AddBuilding(building);
+                    break;
 
-                    _instance._locoManager.SetRallyPointMethod(input.Position) ;
+                case InputType.Move:
+
+                    foreach (int ID in input.Targets)
+                    {
+                        Character walker = (Character)_instance._entities[ID];
+                        walker.SetAction(new Move(walker, input.Position));
+                    }
 
                     break;
             }

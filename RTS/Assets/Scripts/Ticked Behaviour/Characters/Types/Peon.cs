@@ -25,17 +25,6 @@ public class Peon : Character
         return new Hash128();
     }
 
-    public override void Tick()
-    {
-        Debug.Log(_workedOnBuilding);
-
-        if (_workedOnBuilding != null)
-        {
-            if (_workedOnBuilding.AddWorkforce(_specificData.WorkPower))
-                _workedOnBuilding = null;
-        }
-    }
-
     public void SetBuild(Building building)
     {
         _workedOnBuilding = building;
