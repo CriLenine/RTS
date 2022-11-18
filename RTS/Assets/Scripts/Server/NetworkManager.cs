@@ -257,6 +257,8 @@ public partial class NetworkManager : MonoBehaviour
 
                     GameManager.Clear();
 
+                    // Initialisation des péons + buildings au lancement du jeu.
+
                     StartCoroutine(Loop());
 
                     break;
@@ -299,7 +301,7 @@ public partial class NetworkManager : MonoBehaviour
         switch (input.Type)
         {
             case InputType.Spawn:
-                message.Add(input.ID, input.Position);
+                message.Add(input.ID, input.Position.x, input.Position.y);
 
                 break;
 
@@ -313,6 +315,9 @@ public partial class NetworkManager : MonoBehaviour
             case InputType.Build:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 
+                for (int i = 0; i < input.Targets.Length; ++i) // TODO : Clean
+                    message.Add(input.Targets[i]);
+
                 break;
         }
 
@@ -321,6 +326,13 @@ public partial class NetworkManager : MonoBehaviour
 
     private IEnumerator Loop()
     {
+        // DEBUG ONLY
+        // A supprimer à terme.
+        Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(1, 1)));
+        Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(0, 0)));
+        Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(3, 3)));
+        Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(-1, 7)));
+
         yield return new WaitUntil(() => _ticks.ContainsKey(10));
 
         while (IsPlaying)

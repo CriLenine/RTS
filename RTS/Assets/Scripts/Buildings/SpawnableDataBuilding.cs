@@ -6,7 +6,7 @@ using UnityEngine;
 public class SpawnableDataBuilding : ScriptableObject
 {
     [SerializeField]
-    private PeonBuilds _type;
+    private Building.Type _type;
 
     [Header("Building")]
     [SerializeField]
@@ -25,7 +25,7 @@ public class SpawnableDataBuilding : ScriptableObject
     [Header("UI")]
     [SerializeField]
     private Sprite _buildingUiIcon;
-    public PeonBuilds Type => _type;
+    public Building.Type Type => _type;
     public Blueprint BuildingBlueprint => _buildingBlueprint;
     public Building Building => _building;
 

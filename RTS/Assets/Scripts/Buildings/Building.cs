@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PeonBuilds
-{
-    Farm,
-    Barracks,
-    Ressourcesoutpost
-}
 public abstract class Building : TickedBehaviour, IDamageable
 {
+    public enum Type
+    {
+        Farm,
+        Barracks,
+        Ressourcesoutpost
+    }
+
     [SerializeField]
     private bool _isBuilt = false;
 
@@ -46,6 +47,7 @@ public abstract class Building : TickedBehaviour, IDamageable
         _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
         _actualSpriteIndex = 0;
     }
+
     /// <returns><see langword="true"/> if it finishes the building's construction,
     /// <see langword="false"/> otherwise </returns>
     public bool AddWorkforce(int amount)

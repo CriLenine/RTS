@@ -12,7 +12,7 @@ public partial class NetworkManager
         {
             static T[] Extract<T>(Message message, uint start = 0)
             {
-                T[] array = new T[message.GetInt(start)];
+                T[] array = new T[message.Count - start];
 
                 for (uint i = 0; i < array.Length; ++i)
                     array[i] = (T)message[start + i];
@@ -62,7 +62,11 @@ public partial class NetworkManager
 
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
-                            inputs.Add(TickInput.Build(id, position, performer));
+                            int[] ids = Extract<int>(message, i);
+
+                            i += (uint)ids.Length;
+
+                            inputs.Add(TickInput.Build(ids, id, position, performer));
 
                             break;
                         }

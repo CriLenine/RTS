@@ -27,6 +27,8 @@ public class Peon : Character
 
     public override void Tick()
     {
+        Debug.Log(_workedOnBuilding);
+
         if (_workedOnBuilding != null)
         {
             if (_workedOnBuilding.AddWorkforce(_specificData.WorkPower))

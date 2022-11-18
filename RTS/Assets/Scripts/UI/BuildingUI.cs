@@ -10,8 +10,8 @@ public class BuildingUI : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI _text;
 
-    private PeonBuilds _buildingType;
-    public void InitUI(Sprite buildingSprite, string buildingName,PeonBuilds buildingType)
+    private Building.Type _buildingType;
+    public void InitUI(Sprite buildingSprite, string buildingName, Building.Type buildingType)
     {
         _image.sprite = buildingSprite;
         _text.text = buildingName;

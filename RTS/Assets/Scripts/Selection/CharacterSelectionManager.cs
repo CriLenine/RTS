@@ -219,4 +219,13 @@ public class CharacterSelectionManager : MonoBehaviour
         _charactersList.Remove(characterToRemove);
     }
 
+    public static int[] GetSelectedIds()
+    {
+        int[] ids = new int[charactersSelected.Count];
+
+        for (int i = 0; i < ids.Length; ++i)
+            ids[i] = charactersSelected[i].ID;
+
+        return ids;
+    }
 }

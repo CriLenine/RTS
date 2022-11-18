@@ -7,7 +7,7 @@ using UnityEngine.Windows;
 
 public class Blueprint : MonoBehaviour
 {
-    private static PeonBuilds _buildType;
+    private static Building.Type _buildType;
     private SpriteRenderer _blueprintRenderer;
 
     [SerializeField] 
@@ -16,7 +16,7 @@ public class Blueprint : MonoBehaviour
     private Color _notAvailableColor;
 
 
-    internal static Blueprint InstantiateWorldPos(PeonBuilds buildType)
+    internal static Blueprint InstantiateWorldPos(Building.Type buildType)
     {
         SpawnableDataBuilding building = PrefabManager.GetBuildingData(buildType);
 
@@ -40,14 +40,15 @@ public class Blueprint : MonoBehaviour
 
     private void Update()
     {
-        int oC = 0;
+        /*int oC = 0;
         for (float i = 0.5f * TileMapManager._tileSize; i < _blueprintRenderer.bounds.extents.x; i+= TileMapManager._tileSize)
         {
             oC++;
-        }
+        }*/
 
+        int outlineCount = Mathf.FloorToInt(_blueprintRenderer.bounds.extents.x / TileMapManager._tileSize);
 
-        (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(oC);
+        (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(outlineCount);
 
         if (Physics2D.OverlapPoint(position))
         {
@@ -59,7 +60,9 @@ public class Blueprint : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame && available)
         {
-            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position));
+            int[] selected = CharacterSelectionManager.GetSelectedIds();
+
+            NetworkManager.Input(TickInput.Build(selected, (int)_buildType, transform.position));
 
             Destroy(gameObject);
         }

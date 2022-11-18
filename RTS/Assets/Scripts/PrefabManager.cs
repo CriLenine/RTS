@@ -14,7 +14,7 @@ public class PrefabManager : MonoBehaviour
 
     public static List<SpawnableDataBuilding> DataBuildings => _instance._dataBuildings;
 
-    private Dictionary<PeonBuilds, SpawnableDataBuilding> _buildingsPrefabs;
+    private Dictionary<Building.Type, SpawnableDataBuilding> _buildingsPrefabs;
     private Dictionary<Character.Type, SpawnableDataCharacter> _charactersPrefabs;
 
     private void Awake()
@@ -25,7 +25,7 @@ public class PrefabManager : MonoBehaviour
     }
     private void Start()
     {
-        _buildingsPrefabs = new Dictionary<PeonBuilds, SpawnableDataBuilding>();
+        _buildingsPrefabs = new Dictionary<Building.Type, SpawnableDataBuilding>();
         _charactersPrefabs = new Dictionary<Character.Type, SpawnableDataCharacter>();
 
         foreach (var elem in _dataBuildings)
@@ -39,14 +39,14 @@ public class PrefabManager : MonoBehaviour
         }
     }
 
-    public static SpawnableDataBuilding GetBuildingData(PeonBuilds peonBuilds)
+    public static SpawnableDataBuilding GetBuildingData(Building.Type peonBuilds)
     {
         return _instance._buildingsPrefabs[peonBuilds];
     }
 
     public static SpawnableDataBuilding GetBuildingData(int peonBuilds)
     {
-        return GetBuildingData((PeonBuilds)peonBuilds);
+        return GetBuildingData((Building.Type)peonBuilds);
     }
 
     public static SpawnableDataCharacter GetCharacterData(Character.Type characterType)
