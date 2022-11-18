@@ -37,7 +37,7 @@ public class SelectionManager : MonoBehaviour
         _shifting = false;
 
         // conversion of a cell size in the canvas' referential to set the min selection area to that of the size of a cell
-        _minimumSelectionArea = (_camera.WorldToScreenPoint(new Vector3(TileMapManager._tileSize, 0, 0)) -
+        _minimumSelectionArea = (_camera.WorldToScreenPoint(new Vector3(TileMapManager.TileSize, 0, 0)) -
             _camera.WorldToScreenPoint(new Vector3(0, 0, 0))).sqrMagnitude;
     }
 

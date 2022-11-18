@@ -37,10 +37,7 @@ public abstract class Character : TickedBehaviour, IDamageable
     public sealed override void Tick()
     {
         if (_currentAction?.Perform() == true)
-        {
             _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
-            Debug.Log($"NEXT ACTION : {_currentAction}");
-        }
     }
 
     public void AddAction(Action action)

@@ -8,8 +8,8 @@ public class TileMapManager : MonoBehaviour
 {
     private static TileMapManager _instance;
 
-    private static Mouse _mouse;
-    private static Camera _camera;
+    private Mouse _mouse;
+    private Camera _camera;
 
     [SerializeField]
     private Tilemap _graphicGroundTilemap, _graphicObstaclesTilemap, _graphicPreviewTilemap;
@@ -18,32 +18,32 @@ public class TileMapManager : MonoBehaviour
     private int _mapOutline;
 
     // Grid Related
-    private static Grid _grid;
-    public static float _tileSize { get; private set; }
-    private static float _tileSizeInverse;
-    private static float _tilingOffset;
+    private Grid _grid;
+    public static float TileSize { get; private set; }
+    private float _tileSizeInverse;
+    private float _tilingOffset;
 
     private static Vector3 _defaultPosition;
 
     // Map Dimensions
     private BoundsInt _mapBounds;
-    private static int _mapWidth;
-    private static int _mapHeight;
-    private static Vector2Int _mapDimensions;
-    private static Vector2Int _halfMapDimensions;
+    private int _mapWidth;
+    private int _mapHeight;
+    private Vector2Int _mapDimensions;
+    private Vector2Int _halfMapDimensions;
 
-    private static Vector2Int _minPlayable;
-    private static Vector2Int _maxPlayable;
+    private Vector2Int _minPlayable;
+    private Vector2Int _maxPlayable;
 
-    private static LogicalTile[,] _logicalTiles;
-    private static Vector2Int[] _unitCardinalDisplacements = new Vector2Int[]
+    private LogicalTile[,] _logicalTiles;
+    private Vector2Int[] _unitCardinalDisplacements = new Vector2Int[]
     {
         new Vector2Int(1, 0),
         new Vector2Int(0, 1),
         new Vector2Int(-1, 0),
         new Vector2Int(0, -1),
     };
-    private static Vector2Int[] _unitDiagonalDisplacements = new Vector2Int[]
+    private Vector2Int[] _unitDiagonalDisplacements = new Vector2Int[]
     {
         new Vector2Int(1, 1),
         new Vector2Int(-1, 1),
@@ -52,12 +52,12 @@ public class TileMapManager : MonoBehaviour
     };
 
     // Building Positionning Tests 
-    private static bool _previousAvailability;
-    private static Vector2 _previousMousePos;
-    private static Vector3 _hoveredTilePos;
-    private static Vector2Int _hoveredTileCoords;
-    private static Vector2Int _previewMin;
-    private static Vector2Int _previewMax;
+    private bool _previousAvailability;
+    private Vector2 _previousMousePos;
+    private Vector3 _hoveredTilePos;
+    private Vector2Int _hoveredTileCoords;
+    private Vector2Int _previewMin;
+    private Vector2Int _previewMax;
 
     // Debug
     [SerializeField]
@@ -78,9 +78,9 @@ public class TileMapManager : MonoBehaviour
 
         // Retrieval of the grid component.
         _grid = _graphicGroundTilemap.GetComponentInParent<Grid>();
-        _tileSize = _grid.cellSize.x;
-        _tileSizeInverse = 1 / _tileSize;
-        _tilingOffset = _tileSize / 2;
+        TileSize = _grid.cellSize.x;
+        _tileSizeInverse = 1 / TileSize;
+        _tilingOffset = TileSize / 2;
 
         // Retrieval of the tilemap's dimension properties.
         _mapBounds = _graphicGroundTilemap.cellBounds;
@@ -93,7 +93,7 @@ public class TileMapManager : MonoBehaviour
         _maxPlayable = new Vector2Int(_mapWidth - _mapOutline - 1, _mapHeight - _mapOutline - 1);
 
         // Corresponds to the bottom left corner tile position (x,y,z) whose coordinates are (0,0).
-        _defaultPosition = new Vector3(_tilingOffset - _tileSize * _mapWidth * .5f, _tilingOffset - _tileSize * _mapHeight * .5f);
+        _defaultPosition = new Vector3(_tilingOffset - TileSize * _mapWidth * .5f, _tilingOffset - TileSize * _mapHeight * .5f);
 
         // Initialization of the logic tilemap according to the ground graphic tilemap.
         _logicalTiles = new LogicalTile[_mapWidth, _mapHeight];
@@ -115,100 +115,98 @@ public class TileMapManager : MonoBehaviour
 
     public static Vector2Int WorldToTilemapCoords(Vector3 position)
     {
-        Vector2Int coords = _halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _tileSizeInverse),
-                                                                Mathf.FloorToInt(position.y * _tileSizeInverse));
+        Vector2Int coords = _instance._halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _instance._tileSizeInverse),
+                                                                Mathf.FloorToInt(position.y * _instance._tileSizeInverse));
         return coords;
     }
 
     public static Vector3 TilemapCoordsToWorld(Vector2Int coords)
     {
-        Vector3 pos = _defaultPosition + new Vector3(coords.x * _tileSize, coords.y * _tileSize);
+        Vector3 pos = _defaultPosition + new Vector3(coords.x * TileSize, coords.y * TileSize);
         return pos;
     }
 
     public static void AddObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].State = TileState.Obstacle;
+        _instance._logicalTiles[coords.x, coords.y].State = TileState.Obstacle;
     }
 
     public static void RemoveObstacle(Vector2Int coords)
     {
-        _logicalTiles[coords.x, coords.y].State = TileState.Free;
+        _instance._logicalTiles[coords.x, coords.y].State = TileState.Free;
     }
 
     public static LogicalTile GetTile(int x, int y)
     {
-        return _logicalTiles[x, y];
+        return _instance._logicalTiles[x, y];
     }
     public static LogicalTile GetTile(Vector2Int coords)
     {
-        return _logicalTiles[coords.x, coords.y];
+        return _instance._logicalTiles[coords.x, coords.y];
     }
 
     public static bool OutofMap(Vector2Int coords)
     {
-        return coords.x < _minPlayable.x || coords.x > _maxPlayable.x || coords.y < _minPlayable.y || coords.y > _maxPlayable.y;
+        return coords.x < _instance._minPlayable.x || coords.x > _instance._maxPlayable.x 
+            || coords.y < _instance._minPlayable.y || coords.y > _instance._maxPlayable.y;
     }
 
     #region Buildings
     public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
     {
         // Retrieval of the mouse position.
-        Vector2 currentMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
+        Vector2 currentMousePos = _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue());
 
         // If the mouse hasn't moved, avoid unnecessary operations : return last returnedvalue.
-        if (_previousMousePos == currentMousePos)
-            return (_hoveredTilePos, _previousAvailability);
+        if (_instance._previousMousePos == currentMousePos)
+            return (_instance._hoveredTilePos, _instance._previousAvailability);
 
-        if (WorldToTilemapCoords(currentMousePos) == _hoveredTileCoords)
-            return (_hoveredTilePos, _previousAvailability);
+        if (WorldToTilemapCoords(currentMousePos) == _instance._hoveredTileCoords)
+            return (_instance._hoveredTilePos, _instance._previousAvailability);
 
         // Update of the "previous" variables according to the new entries.
-        _previousAvailability = false;
-        _previousMousePos = currentMousePos;
+        _instance._previousAvailability = false;
+        _instance._previousMousePos = currentMousePos;
 
-        _hoveredTileCoords = WorldToTilemapCoords(currentMousePos);
-        _hoveredTilePos = TilemapCoordsToWorld(_hoveredTileCoords);
+        _instance._hoveredTileCoords = WorldToTilemapCoords(currentMousePos);
+        _instance._hoveredTilePos = TilemapCoordsToWorld(_instance._hoveredTileCoords);
 
         // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
-        _previewMin = new Vector2Int(_hoveredTileCoords.x - outlinesCount, _hoveredTileCoords.y - outlinesCount);
-        _previewMax = new Vector2Int(_hoveredTileCoords.x + outlinesCount, _hoveredTileCoords.y + outlinesCount);
+        _instance._previewMin = new Vector2Int(_instance._hoveredTileCoords.x - outlinesCount, _instance._hoveredTileCoords.y - outlinesCount);
+        _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + outlinesCount, _instance._hoveredTileCoords.y + outlinesCount);
 
         // If the building steps outside of the map.
-        if (_previewMin.x < _minPlayable.x || _previewMin.y < _minPlayable.y 
-            || _previewMax.x > _maxPlayable.x || _previewMax.y > _maxPlayable.y)
-            return (_hoveredTilePos, _previousAvailability);
+        if (_instance._previewMin.x < _instance._minPlayable.x || _instance._previewMin.y < _instance._minPlayable.y 
+            || _instance._previewMax.x > _instance._maxPlayable.x || _instance._previewMax.y > _instance._maxPlayable.y)
+            return (_instance._hoveredTilePos, _instance._previousAvailability);
 
         // If any of the tiles located in the preview area are currently occupied by obstacles.
-        for (int x = _previewMin.x; x <= _previewMax.x; ++x)
-            for (int y = _previewMin.y; y <= _previewMax.y; ++y)
-                if (_logicalTiles[x, y].State != TileState.Free)
-                    return (_hoveredTilePos, _previousAvailability);
+        for (int x = _instance._previewMin.x; x <= _instance._previewMax.x; ++x)
+            for (int y = _instance._previewMin.y; y <= _instance._previewMax.y; ++y)
+                if (_instance._logicalTiles[x, y].State != TileState.Free)
+                    return (_instance._hoveredTilePos, _instance._previousAvailability);
 
         // Else the building can be placed at this location.
-        _previousAvailability = true;
-        return (_hoveredTilePos, _previousAvailability);
+        _instance._previousAvailability = true;
+        return (_instance._hoveredTilePos, _instance._previousAvailability);
     }
 
-    public static void AddBuilding(int outlinesCount)
+    public static void AddBuilding(int outlinesCount, Vector2 position)
     {
+        Vector2Int centerCoords = WorldToTilemapCoords(position);
+
         //Set building tiles
-        var _buildingMin = new Vector2Int(_hoveredTileCoords.x - outlinesCount, _hoveredTileCoords.y - outlinesCount);
-        var _buildingMax = new Vector2Int(_hoveredTileCoords.x + outlinesCount, _hoveredTileCoords.y + outlinesCount);
+        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlinesCount, centerCoords.y - outlinesCount);
+        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlinesCount, centerCoords.y + outlinesCount);
 
         for (int x = _buildingMin.x; x <= _buildingMax.x; ++x)
             for (int y = _buildingMin.y; y <= _buildingMax.y; ++y)
-                _logicalTiles[x, y].State = TileState.BuildingOutline;
-
-        //Set obstacle tiles
-        int obstacleOutline = outlinesCount > 0 ? outlinesCount - 1 : 0;
-
-        var _obstacleMin = new Vector2Int(_hoveredTileCoords.x - obstacleOutline, _hoveredTileCoords.y - obstacleOutline);
-        var _obstacleMax = new Vector2Int(_hoveredTileCoords.x + obstacleOutline, _hoveredTileCoords.y + obstacleOutline);
-
-        for (int x = _obstacleMin.x; x <= _obstacleMax.x; ++x)
-            for (int y = _obstacleMin.y; y <= _obstacleMax.y; ++y)
-                _logicalTiles[x, y].State = TileState.Obstacle;  
+            {
+                if (x == _buildingMin.x || x == _buildingMax.x || y == _buildingMin.y || y == _buildingMax.y)
+                    _instance._logicalTiles[x, y].State = TileState.BuildingOutline;
+                else
+                    _instance._logicalTiles[x, y].State = TileState.Obstacle;
+            }
     }
     public static void RemoveBuilding(Vector2Int coords)
     {
@@ -223,8 +221,8 @@ public class TileMapManager : MonoBehaviour
         List<LogicalTile> open = new List<LogicalTile>();
         List<LogicalTile> closed = new List<LogicalTile>();
 
-        LogicalTile startTile = _logicalTiles[startCoords.x, startCoords.y];
-        LogicalTile endTile = _logicalTiles[endCoords.x, endCoords.y];
+        LogicalTile startTile = _instance._logicalTiles[startCoords.x, startCoords.y];
+        LogicalTile endTile = _instance._logicalTiles[endCoords.x, endCoords.y];
 
         if (_instance._debug)
         {
@@ -246,9 +244,9 @@ public class TileMapManager : MonoBehaviour
         do
         {
             Vector2Int currentCoords = currentTile.Coords;
-            displacementsToTest = _unitCardinalDisplacements;
+            displacementsToTest = _instance._unitCardinalDisplacements;
 
-            for (int i = 0; i < 2; ++i, displacementsToTest = _unitDiagonalDisplacements)
+            for (int i = 0; i < 2; ++i, displacementsToTest = _instance._unitDiagonalDisplacements)
             {
                 weight = 1 + .4f * i;
 
@@ -256,11 +254,11 @@ public class TileMapManager : MonoBehaviour
                 {
                     Vector2Int neighborCoords = currentCoords + displacement;
 
-                    if (neighborCoords.x < _minPlayable.x || neighborCoords.y < _minPlayable.y 
-                        || neighborCoords.x > _maxPlayable.x || neighborCoords.y > _maxPlayable.y)
+                    if (neighborCoords.x < _instance._minPlayable.x || neighborCoords.y < _instance._minPlayable.y 
+                        || neighborCoords.x > _instance._maxPlayable.x || neighborCoords.y > _instance._maxPlayable.y)
                         continue;
 
-                    LogicalTile neighbor = _logicalTiles[neighborCoords.x, neighborCoords.y];
+                    LogicalTile neighbor = _instance._logicalTiles[neighborCoords.x, neighborCoords.y];
 
                     if (neighbor.isObstacle || closed.Contains(neighbor))
                         continue;

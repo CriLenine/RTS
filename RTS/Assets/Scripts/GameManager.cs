@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
                     SpawnableDataBuilding data = PrefabManager.GetBuildingData(input.ID);
 
                     Building building = TickedBehaviour.Create(input.Performer, data.Building, input.Position);
-                    TileMapManager.AddBuilding(data.Outline);
+                    TileMapManager.AddBuilding(data.Outline, input.Position);
 
                     foreach (int ID in input.Targets) 
                     {

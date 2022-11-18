@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Building : TickedBehaviour, IDamageable
@@ -75,15 +73,6 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (CurrentWorkforceRatio >= 1f)
         {
-            //addBuildingToLogicalTileMap
-            int oC = 0;
-            for (float i = 0.5f * TileMapManager._tileSize; i < _buildingRenderer.bounds.extents.x; i += TileMapManager._tileSize)
-            {
-                oC++;
-            }
-            TileMapManager.AddBuilding(oC);
-            //
-
             _currentWorkforce = _buildingData.TotalWorkforce;
             _isBuilt = true;
         }
