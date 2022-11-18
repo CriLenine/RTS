@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BuildingData : ScriptableObject
@@ -17,6 +15,5 @@ public abstract class BuildingData : ScriptableObject
 
     public int TotalWorkforce => _totalWorkforce;
     public int MaxHealth => _maxHealth;
-
     public Sprite[] ConstructionSteps => _constructionSteps;
 }

@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 public class Blueprint : MonoBehaviour
 {
@@ -12,8 +8,11 @@ public class Blueprint : MonoBehaviour
 
     [SerializeField] 
     private Color _availableColor;
+
     [SerializeField]
     private Color _notAvailableColor;
+
+    private static int _outline;
 
 
     internal static Blueprint InstantiateWorldPos(Building.Type buildType)
@@ -21,7 +20,7 @@ public class Blueprint : MonoBehaviour
         SpawnableDataBuilding building = PrefabManager.GetBuildingData(buildType);
 
         _buildType = buildType;
-        
+        _outline = building.Outline;
 
         return Instantiate(building.BuildingBlueprint, Vector2.zero, Quaternion.identity);
     }
@@ -40,15 +39,7 @@ public class Blueprint : MonoBehaviour
 
     private void Update()
     {
-        /*int oC = 0;
-        for (float i = 0.5f * TileMapManager._tileSize; i < _blueprintRenderer.bounds.extents.x; i+= TileMapManager._tileSize)
-        {
-            oC++;
-        }*/
-
-        int outlineCount = Mathf.FloorToInt(_blueprintRenderer.bounds.extents.x / TileMapManager._tileSize);
-
-        (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(outlineCount);
+        (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
 
         if (Physics2D.OverlapPoint(position))
         {

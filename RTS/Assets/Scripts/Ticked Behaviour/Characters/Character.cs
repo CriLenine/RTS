@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
+    private Action _currentAction;
+
+    private Queue<Action> _actions;
+
     public enum Type
     {
         Peon,
@@ -11,6 +15,7 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     [SerializeField]
     protected CharacterData _data;
+
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
@@ -26,9 +31,33 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Start()
     {
+        _actions = new Queue<Action>();
+
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
         TileMapManager.AddObstacle(Coords);
         CharacterSelectionManager.AddCharacter(this);
+    }
+
+    public sealed override void Tick()
+    {
+        if (_currentAction?.Perform() == true)
+            _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+    }
+
+    public void AddAction(Action action)
+    {
+        _actions.Enqueue(action);
+
+        _currentAction ??= _actions.Dequeue();
+    }
+
+    public void SetAction(Action action)
+    {
+        _currentAction = null;
+
+        _actions.Clear();
+
+        AddAction(action);
     }
 
     public void DebugCoordinates()

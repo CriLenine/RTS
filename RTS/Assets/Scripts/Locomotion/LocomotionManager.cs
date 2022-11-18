@@ -187,9 +187,6 @@ public class LocomotionManager : MonoBehaviour
                 if(_debug)
                     Debug.Log("RALLYPOINT REACHED");
 
-                if (leader.RallyPointGoal == Goal.Build)
-                    BuildingManager.StartBuild(leader.RallyPoint,troopCharacters.Cast<Peon>().ToList());
-
                 _troopsToRemove.Add(troop);
             }
 

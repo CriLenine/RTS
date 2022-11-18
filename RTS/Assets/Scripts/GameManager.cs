@@ -49,19 +49,20 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Build:
-                    foreach (int ID in input.Targets)
+
+                    SpawnableDataBuilding data = PrefabManager.GetBuildingData(input.ID);
+
+                    Building building = TickedBehaviour.Create(input.Performer, data.Building, input.Position);
+                    TileMapManager.AddBuilding(data.Outline);
+
+                    foreach (int ID in input.Targets) 
                     {
-                        Character builder = (Character)_instance._entities[ID];
-                        builder.RallyPointGoal = Goal.Build;
+                        Peon builder = (Peon)_instance._entities[ID];
+                        builder.SetAction(new Move(builder, builder.RallyPoint.Coords));
+                        builder.AddAction(new Build(builder, building));
                     }
 
-                    Building building = TickedBehaviour.Create(input.Performer, PrefabManager.GetBuildingData(input.ID).Building, input.Position);
-
                     _instance._entities.Add(building);
-
-                    BuildingManager.AddBuilding(building);
-
-                    _instance._locoManager.SetRallyPointMethod(input.Position) ;
 
                     break;
             }
