@@ -25,23 +25,22 @@ public abstract class Character : TickedBehaviour, IDamageable
     public Vector2Int Coords;
 
     public Stack<LogicalTile> Path;
-    public LogicalTile RallyPoint;
-    public Goal RallyPointGoal = Goal.None;
-    public bool isInTroop;
 
     protected virtual void Start()
     {
         _actions = new Queue<Action>();
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
-        TileMapManager.AddObstacle(Coords);
-        CharacterSelectionManager.AddCharacter(this);
+        CharacterManager.AddSelectableCharacter(this);
     }
 
     public sealed override void Tick()
     {
         if (_currentAction?.Perform() == true)
+        {
             _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+            Debug.Log($"NEXT ACTION : {_currentAction}");
+        }
     }
 
     public void AddAction(Action action)
@@ -67,6 +66,6 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     private void OnDestroy()
     {
-        CharacterSelectionManager.RemoveCharacter(this);
+        CharacterManager.RemoveSelectableCharacter(this);
     }
 }

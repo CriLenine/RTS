@@ -1,8 +1,6 @@
-using UnityEngine;
-
 public abstract class Action
 {
-    private Character _character;
+    protected Character _character;
 
     public Action(Character character)
     {

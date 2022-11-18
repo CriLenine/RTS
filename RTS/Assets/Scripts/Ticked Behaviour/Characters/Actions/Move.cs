@@ -11,7 +11,6 @@ public class Move : Action
 
     public override bool Perform()
     {
-        /* LocomotionManager.Move(character); */
-        throw new System.NotImplementedException();
+        return CharacterManager.Move(_character, _position);
     }
 }

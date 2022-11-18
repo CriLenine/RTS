@@ -51,7 +51,7 @@ public class Blueprint : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame && available)
         {
-            int[] selected = CharacterSelectionManager.GetSelectedIds();
+            int[] selected = CharacterManager.GetSelectedIds();
 
             NetworkManager.Input(TickInput.Build(selected, (int)_buildType, transform.position));
 

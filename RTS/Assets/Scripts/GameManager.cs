@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private LocomotionManager _locoManager;
-
     private static GameManager _instance;
+
+    private LocomotionManager _locomotionManager;
 
     #region Init & Variables
 
@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _entities = new List<TickedBehaviour>();
+        _locomotionManager = GetComponent<LocomotionManager>();
     }
 
     #endregion
@@ -58,11 +59,21 @@ public class GameManager : MonoBehaviour
                     foreach (int ID in input.Targets) 
                     {
                         Peon builder = (Peon)_instance._entities[ID];
-                        builder.SetAction(new Move(builder, builder.RallyPoint.Coords));
+                        builder.SetAction(new Move(builder, input.Position));
                         builder.AddAction(new Build(builder, building));
                     }
 
                     _instance._entities.Add(building);
+
+                    break;
+
+                case InputType.Move:
+
+                    foreach (int ID in input.Targets)
+                    {
+                        Character walker = (Character)_instance._entities[ID];
+                        walker.SetAction(new Move(walker, input.Position));
+                    }
 
                     break;
             }
