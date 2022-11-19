@@ -472,6 +472,79 @@ MonoBehaviour:
   _startingView: {fileID: 0}
   _views:
   - {fileID: 971529783}
+--- !u!1 &273969427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 273969428}
+  - component: {fileID: 273969429}
+  m_Layer: 0
+  m_Name: Forest east
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &273969428
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273969427}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.54, y: -2.15, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1603773044}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &273969429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273969427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c801d111311b444e94c11ef770a6070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _data: {fileID: 0}
+  _trees:
+  - {x: 12, y: 1}
+  - {x: 12, y: -1}
+  - {x: 12, y: 0}
+  - {x: 13, y: -3}
+  - {x: 13, y: -2}
+  - {x: 13, y: 1}
+  - {x: 13, y: -1}
+  - {x: 13, y: 0}
+  - {x: 14, y: -3}
+  - {x: 14, y: 1}
+  - {x: 14, y: -2}
+  - {x: 14, y: -1}
+  - {x: 14, y: 0}
+  - {x: 15, y: -4}
+  - {x: 15, y: 1}
+  - {x: 15, y: 0}
+  - {x: 15, y: -1}
+  - {x: 15, y: -1}
+  - {x: 15, y: -2}
+  - {x: 15, y: -3}
+  - {x: 16, y: 1}
+  - {x: 16, y: 0}
+  - {x: 16, y: -2}
+  - {x: 16, y: -3}
+  - {x: 16, y: -1}
+  - {x: 17, y: 0}
+  - {x: 17, y: -1}
 --- !u!1839735485 &301894023 stripped
 Tilemap:
   m_CorrespondingSourceObject: {fileID: 8661668089645912189, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
@@ -481,11 +554,6 @@ Tilemap:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3664803606445089803, guid: 22f053ff309a4234495d23ac46e2a659, type: 3}
   m_PrefabInstance: {fileID: 209083894}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &388196215 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2534765254464438319, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
-  m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &442939637
 GameObject:
@@ -1500,18 +1568,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Grid
       objectReference: {fileID: 0}
-    - target: {fileID: 2534765254042609405, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2534765254464438319, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 6521531040268582250, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
 --- !u!4 &1284263632 stripped
@@ -1837,9 +1893,78 @@ Transform:
   m_Children:
   - {fileID: 1284263632}
   - {fileID: 619394802}
+  - {fileID: 1637729177}
+  - {fileID: 273969428}
+  - {fileID: 1784158644}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1637729176
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1637729177}
+  - component: {fileID: 1637729178}
+  m_Layer: 0
+  m_Name: Forest north
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1637729177
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637729176}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.47, y: 1.44, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1603773044}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1637729178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637729176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c801d111311b444e94c11ef770a6070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _data: {fileID: 0}
+  _trees:
+  - {x: -4, y: 5}
+  - {x: -4, y: 6}
+  - {x: -3, y: 4}
+  - {x: -3, y: 5}
+  - {x: -3, y: 6}
+  - {x: -3, y: 7}
+  - {x: -2, y: 4}
+  - {x: -2, y: 5}
+  - {x: -2, y: 6}
+  - {x: -2, y: 7}
+  - {x: -1, y: 7}
+  - {x: -1, y: 6}
+  - {x: -1, y: 8}
+  - {x: -1, y: 5}
+  - {x: -1, y: 6}
+  - {x: 0, y: 6}
+  - {x: 0, y: 7}
+  - {x: 1, y: 7}
+  - {x: 1, y: 6}
+  - {x: 2, y: 6}
 --- !u!1 &1644409078
 GameObject:
   m_ObjectHideFlags: 0
@@ -1975,6 +2100,149 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644409078}
   m_CullTransparentMesh: 1
+--- !u!1 &1784158643
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1784158644}
+  - component: {fileID: 1784158645}
+  m_Layer: 0
+  m_Name: Forest west
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1784158644
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784158643}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.44, y: -4.59, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1603773044}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1784158645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784158643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c801d111311b444e94c11ef770a6070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _data: {fileID: 0}
+  _trees:
+  - {x: -18, y: -10}
+  - {x: -18, y: -1}
+  - {x: -18, y: -5}
+  - {x: -18, y: -2}
+  - {x: -18, y: 0}
+  - {x: -18, y: -3}
+  - {x: -18, y: -7}
+  - {x: -18, y: -9}
+  - {x: -18, y: 1}
+  - {x: -18, y: -4}
+  - {x: -18, y: 2}
+  - {x: -18, y: -6}
+  - {x: -18, y: -8}
+  - {x: -17, y: -7}
+  - {x: -17, y: -8}
+  - {x: -17, y: -3}
+  - {x: -17, y: -5}
+  - {x: -17, y: -2}
+  - {x: -17, y: -6}
+  - {x: -17, y: -4}
+  - {x: -17, y: 2}
+  - {x: -17, y: -1}
+  - {x: -17, y: -10}
+  - {x: -17, y: 0}
+  - {x: -17, y: 1}
+  - {x: -17, y: -9}
+  - {x: -16, y: -6}
+  - {x: -16, y: -10}
+  - {x: -16, y: 1}
+  - {x: -16, y: -5}
+  - {x: -16, y: -4}
+  - {x: -16, y: -8}
+  - {x: -16, y: 0}
+  - {x: -16, y: -9}
+  - {x: -16, y: -3}
+  - {x: -16, y: -1}
+  - {x: -16, y: -2}
+  - {x: -16, y: -7}
+  - {x: -15, y: -2}
+  - {x: -15, y: 0}
+  - {x: -15, y: -5}
+  - {x: -15, y: -3}
+  - {x: -15, y: -1}
+  - {x: -15, y: -4}
+  - {x: -15, y: -6}
+  - {x: -15, y: -10}
+  - {x: -15, y: -6}
+  - {x: -15, y: -7}
+  - {x: -15, y: -9}
+  - {x: -15, y: -8}
+  - {x: -14, y: -1}
+  - {x: -14, y: -2}
+  - {x: -14, y: -4}
+  - {x: -14, y: -7}
+  - {x: -14, y: -3}
+  - {x: -14, y: -8}
+  - {x: -14, y: -5}
+  - {x: -14, y: -6}
+  - {x: -14, y: -10}
+  - {x: -14, y: -9}
+  - {x: -13, y: -5}
+  - {x: -13, y: -9}
+  - {x: -13, y: -7}
+  - {x: -13, y: -6}
+  - {x: -13, y: -10}
+  - {x: -13, y: -4}
+  - {x: -13, y: -8}
+  - {x: -13, y: -2}
+  - {x: -13, y: -3}
+  - {x: -12, y: -9}
+  - {x: -12, y: -10}
+  - {x: -12, y: -2}
+  - {x: -12, y: -6}
+  - {x: -12, y: -8}
+  - {x: -12, y: -4}
+  - {x: -12, y: -7}
+  - {x: -12, y: -3}
+  - {x: -12, y: -5}
+  - {x: -11, y: -3}
+  - {x: -11, y: -8}
+  - {x: -11, y: -6}
+  - {x: -11, y: -10}
+  - {x: -11, y: -4}
+  - {x: -11, y: -9}
+  - {x: -11, y: -5}
+  - {x: -11, y: -7}
+  - {x: -10, y: -6}
+  - {x: -10, y: -7}
+  - {x: -10, y: -10}
+  - {x: -10, y: -5}
+  - {x: -10, y: -4}
+  - {x: -10, y: -8}
+  - {x: -10, y: -9}
+  - {x: -9, y: -9}
+  - {x: -9, y: -7}
+  - {x: -9, y: -8}
+  - {x: -9, y: -6}
 --- !u!1 &1960286099
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,19 +2617,3 @@ Tilemap:
   m_CorrespondingSourceObject: {fileID: 2534765254464438318, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
   m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
---- !u!19719996 &2108888582
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 388196215}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0.00001

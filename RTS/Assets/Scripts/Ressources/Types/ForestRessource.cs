@@ -85,7 +85,7 @@ public class ForestRessource : Ressource
 
     public void Clear()
     {
-        _trees.Clear();
+        _trees?.Clear();
 
         _holyNode?.Children.Clear();
     }

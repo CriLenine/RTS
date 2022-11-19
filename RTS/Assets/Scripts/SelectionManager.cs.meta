@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:RTS/Assets/Scripts/SelectionManager.cs.meta
 guid: 4fafa021605a8384f95a61c9ea94b0a4
+========
+guid: 5bf7464753657b24fa2b3313cd6434fd
+>>>>>>>> Stashed changes:RTS/Assets/Scripts/Ticked Behaviour/Characters/Actions/Attack.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
