@@ -2096,6 +2096,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96c6d192a525ff4abf8d4661b430ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _locoManager: {fileID: 2045357350}
 --- !u!4 &2045357345
 Transform:
   m_ObjectHideFlags: 0
@@ -2171,6 +2172,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afed2b4e794c6643a2ac547739df745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _clickable:
+    serializedVersion: 2
+    m_Bits: 256
+  _environment:
+    serializedVersion: 2
+    m_Bits: 128
+  _boxVisual: {fileID: 340726146}
+  _debug: 0
 --- !u!114 &2045357350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2193,18 +2202,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2045357342}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fafa021605a8384f95a61c9ea94b0a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 16a01fe786e91c7409820494b058d2fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shifting: 0
-  _clickable:
-    serializedVersion: 2
-    m_Bits: 256
-  _environment:
-    serializedVersion: 2
-    m_Bits: 128
-  _boxVisual: {fileID: 340726146}
-  _debug: 0
 --- !u!1 &2049527959
 GameObject:
   m_ObjectHideFlags: 0
