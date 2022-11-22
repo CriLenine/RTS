@@ -41,7 +41,7 @@ public class LocomotionManager : MonoBehaviour
         for(int i = 0; i < characters.Count; ++i)
             IDs[i] = characters[i].ID;
 
-        NetworkManager.Input(TickInput.Move(IDs, rallyPointCoords));
+        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
     }
 
     public bool Move(Character character, Vector2 position)

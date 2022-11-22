@@ -309,9 +309,12 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Move:
-                Spread(input.Targets);
+                //Spread(input.Targets);
 
-                message.Add(input.Position);
+                message.Add(input.Position.x,input.Position.y);
+
+                for (int i = 0; i < input.Targets.Length; ++i) // TODO : Clean
+                    message.Add(input.Targets[i]);
 
                 break;
 

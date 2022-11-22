@@ -15,6 +15,6 @@ public class BuildingBlueprintsManager : MonoBehaviour
 
     public static void SpawnBlueprint(Building.Type building)
     {
-        _instance._actualBlueprint ??= Blueprint.InstantiateWorldPos(building);
+        _instance._actualBlueprint = !_instance._actualBlueprint? Blueprint.InstantiateWorldPos(building): _instance._actualBlueprint;
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+using System;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
@@ -16,8 +16,6 @@ public class CharacterManager : MonoBehaviour
 
     private HashSet<Character> _charactersSelectable = new HashSet<Character>();
     private List<Character> _charactersSelected = new List<Character>();
-
-    private View _currentView;
 
     private void Awake()
     {
@@ -56,7 +54,7 @@ public class CharacterManager : MonoBehaviour
 
     public static void ChangeView()
     {
-        ViewManager.Show<PeonView>();
+        UIManager.ShowTickedBehaviourUI(_instance._charactersSelected[0]);
     }
 
     public static List<Character> SelectedCharacters()
@@ -86,8 +84,7 @@ public class CharacterManager : MonoBehaviour
 
     public static void DeselectAll()
     {
-        if (_instance._currentView != null)
-            _instance._currentView.Hide();
+        UIManager.HideCurrentUI();
 
         foreach (Character characterToRemove in _instance._charactersSelected)
             characterToRemove.SelectionMarker.SetActive(false);

@@ -88,12 +88,12 @@ public class SelectionManager : MonoBehaviour
                     if (!_shifting) // Normal click
                     {
                         CharacterManager.DeselectAll();
-
-                        CharacterManager.ChangeView();
+                       
 
                         CharacterManager.SelectedCharacters().Add(selectedCharacter);
                         selectedCharacter.SelectionMarker.SetActive(true);
 
+                        CharacterManager.ChangeView();
                         if (_debug)
                             selectedCharacter.DebugCoordinates();
                     }

@@ -462,11 +462,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 221595889}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e561a061897767f4c9f7ea7151b1ef4c, type: 3}
+  m_Script: {fileID: 11500000, guid: 54d47b2237d75c34294ef205569cd07c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startingView: {fileID: 0}
-  _views:
+  _tickedBehaviourUI:
   - {fileID: 971529783}
 --- !u!1839735485 &301894023 stripped
 Tilemap:
@@ -957,13 +956,14 @@ GameObject:
   - component: {fileID: 747501732}
   - component: {fileID: 747501734}
   - component: {fileID: 747501733}
+  - component: {fileID: 747501735}
   m_Layer: 5
-  m_Name: Builds
+  m_Name: Constructions
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &747501732
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1024,6 +1024,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 747501731}
   m_CullTransparentMesh: 1
+--- !u!114 &747501735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747501731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bdedb04b2afad9449fe726c405aace6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buildingUI: {fileID: 2139675986669268617, guid: 11b4f3a5aca9ab34fbf3814bba12f5d3, type: 3}
+  _buildingsParent: {fileID: 173254704}
 --- !u!1 &776252608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,8 +1082,9 @@ GameObject:
   - component: {fileID: 953154766}
   - component: {fileID: 953154768}
   - component: {fileID: 953154767}
+  - component: {fileID: 953154769}
   m_Layer: 5
-  m_Name: Depth0
+  m_Name: Default
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1135,6 +1150,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953154765}
   m_CullTransparentMesh: 1
+--- !u!114 &953154769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953154765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3423161b88415264c982b98b19189da9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &971529779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,10 +1254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e062e4350405f7f4d909edbb3ecdad57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _depth0: {fileID: 953154765}
-  _buildings: {fileID: 747501731}
-  _buildinglayoutParent: {fileID: 173254704}
-  _buildingUI: {fileID: 2139675986669268617, guid: 11b4f3a5aca9ab34fbf3814bba12f5d3, type: 3}
+  _views:
+  - {fileID: 953154769}
+  - {fileID: 747501735}
+  _owner: {fileID: 6059221905173487255, guid: 2d27dceb886f90548b235bfb83e7e23b, type: 3}
 --- !u!1 &998780877
 GameObject:
   m_ObjectHideFlags: 0
