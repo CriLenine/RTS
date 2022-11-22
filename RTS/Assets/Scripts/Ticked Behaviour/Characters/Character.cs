@@ -34,6 +34,11 @@ public abstract class Character : TickedBehaviour, IDamageable
         CharacterManager.AddSelectableCharacter(this);
     }
 
+    private void Update()
+    {
+        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
+    }
+
     public sealed override void Tick()
     {
         if (_currentAction?.Perform() == true)
