@@ -28,6 +28,13 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    public int nCharThresh = 3;
+    public QuadTreeNode holyNode;
+    public int x0;
+    public int y0;
+
+    public List<Transform> transformList;
+
     public static void Clear()
     {
         foreach (TickedBehaviour entity in _instance._entities)
@@ -83,6 +90,24 @@ public class GameManager : MonoBehaviour
             entity.Tick();
 
         return new byte[1];
+    }
+
+    [ContextMenu("CreateQuadTree")]
+    public void CreateQuadTree()
+    {
+        holyNode = QuadTreeNode.Init(nCharThresh, x0 + 20, y0 + 13);
+
+        for (int i = 0; i < transformList.Count; i++)
+        {
+            Transform item = transformList[i];
+            holyNode.GetNeighbours(i, 1, (Vector2)item.position + new Vector2(20, 13));
+        }
+        Debug.Log("QuadTree created");
+    }
+    [ContextMenu("clear")]
+    public void ClearTree()
+    {
+        holyNode?.Clear();
     }
 
     [Serializable]
