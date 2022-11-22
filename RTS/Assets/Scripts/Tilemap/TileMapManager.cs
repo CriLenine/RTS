@@ -23,7 +23,7 @@ public class TileMapManager : MonoBehaviour
     private float _tileSizeInverse;
     private float _tilingOffset;
 
-    private static Vector3 _defaultPosition;
+    private Vector3 _defaultPosition;
 
     // Map Dimensions
     private BoundsInt _mapBounds;
@@ -122,7 +122,7 @@ public class TileMapManager : MonoBehaviour
 
     public static Vector3 TilemapCoordsToWorld(Vector2Int coords)
     {
-        Vector3 pos = _defaultPosition + new Vector3(coords.x * TileSize, coords.y * TileSize);
+        Vector3 pos = _instance._defaultPosition + new Vector3(coords.x * TileSize, coords.y * TileSize);
         return pos;
     }
 
