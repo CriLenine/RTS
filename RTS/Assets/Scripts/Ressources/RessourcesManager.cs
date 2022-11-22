@@ -9,8 +9,10 @@ public class RessourcesManager : MonoBehaviour
     [SerializeField]
     private Tilemap _treesTilemap;
 
-    private List<Vector2Int> _allTrees;
-
+    /// <summary>
+    /// Dispatch every forest-like ressource tile in the appropriate <see cref="ForestRessource"/> found in the scene,
+    /// and calls their own Bake.
+    /// </summary>
     [ContextMenu("Bake")]
     public void Bake()
     {
@@ -23,18 +25,16 @@ public class RessourcesManager : MonoBehaviour
             forest.Clear();
 
         foreach (Vector3Int position in _treesTilemap.cellBounds.allPositionsWithin)
-        {
             if (_treesTilemap.HasTile(position))
-                FindNearestForest(forests, (Vector2Int)position).AddTree((Vector2Int)position);
-        }
+                AddToNearestForest(forests, (Vector2Int)position);
 
         foreach (ForestRessource forest in forests)
             forest.Bake((Vector2Int)_treesTilemap.WorldToCell(forest.transform.position));
 
-        Debug.Log("Bake done");
+        Debug.Log("Baked");
     }
 
-    private ForestRessource FindNearestForest(ForestRessource[] forests, Vector2Int position)
+    private void AddToNearestForest(ForestRessource[] forests, Vector2Int position)
     {
         (int minMagnitude, int index) = (int.MaxValue, 0);
 
@@ -46,6 +46,6 @@ public class RessourcesManager : MonoBehaviour
                 (minMagnitude, index) = (currentMagnitude, i);
         }
 
-        return forests[index];
+        forests[index].AddTree(position);
     }
 }

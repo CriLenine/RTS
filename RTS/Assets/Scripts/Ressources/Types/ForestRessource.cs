@@ -5,76 +5,6 @@ using System;
 
 public class ForestRessource : Ressource
 {
-    private class Node<T>
-    {
-        private readonly T _value;
-
-        private List<Node<T>> _children;
-
-        public Node<T> Parent { get; private set; }
-
-        public T Value => _value;
-
-        public Node<T> this[Index i] => _children[i];
-
-        public List<Node<T>> Children => _children;
-
-        public int NodesCount 
-        { 
-            get 
-            {
-                int sum = 0;
-                foreach (Node<T> child in _children)
-                    sum += child.NodesCount;
-                return 1 + sum; 
-            } 
-        }
-
-        public Node(T value, List<Node<T>> children = null)
-        {
-            _value = value;
-
-            _children = children ?? new();
-        }
-
-        public bool RemoveChild(Node<T> node)
-        {
-            return _children.Remove(node);
-        }
-
-        public Node<T> AddChild(T value)
-        {
-            Node<T> newNode = new Node<T>(value) { Parent = this };
-            _children.Add(newNode);
-            return newNode;
-        }
-
-        /// <returns>The parent of the deleted node, which is <see langword="null"/> if the node was not found</returns>
-        public Node<T> DeleteDescendant(T value)
-        {
-            if (_value.Equals(value))
-            {
-                foreach (Node<T> child in _children)
-                {
-                    child.Parent = Parent;
-                    Parent._children.Add(child);
-                }
-                Parent.RemoveChild(this);
-                return Parent;
-            }
-            else
-            {
-                Node<T> deletedNodeParent = null;
-                foreach (Node<T> child in _children)
-                {
-                    deletedNodeParent ??= child.DeleteDescendant(value);
-                    if (deletedNodeParent != null)
-                        return deletedNodeParent;
-                }
-                return deletedNodeParent;                
-            }
-        }
-    }
 
     [SerializeField]
     private List<Vector2Int> _trees;
@@ -86,8 +16,7 @@ public class ForestRessource : Ressource
     public void Clear()
     {
         _trees?.Clear();
-
-        _holyNode?.Children.Clear();
+        _holyNode?.Clear();
     }
 
     #region Baking
@@ -152,17 +81,8 @@ public class ForestRessource : Ressource
     }
     #endregion
 
-    private void RPrintNode(Node<Vector2Int> node, string offset = "")
-    {
-        Debug.Log($"{offset}{node.Value}");
-        if (node.Children.Count == 0)
-            return;
-        offset += "       ";
-        foreach (Node<Vector2Int> child in node.Children)
-            RPrintNode(child, offset);
-    }
-
     /// <summary>
+    /// Called when a tree is cut.
     /// Removes the node <paramref name="lastTree"/> from the data tree
     /// </summary>
     /// <returns>The position of the next tree to cut, or <paramref name="lastTree"/> if forest is empty</returns>
@@ -178,18 +98,18 @@ public class ForestRessource : Ressource
         Node<Vector2Int> substituteParent = _holyNode.DeleteDescendant(lastTree);
         if (_holyNode.NodesCount == 1)
             return lastTree;
-        if (substituteParent.Children.Count > 0)
+        if (!substituteParent.IsLeave)
             return substituteParent[0].Value;
         return substituteParent.Value;
     }
 
     public override void Tick()
     {
-        throw new NotImplementedException();
+        
     }
 
     public override Hash128 GetHash128()
     {
-        throw new NotImplementedException();
+        return new Hash128();
     }
 }
