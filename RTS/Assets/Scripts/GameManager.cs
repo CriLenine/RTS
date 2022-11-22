@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Unity.VisualScripting;
+using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -83,6 +86,65 @@ public class GameManager : MonoBehaviour
             entity.Tick();
 
         return new byte[1];
+    }
+
+    private bool LineOfSight(Vector2 start, Vector2 end)
+    {
+        Vector2Int cStart = TileMapManager.WorldToTilemapCoords(start);
+        Vector2Int cEnd = TileMapManager.WorldToTilemapCoords(end);
+
+        int dx = cEnd.x - cStart.x;
+        int dy = cEnd.y - cStart.y;
+
+        int nx = Mathf.Abs(dx);
+        int ny = Mathf.Abs(dy);
+
+        int signX = dx > 0 ? 1 : -1;
+        int signY = dy > 0 ? 1 : -1;
+
+        int ix = 0, iy = 0;
+
+        while (ix < nx || iy < ny)
+        {
+            int decision = (1 + 2 * ix) * ny - (1 + 2 * iy) * nx;
+
+            if (decision == 0)
+            {
+                cStart.x += signX;
+                cStart.y += signY;
+
+                ++ix;
+                ++iy;
+            }
+            else if (decision < 0)
+            {
+                cStart.x += signX;
+
+                ++ix;
+            }
+            else
+            {
+                cStart.y += signY;
+
+                ++iy;
+            }
+
+            if (TileMapManager.GetTile(cStart).isObstacle)
+                return false;
+        }
+
+        return true;
+
+        /*foreach (Vector2 point in Points)
+            Gizmos.DrawCube(point + Vector2.one * TileMapManager.CellSize / 2f, Vector2.one * TileMapManager.CellSize);
+
+        Gizmos.color = Color.red;
+
+        Gizmos.DrawLine(PStart, PEnd);*/
+    }
+
+    private void OnDrawGizmos()
+    {
     }
 
     [Serializable]

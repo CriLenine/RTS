@@ -257,10 +257,10 @@ public partial class NetworkManager : MonoBehaviour
 
                     GameManager.Clear();
 
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(1, 1)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(0, 0)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(3, 3)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(-1, 7)));
+                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(.25f, .25f)));
+                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(.75f, 1.25f)));
+                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(3.25f, 4.75f)));
+                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(-.75f, -3.25f)));
 
                     StartCoroutine(Loop());
 
