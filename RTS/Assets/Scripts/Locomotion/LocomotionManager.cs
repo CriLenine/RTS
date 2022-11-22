@@ -23,6 +23,9 @@ public class LocomotionManager : MonoBehaviour
         if (characters.Count == 0)
             return;
 
+        //if (characters.Count > 1)
+        //    Debug.Log(TileMapManager.RetreiveClusters(characters).Count);
+
         // Retrieve the rallypoint's coordinates according to the input.
 
         Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());

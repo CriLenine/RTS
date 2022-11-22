@@ -17,20 +17,20 @@ public class TileMapManager : MonoBehaviour
     [SerializeField]
     private int _mapOutline;
 
+    [SerializeField]
+    private Transform _origin;
+
     // Grid Related
     private Grid _grid;
     public static float TileSize { get; private set; }
-    private float _tileSizeInverse;
-    private float _tilingOffset;
-
-    private Vector3 _defaultPosition;
 
     // Map Dimensions
     private BoundsInt _mapBounds;
     private int _mapWidth;
     private int _mapHeight;
-    private Vector2Int _mapDimensions;
-    private Vector2Int _halfMapDimensions;
+
+    private Vector3 _gridPosOffset;
+    private Vector3Int _gridCoordOffset;
 
     private Vector2Int _minPlayable;
     private Vector2Int _maxPlayable;
@@ -69,7 +69,7 @@ public class TileMapManager : MonoBehaviour
     private void Awake()
     {
         if (_instance != null && _instance != this)
-            Destroy(this.gameObject);
+            Destroy(this);
         else
             _instance = this;
 
@@ -79,27 +79,23 @@ public class TileMapManager : MonoBehaviour
         // Retrieval of the grid component.
         _grid = _graphicGroundTilemap.GetComponentInParent<Grid>();
         TileSize = _grid.cellSize.x;
-        _tileSizeInverse = 1 / TileSize;
-        _tilingOffset = TileSize / 2;
 
         // Retrieval of the tilemap's dimension properties.
         _mapBounds = _graphicGroundTilemap.cellBounds;
         _mapWidth = _mapBounds.xMax - _mapBounds.xMin;
         _mapHeight = _mapBounds.yMax - _mapBounds.yMin;
-        _mapDimensions = new Vector2Int(_mapWidth, _mapHeight);
-        _halfMapDimensions = _mapDimensions / 2;
 
         _minPlayable = new Vector2Int(_mapOutline, _mapOutline);
         _maxPlayable = new Vector2Int(_mapWidth - _mapOutline - 1, _mapHeight - _mapOutline - 1);
-
-        // Corresponds to the bottom left corner tile position (x,y,z) whose coordinates are (0,0).
-        _defaultPosition = new Vector3(_tilingOffset - TileSize * _mapWidth * .5f, _tilingOffset - TileSize * _mapHeight * .5f);
 
         // Initialization of the logic tilemap according to the ground graphic tilemap.
         _logicalTiles = new LogicalTile[_mapWidth, _mapHeight];
         for (int x = 0; x < _mapWidth; ++x)
             for (int y = 0; y < _mapHeight; ++y)
                 _logicalTiles[x, y] = new LogicalTile(new Vector2Int(x, y));
+
+        _gridPosOffset = _origin.transform.position - _grid.GetCellCenterWorld(new Vector3Int(0,0));
+        _gridCoordOffset = Vector3Int.FloorToInt(-_gridPosOffset / TileSize);
 
         // Initialization of the obstacles in the logic tilemap according to the top layer tilemap.
         foreach (Vector3Int position in _graphicObstaclesTilemap.cellBounds.allPositionsWithin)
@@ -115,15 +111,12 @@ public class TileMapManager : MonoBehaviour
 
     public static Vector2Int WorldToTilemapCoords(Vector3 position)
     {
-        Vector2Int coords = _instance._halfMapDimensions + new Vector2Int(Mathf.FloorToInt(position.x * _instance._tileSizeInverse),
-                                                                Mathf.FloorToInt(position.y * _instance._tileSizeInverse));
-        return coords;
+        return ((Vector2Int)_instance._grid.WorldToCell(position)) + ((Vector2Int)_instance._gridCoordOffset);
     }
 
     public static Vector3 TilemapCoordsToWorld(Vector2Int coords)
     {
-        Vector3 pos = _instance._defaultPosition + new Vector3(coords.x * TileSize, coords.y * TileSize);
-        return pos;
+        return _instance._grid.GetCellCenterWorld(((Vector3Int)coords)) + _instance._gridPosOffset;
     }
 
     public static void AddObstacle(Vector2Int coords)
@@ -147,7 +140,7 @@ public class TileMapManager : MonoBehaviour
 
     public static bool OutofMap(Vector2Int coords)
     {
-        return coords.x < _instance._minPlayable.x || coords.x > _instance._maxPlayable.x 
+        return coords.x < _instance._minPlayable.x || coords.x > _instance._maxPlayable.x
             || coords.y < _instance._minPlayable.y || coords.y > _instance._maxPlayable.y;
     }
 
@@ -176,7 +169,7 @@ public class TileMapManager : MonoBehaviour
         _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + outlinesCount, _instance._hoveredTileCoords.y + outlinesCount);
 
         // If the building steps outside of the map.
-        if (_instance._previewMin.x < _instance._minPlayable.x || _instance._previewMin.y < _instance._minPlayable.y 
+        if (_instance._previewMin.x < _instance._minPlayable.x || _instance._previewMin.y < _instance._minPlayable.y
             || _instance._previewMax.x > _instance._maxPlayable.x || _instance._previewMax.y > _instance._maxPlayable.y)
             return (_instance._hoveredTilePos, _instance._previousAvailability);
 
@@ -212,7 +205,169 @@ public class TileMapManager : MonoBehaviour
     {
         throw new NotImplementedException("RemoveBuildingToImplement");
     }
+
     #endregion
+
+    #region Clustering
+
+    public static bool[,] RetrieveClusteringMap(int minX, int maxX, int minY, int maxY)
+    {
+        Debug.Log($"dimensions : {minX} {maxX} {minY} {maxY}");
+
+        bool[,] clusteringMap = new bool[maxX, maxY];
+        for (int x = minX; x <= maxX; x++)
+            for (int y = minY; y <= maxY; y++)
+                clusteringMap[x - minX, y - minY] = _instance._logicalTiles[x, y].isObstacle;
+        return clusteringMap;
+    }
+
+    public static List<Character[]> RetreiveClusters(List<Character> characters)
+    {
+        List<Character> remainingCharacters = new List<Character>(characters);
+        List<Character[]> clusters = new List<Character[]>();
+
+        List<Character> XSorted = new List<Character>(characters);
+        List<Character> YSorted = new List<Character>(characters);
+
+        XSorted.Sort((a, b) => a.Coords.x.CompareTo(b.Coords.x));
+        YSorted.Sort((a, b) => a.Coords.y.CompareTo(b.Coords.y));
+
+        int minXindex = XSorted[0].Coords.x;
+        int maxXindex = XSorted[^1].Coords.x;
+        int minYindex = YSorted[0].Coords.y;
+        int maxYindex = YSorted[^1].Coords.y;
+
+        int currentXmin;
+        int currentXmax;
+        int currentYmin;
+        int currentYmax;
+
+        bool[,] clusteringMap = RetrieveClusteringMap(minXindex - 1, maxXindex + 1, minYindex - 1, maxYindex + 1);
+
+        List<Character> currentCluster = new List<Character>();
+        List<Character> currentXSorted = new List<Character>();
+        List<Character> currentYSorted = new List<Character>();
+
+        List<Vector2Int> obstaclesPos = new List<Vector2Int>();
+
+        bool invalidSelection;
+
+        Vector2 mean;
+
+        HashSet<Character> edgeCharacters = new HashSet<Character>();
+
+        Character farthestCharacter;
+        float farthestDistance;
+
+        int currentIteration = 0;
+
+        while (remainingCharacters.Count > 0)
+        {
+            if (remainingCharacters.Count == 1)
+            {
+                clusters.Add(new Character[1] { remainingCharacters[0] });
+                break;
+            }
+
+            currentCluster.Clear();
+            currentCluster.AddRange(remainingCharacters);
+
+            mean = Vector2.zero;
+
+            edgeCharacters.Clear();
+
+            farthestCharacter = null;
+            farthestDistance = 0f;
+
+            do
+            {
+                if (currentIteration++ > characters.Count)
+                {
+                    //Debug.Log("ERROR, MAX ITERATIONS REACHED");
+                    return clusters;
+                }
+
+                currentXSorted.Clear();
+                currentYSorted.Clear();
+                currentXSorted.AddRange(XSorted);
+                currentYSorted.AddRange(XSorted);
+
+                invalidSelection = false;
+
+                obstaclesPos.Clear();
+
+                currentXmin = currentXSorted[0].Coords.x - minXindex;
+                currentXmax = currentXSorted[^1].Coords.x - minXindex;
+                currentYmin = currentYSorted[0].Coords.y - minYindex;
+                currentYmax = currentYSorted[^1].Coords.y - minYindex;
+
+                //Debug.Log($"currentXmin : {currentXmin}, currentXmax : {currentXmax}");
+                //Debug.Log($"currentYmin : {currentYmin}, currentYmax : {currentYmax}");
+
+                for (int x = currentXmin; x <= currentXmax; ++x)
+                    for (int y = currentYmin; y <= currentYmax; ++y)
+                    {
+                        //Debug.Log($"x : {x}, y : {y}, bool = {clusteringMap[x + 1, y + 1]}");
+                        if (clusteringMap[x + 1, y + 1])
+                            obstaclesPos.Add(new Vector2Int(x + 1, y + 1));
+                    }
+
+                //Debug.Log($"Iteration : {currentIteration}, obstacles Count : {obstaclesPos.Count}");
+
+                for (int i = 0; i < obstaclesPos.Count && !invalidSelection; ++i)
+                    for (int x = -1; x <= 1 && !invalidSelection; ++x)
+                        for (int y = -1; y <= 1 && !invalidSelection; ++y)
+                            if (!(x == 0 && y == 0) && clusteringMap[obstaclesPos[i].x + x, obstaclesPos[i].y + y])
+                                invalidSelection = true;
+
+                if (!invalidSelection)
+                    break;
+
+                foreach (Character character in currentCluster)
+                    mean += character.Coords;
+
+                mean /= currentCluster.Count;
+
+                //Debug.Log($"mean : {mean}");
+
+                edgeCharacters.Add(currentXSorted[0]);
+                edgeCharacters.Add(currentYSorted[^1]);
+                edgeCharacters.Add(currentXSorted[0]);
+                edgeCharacters.Add(currentYSorted[^1]);
+
+                foreach (Character character in edgeCharacters)
+                {
+                    float distance = (mean - character.Coords).sqrMagnitude;
+                    if (farthestCharacter == null || distance > farthestDistance)
+                    {
+                        farthestDistance = distance;
+                        farthestCharacter = character;
+                    }
+                }
+
+                currentXSorted.Remove(farthestCharacter);
+                currentYSorted.Remove(farthestCharacter);
+                currentCluster.Remove(farthestCharacter);
+
+            } while (true);
+
+            foreach (Character character in currentCluster)
+            {
+                remainingCharacters.Remove(character);
+                XSorted.Remove(character);
+                YSorted.Remove(character);
+            }
+
+            clusters.Add(currentCluster.ToArray());
+
+            //Debug.Log($"Iteration : {currentIteration}, characters remaining : {remainingCharacters.Count}");
+        }
+
+        return clusters;
+    }
+
+    #endregion
+
     #region PathFinding
 
     public static Stack<LogicalTile> FindPath(Vector2Int startCoords, Vector2Int endCoords)
@@ -254,7 +409,7 @@ public class TileMapManager : MonoBehaviour
                 {
                     Vector2Int neighborCoords = currentCoords + displacement;
 
-                    if (neighborCoords.x < _instance._minPlayable.x || neighborCoords.y < _instance._minPlayable.y 
+                    if (neighborCoords.x < _instance._minPlayable.x || neighborCoords.y < _instance._minPlayable.y
                         || neighborCoords.x > _instance._maxPlayable.x || neighborCoords.y > _instance._maxPlayable.y)
                         continue;
 
@@ -298,9 +453,9 @@ public class TileMapManager : MonoBehaviour
 
                 bestTile.parent = currentTile;
                 currentTile = bestTile;
-                if(_instance._debug)
+                if (_instance._debug)
                     Debug.Log($"path tile considered : {currentTile.Coords}");
-                closed.Add(currentTile); 
+                closed.Add(currentTile);
             }
 
             validNeighbors.Clear();
