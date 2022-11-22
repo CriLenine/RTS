@@ -210,160 +210,31 @@ public class TileMapManager : MonoBehaviour
 
     #region Clustering
 
-    public static bool[,] RetrieveClusteringMap(int minX, int maxX, int minY, int maxY)
+    public static (bool[,], int[]) RetrieveClusteringMap(int minX, int maxX, int minY, int maxY)
     {
-        Debug.Log($"dimensions : {minX} {maxX} {minY} {maxY}");
+        int rangeX = maxX - minX + 1;
+        int rangeY = maxY - minY + 1;
 
-        bool[,] clusteringMap = new bool[maxX, maxY];
-        for (int x = minX; x <= maxX; x++)
-            for (int y = minY; y <= maxY; y++)
+        bool[,] clusteringMap = new bool[rangeX, rangeY];
+        int[] obstaclesCount = new int[rangeY];
+
+        for (int y = minY; y <= maxY; y++)
+            for (int x = minX; x <= maxX; x++)
+            {
                 clusteringMap[x - minX, y - minY] = _instance._logicalTiles[x, y].isObstacle;
-        return clusteringMap;
+                obstaclesCount[y - minY] += _instance._logicalTiles[x, y].isObstacle ? 1 : 0;
+            }
+        return (clusteringMap, obstaclesCount);
     }
 
-    public static List<Character[]> RetreiveClusters(List<Character> characters)
+    public static bool ObstacleDetection(int minX, int maxX, int minY, int maxY)
     {
-        List<Character> remainingCharacters = new List<Character>(characters);
-        List<Character[]> clusters = new List<Character[]>();
+        for (int y = minY; y <= maxY; y++)
+            for (int x = minX; x <= maxX; x++)
+                if (_instance._logicalTiles[x, y].isObstacle)
+                    return true;
 
-        List<Character> XSorted = new List<Character>(characters);
-        List<Character> YSorted = new List<Character>(characters);
-
-        XSorted.Sort((a, b) => a.Coords.x.CompareTo(b.Coords.x));
-        YSorted.Sort((a, b) => a.Coords.y.CompareTo(b.Coords.y));
-
-        int minXindex = XSorted[0].Coords.x;
-        int maxXindex = XSorted[^1].Coords.x;
-        int minYindex = YSorted[0].Coords.y;
-        int maxYindex = YSorted[^1].Coords.y;
-
-        int currentXmin;
-        int currentXmax;
-        int currentYmin;
-        int currentYmax;
-
-        bool[,] clusteringMap = RetrieveClusteringMap(minXindex - 1, maxXindex + 1, minYindex - 1, maxYindex + 1);
-
-        List<Character> currentCluster = new List<Character>();
-        List<Character> currentXSorted = new List<Character>();
-        List<Character> currentYSorted = new List<Character>();
-
-        List<Vector2Int> obstaclesPos = new List<Vector2Int>();
-
-        bool invalidSelection;
-
-        Vector2 mean;
-
-        HashSet<Character> edgeCharacters = new HashSet<Character>();
-
-        Character farthestCharacter;
-        float farthestDistance;
-
-        int currentIteration = 0;
-
-        while (remainingCharacters.Count > 0)
-        {
-            if (remainingCharacters.Count == 1)
-            {
-                clusters.Add(new Character[1] { remainingCharacters[0] });
-                break;
-            }
-
-            currentCluster.Clear();
-            currentCluster.AddRange(remainingCharacters);
-
-            mean = Vector2.zero;
-
-            edgeCharacters.Clear();
-
-            farthestCharacter = null;
-            farthestDistance = 0f;
-
-            do
-            {
-                if (currentIteration++ > characters.Count)
-                {
-                    //Debug.Log("ERROR, MAX ITERATIONS REACHED");
-                    return clusters;
-                }
-
-                currentXSorted.Clear();
-                currentYSorted.Clear();
-                currentXSorted.AddRange(XSorted);
-                currentYSorted.AddRange(XSorted);
-
-                invalidSelection = false;
-
-                obstaclesPos.Clear();
-
-                currentXmin = currentXSorted[0].Coords.x - minXindex;
-                currentXmax = currentXSorted[^1].Coords.x - minXindex;
-                currentYmin = currentYSorted[0].Coords.y - minYindex;
-                currentYmax = currentYSorted[^1].Coords.y - minYindex;
-
-                //Debug.Log($"currentXmin : {currentXmin}, currentXmax : {currentXmax}");
-                //Debug.Log($"currentYmin : {currentYmin}, currentYmax : {currentYmax}");
-
-                for (int x = currentXmin; x <= currentXmax; ++x)
-                    for (int y = currentYmin; y <= currentYmax; ++y)
-                    {
-                        //Debug.Log($"x : {x}, y : {y}, bool = {clusteringMap[x + 1, y + 1]}");
-                        if (clusteringMap[x + 1, y + 1])
-                            obstaclesPos.Add(new Vector2Int(x + 1, y + 1));
-                    }
-
-                //Debug.Log($"Iteration : {currentIteration}, obstacles Count : {obstaclesPos.Count}");
-
-                for (int i = 0; i < obstaclesPos.Count && !invalidSelection; ++i)
-                    for (int x = -1; x <= 1 && !invalidSelection; ++x)
-                        for (int y = -1; y <= 1 && !invalidSelection; ++y)
-                            if (!(x == 0 && y == 0) && clusteringMap[obstaclesPos[i].x + x, obstaclesPos[i].y + y])
-                                invalidSelection = true;
-
-                if (!invalidSelection)
-                    break;
-
-                foreach (Character character in currentCluster)
-                    mean += character.Coords;
-
-                mean /= currentCluster.Count;
-
-                //Debug.Log($"mean : {mean}");
-
-                edgeCharacters.Add(currentXSorted[0]);
-                edgeCharacters.Add(currentYSorted[^1]);
-                edgeCharacters.Add(currentXSorted[0]);
-                edgeCharacters.Add(currentYSorted[^1]);
-
-                foreach (Character character in edgeCharacters)
-                {
-                    float distance = (mean - character.Coords).sqrMagnitude;
-                    if (farthestCharacter == null || distance > farthestDistance)
-                    {
-                        farthestDistance = distance;
-                        farthestCharacter = character;
-                    }
-                }
-
-                currentXSorted.Remove(farthestCharacter);
-                currentYSorted.Remove(farthestCharacter);
-                currentCluster.Remove(farthestCharacter);
-
-            } while (true);
-
-            foreach (Character character in currentCluster)
-            {
-                remainingCharacters.Remove(character);
-                XSorted.Remove(character);
-                YSorted.Remove(character);
-            }
-
-            clusters.Add(currentCluster.ToArray());
-
-            //Debug.Log($"Iteration : {currentIteration}, characters remaining : {remainingCharacters.Count}");
-        }
-
-        return clusters;
+        return false;
     }
 
     #endregion
