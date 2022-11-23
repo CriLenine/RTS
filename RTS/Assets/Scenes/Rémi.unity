@@ -1379,11 +1379,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 998780877}
   m_CullTransparentMesh: 1
---- !u!1839735485 &1070336198 stripped
-Tilemap:
-  m_CorrespondingSourceObject: {fileID: 1294285485, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
-  m_PrefabInstance: {fileID: 1284263631}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1156824138
 GameObject:
   m_ObjectHideFlags: 0
@@ -11576,6 +11571,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
   m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
+--- !u!156049354 &1284263633 stripped
+Grid:
+  m_CorrespondingSourceObject: {fileID: 2534765254042609404, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
+  m_PrefabInstance: {fileID: 1284263631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1428680247
 GameObject:
   m_ObjectHideFlags: 0
@@ -12397,11 +12397,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed3c57f6a2fa4b4b916aa93b312ebda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _graphicGroundTilemap: {fileID: 2108888579}
-  _graphicObstaclesTilemap: {fileID: 301894023}
-  _graphicPreviewTilemap: {fileID: 0}
-  _mapOutline: 4
-  _pathMarker: {fileID: 0}
+  _parentGrid: {fileID: 1284263633}
+  _playableTileMap: {fileID: 2108888579}
+  _obstacleTilemaps:
+  - {fileID: 301894023}
+  _pathMarker: {fileID: 8839846287654581871, guid: 0a9c11a879be0d64b95bfa4720a7c623, type: 3}
   _debug: 0
 --- !u!114 &2045357347
 MonoBehaviour:
@@ -12491,7 +12491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46aab3b4f4e11cb46b96400e3b4b0f15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _treesTilemap: {fileID: 1070336198}
+  _treesTilemap: {fileID: 0}
 --- !u!1 &2049527959
 GameObject:
   m_ObjectHideFlags: 0

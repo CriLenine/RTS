@@ -175,6 +175,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1941924484501974833, guid: 0657be7f630b26e42b7db202de9f5e6d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1941924484501974833, guid: 0657be7f630b26e42b7db202de9f5e6d, type: 3}
       propertyPath: _edgeTolerance
       value: 0.01
       objectReference: {fileID: 0}
@@ -1454,15 +1458,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.846824
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.7724173
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.09209856
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1508,11 +1512,20 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 6830071704997682414, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
 --- !u!4 &1284263632 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
+  m_PrefabInstance: {fileID: 1284263631}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1344685231 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6830071704997682414, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
   m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1428680247
@@ -1827,7 +1840,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603773043}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.846824, y: 1.7724173, z: 0.09209856}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2062,9 +2075,9 @@ GameObject:
   - component: {fileID: 2045357346}
   - component: {fileID: 2045357347}
   - component: {fileID: 2045357348}
+  - component: {fileID: 2045357351}
   - component: {fileID: 2045357349}
   - component: {fileID: 2045357350}
-  - component: {fileID: 2045357351}
   m_Layer: 0
   m_Name: _Scripts
   m_TagString: Untagged
@@ -2096,7 +2109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96c6d192a525ff4abf8d4661b430ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _locoManager: {fileID: 2045357350}
 --- !u!4 &2045357345
 Transform:
   m_ObjectHideFlags: 0
@@ -2128,7 +2140,8 @@ MonoBehaviour:
   _graphicObstaclesTilemap: {fileID: 301894023}
   _graphicPreviewTilemap: {fileID: 0}
   _mapOutline: 4
-  _pathMarker: {fileID: 0}
+  _origin: {fileID: 1344685231}
+  _pathMarker: {fileID: 8839846287654581871, guid: 0a9c11a879be0d64b95bfa4720a7c623, type: 3}
   _debug: 0
 --- !u!114 &2045357347
 MonoBehaviour:
@@ -2172,14 +2185,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afed2b4e794c6643a2ac547739df745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _clickable:
-    serializedVersion: 2
-    m_Bits: 256
-  _environment:
-    serializedVersion: 2
-    m_Bits: 128
-  _boxVisual: {fileID: 340726146}
-  _debug: 0
 --- !u!114 &2045357350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2202,9 +2207,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2045357342}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16a01fe786e91c7409820494b058d2fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 4fafa021605a8384f95a61c9ea94b0a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _shifting: 0
+  _clickable:
+    serializedVersion: 2
+    m_Bits: 256
+  _environment:
+    serializedVersion: 2
+    m_Bits: 128
+  _boxVisual: {fileID: 340726146}
+  _debug: 0
 --- !u!1 &2049527959
 GameObject:
   m_ObjectHideFlags: 0
