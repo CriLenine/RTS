@@ -31,7 +31,7 @@ public abstract class Ressource : TickedBehaviour
                 {
                     if (i == 0 && j == 0)
                         continue;
-                    Vector2Int tilePosition = currentPos + new Vector2Int(i, j);
+                    Vector2Int tilePosition = ressourcePosition + new Vector2Int(i, j);
                     if (TileMapManager.GetLogicalTile(tilePosition).IsFree)
                         availableTiles.Add(tilePosition);
                 }
