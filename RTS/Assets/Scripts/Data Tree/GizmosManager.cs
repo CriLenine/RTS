@@ -16,8 +16,7 @@ public class GizmosManager : MonoBehaviour
         }
     }
 
-    [ContextMenu("Clear")]
-    public void Clear()
+    public static void Clear()
     {
         toDrawStart?.Clear();
         toDrawEnd?.Clear();
