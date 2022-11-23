@@ -14,6 +14,7 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
+    [SerializeField]
     private List<Character> _charactersSelected = new List<Character>();
 
     private View _currentView;

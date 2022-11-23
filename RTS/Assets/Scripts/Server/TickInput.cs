@@ -45,7 +45,7 @@ public class TickInput
         };
     }
 
-    public static TickInput Build(int[] targets, int id, Vector2 position, int performer = 0)
+    public static TickInput Build(int id, Vector2 position, int[] targets, int performer = 0)
     {
         return new TickInput()
         {

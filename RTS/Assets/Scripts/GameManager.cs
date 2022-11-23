@@ -2,27 +2,48 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Windows;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
 
-    private LocomotionManager _locomotionManager;
+    [SerializeField]
+    private Transform _spawnPoints;
 
     #region Init & Variables
 
-    public class TickedList : KeyedCollection<int, TickedBehaviour>
+    public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
     {
-        protected override int GetKeyForItem(TickedBehaviour tickedBehaviour)
+        public TickedBehaviour At(int index)
+        {
+            return Items[index];
+        }
+
+        protected override int GetKeyForItem(T tickedBehaviour)
         {
             return tickedBehaviour.ID;
         }
     }
 
-    private TickedList _entities;
+    private TickedList<TickedBehaviour> _entities = new TickedList<TickedBehaviour>();
+    private TickedList<TickedBehaviour> _myEntities = new TickedList<TickedBehaviour>();
 
-    public static TickedList Entities => _instance._entities;
+    public static TickedList<TickedBehaviour> Entities => _instance._entities;
+    public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
+
+    private TickedList<Character> _characters = new TickedList<Character>();
+    private TickedList<Character> _myCharacters = new TickedList<Character>();
+
+    public static TickedList<Character> Characters => _instance._characters;
+    public static TickedList<Character> MyCharacters => _instance._myCharacters;
+
+    private TickedList<Building> _buildings = new TickedList<Building>();
+    private TickedList<Building> _myBuildings = new TickedList<Building>();
+
+    public static TickedList<Building> Buildings => _instance._buildings;
+    public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
     private void Awake()
     {
@@ -31,22 +52,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
-    private void Start()
-    {
-        _entities = new TickedList();
-
-        _locomotionManager = GetComponent<LocomotionManager>();
-    }
-
     #endregion
-
-    public static void Clear()
-    {
-        foreach (TickedBehaviour entity in _instance._entities)
-            Destroy(entity.gameObject);
-
-        _instance._entities.Clear();
-    }
 
     public static byte[] Tick(TickInput[] inputs)
     {
@@ -55,32 +61,16 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    Character character = TickedBehaviour.Create(input.Performer, PrefabManager.GetCharacterData(input.ID).Character, input.Position);
-
-                    _instance._entities.Add(character);
+                    CreateCharacter(input.Performer, input.ID, input.Position);
 
                     break;
 
                 case InputType.Build:
-
-                    SpawnableDataBuilding data = PrefabManager.GetBuildingData(input.ID);
-
-                    Building building = TickedBehaviour.Create(input.Performer, data.Building, input.Position);
-                    TileMapManager.AddBuilding(data.Outline, input.Position);
-
-                    foreach (int ID in input.Targets)
-                    {
-                        Peon builder = (Peon)_instance._entities[ID];
-                        builder.SetAction(new Move(builder, input.Position));
-                        builder.AddAction(new Build(builder, building));
-                    }
-
-                    _instance._entities.Add(building);
+                    CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
 
                     break;
 
                 case InputType.Move:
-
                     foreach (int ID in input.Targets)
                     {
                         Character walker = (Character)_instance._entities[ID];
@@ -97,193 +87,142 @@ public class GameManager : MonoBehaviour
         return new byte[1];
     }
 
-    private static bool LineOfSight(Vector2Int start, Vector2Int end)
+    #region Create & Destroy TickedBehaviours
+
+    private static Character CreateCharacter(int performer, Character.Type type, Vector2 position)
     {
-        int dx = end.x - start.x;
-        int dy = end.y - start.y;
+        SpawnableDataCharacter data = PrefabManager.GetCharacterData(type);
 
-        int nx = Mathf.Abs(dx);
-        int ny = Mathf.Abs(dy);
+        Character character = TickedBehaviour.Create(performer, data.Character);
 
-        int signX = dx > 0 ? 1 : -1;
-        int signY = dy > 0 ? 1 : -1;
+        _instance._entities.Add(character);
+        _instance._characters.Add(character);
 
-        int ix = 0, iy = 0;
-
-        while (ix < nx || iy < ny)
+        if (performer == NetworkManager.Me)
         {
-            int decision = (1 + 2 * ix) * ny - (1 + 2 * iy) * nx;
-
-            if (decision == 0)
-            {
-                start.x += signX;
-                start.y += signY;
-
-                ++ix;
-                ++iy;
-            }
-            else if (decision < 0)
-            {
-                start.x += signX;
-
-                ++ix;
-            }
-            else
-            {
-                start.y += signY;
-
-                ++iy;
-            }
-
-            if (TileMapManager.GetTile(start).isObstacle)
-                return false;
+            _instance._myEntities.Add(character);
+            _instance._myCharacters.Add(character);
         }
 
-        return true;
+        character.transform.position = position;
+
+        return character;
     }
 
-    /// <summary>
-    /// Clusterize a list of Character taking into account the obstacles
-    /// </summary>
-    /// <para name="peons">Characters to clusterize</para>
-    /// <para name="maxSqrtMagnitude">The square of the maximum distance to the leader of a group</para>
-    /// <returns>A list of Character list</returns>
-    private List<List<Character>> MakeGroups(Character[] peons, float maxSqrtMagnitude = 100f) 
+    private static Character CreateCharacter(int performer, int id, Vector2 position)
     {
-        /// <summary>
-        /// Check if all characters can be contained in a square without obstacles
-        /// </summary>
-        bool IsComplexGroupsNeeded(Character[] characters)
-        {
-            if (characters.Length < 2)
-                return false;
-
-            int minX = characters[0].Coords.x;
-            int maxX = characters[0].Coords.x;
-            int minY = characters[0].Coords.y;
-            int maxY = characters[0].Coords.y;
-
-            for (int i = 1; i < characters.Length; ++i)
-            {
-                Vector2Int coords = characters[i].Coords;
-
-                if (coords.x < minX)
-                    minX = coords.x;
-
-                if (coords.x > maxX)
-                    maxX = coords.x;
-
-                if (coords.y < minY)
-                    minY = coords.y;
-
-                if (coords.y > maxY)
-                    maxY = coords.y;
-            }
-
-            return TileMapManager.ObstacleDetection(minX, maxX, minY, maxY);
-        }
-
-        List<List<Character>> groups = new List<List<Character>>();
-
-        if (!IsComplexGroupsNeeded(peons))
-        {
-            groups.Add(new List<Character>(peons));
-
-            return groups;
-        }
-
-        List<Character> openSet = new List<Character>(peons);
-
-        /// <summary>
-        /// Return the Character closest to the center of gravity of openSet
-        /// </summary>
-        int GetLeader()
-        {
-            Vector2 gravityCenter = Vector2.zero;
-
-            for (int i = 0; i < peons.Length; ++i)
-                gravityCenter += (Vector2)peons[i].transform.position;
-
-            gravityCenter /= peons.Length;
-
-            float bestSrtMagnitude = Vector2.SqrMagnitude((Vector2)openSet[0].transform.position - gravityCenter), sqrtMagnitude;
-            int bestIndex = 0;
-
-            for (int i = 1; i < openSet.Count; ++i)
-            {
-                sqrtMagnitude = Vector2.SqrMagnitude((Vector2)openSet[i].transform.position - gravityCenter);
-
-                if (sqrtMagnitude < bestSrtMagnitude)
-                {
-                    bestIndex = i;
-
-                    bestSrtMagnitude = sqrtMagnitude;
-                }
-            }
-
-            return bestIndex;
-        }
-
-        List<Character> group;
-
-        while (openSet.Count > 0)
-        {
-            int leaderIndex = GetLeader();
-
-            Character leader = openSet[leaderIndex];
-
-            openSet.RemoveAt(leaderIndex);
-
-            group = new List<Character>() { leader };
-
-            for (int i = 0; i < openSet.Count; ++i)
-            {
-                if (Vector2.SqrMagnitude(openSet[i].transform.position - leader.transform.position) <= maxSqrtMagnitude)
-                {
-                    if (LineOfSight(leader.Coords, openSet[i].Coords))
-                    {
-                        group.Add(openSet[i]);
-
-                        openSet.RemoveAt(i);
-
-                        --i;
-                    }
-                }
-            }
-
-            groups.Add(group);
-        }
-
-        return groups;
+        return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private void Update()
+    private static Building CreateBuilding(int performer, Building.Type type, Vector2 position, int[] targets)
     {
-        Character[] peons = FindObjectsOfType<Character>();
+        SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);
 
-        Color[] colors = new Color[] { new Color(1f, 0f, 0f), new Color(0f, 1f, 0f), new Color(0f, 0f, 1f), new Color(1f, 1f, 0f), new Color(1f, 0f, 1f), new Color(0f, 1f, 1f), new Color(0f, 0f, 0f), new Color(0.5019607843137255f, 0f, 0f), new Color(0f, 0.5019607843137255f, 0f), new Color(0f, 0f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0f), new Color(0.5019607843137255f, 0f, 0.5019607843137255f), new Color(0f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.7529411764705882f, 0f, 0f), new Color(0f, 0.7529411764705882f, 0f), new Color(0f, 0f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0f), new Color(0.7529411764705882f, 0f, 0.7529411764705882f), new Color(0f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.25098039215686274f, 0f, 0f), new Color(0f, 0.25098039215686274f, 0f), new Color(0f, 0f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0f), new Color(0.25098039215686274f, 0f, 0.25098039215686274f), new Color(0f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.12549019607843137f, 0f, 0f), new Color(0f, 0.12549019607843137f, 0f), new Color(0f, 0f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0f), new Color(0.12549019607843137f, 0f, 0.12549019607843137f), new Color(0f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.3764705882352941f, 0f, 0f), new Color(0f, 0.3764705882352941f, 0f), new Color(0f, 0f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0f), new Color(0.3764705882352941f, 0f, 0.3764705882352941f), new Color(0f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.6274509803921569f, 0f, 0f), new Color(0f, 0.6274509803921569f, 0f), new Color(0f, 0f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0f), new Color(0.6274509803921569f, 0f, 0.6274509803921569f), new Color(0f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.8784313725490196f, 0f, 0f), new Color(0f, 0.8784313725490196f, 0f), new Color(0f, 0f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0f), new Color(0.8784313725490196f, 0f, 0.8784313725490196f), new Color(0f, 0.8784313725490196f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0.8784313725490196f) };
+        Building building = TickedBehaviour.Create(performer, data.Building);
 
-        List<List<Character>> groups = MakeGroups(peons);
+        _instance._entities.Add(building);
+        _instance._buildings.Add(building);
+
+        if (performer == NetworkManager.Me)
+        {
+            _instance._myEntities.Add(building);
+            _instance._myBuildings.Add(building);
+        }
+
+        TileMapManager.AddBuilding(data.Outline, position);
+
+        foreach (int ID in targets)
+        {
+            Peon builder = (Peon)_instance._entities[ID];
+
+            if (!builder)
+                continue;
+
+            builder.SetAction(new Move(builder, position));
+            builder.AddAction(new Build(builder, building));
+        }
+
+        return building;
     }
+
+    private static Building CreateBuilding(int performer, int type, Vector2 position, int[] targets)
+    {
+        return CreateBuilding(performer, (Building.Type)type, position, targets);
+    }
+
+    public static void DestroyEntity(int id)
+    {
+        Destroy(_instance._entities[id]);
+
+        _instance._entities.Remove(id);
+    }
+
+    public static void DestroyAllEntities()
+    {
+        for (int i = 0; i < _instance._entities.Count; ++i)
+            Destroy(_instance._entities.At(i).gameObject);
+
+        _instance._entities.Clear();
+    }
+
+    #endregion
+
+    public static void Prepare()
+    {
+        for (int i = 0; i < _instance._entities.Count; ++i)
+        {
+            Destroy(_instance._entities.At(i).gameObject);
+            _instance._entities.RemoveAt(i);
+        }
+
+        for (int i = 0; i < NetworkManager.RoomSize; ++i)
+        {
+            Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
+
+            CreateBuilding(i, Building.Type.Farm, spawnPoint, new int[]
+            {
+                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f)).ID,
+                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f)).ID,
+                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f)).ID,
+                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f)).ID,
+            });
+
+            if (i == NetworkManager.Me)
+                CameraMovement.SetPosition(spawnPoint);
+        }
+    }
+
+    #region Debug
+
+    public readonly Color[] Colors = { new Color(1f, 0f, 0f), new Color(0f, 1f, 0f), new Color(0f, 0f, 1f), new Color(1f, 1f, 0f), new Color(1f, 0f, 1f), new Color(0f, 1f, 1f), new Color(0f, 0f, 0f), new Color(0.5019607843137255f, 0f, 0f), new Color(0f, 0.5019607843137255f, 0f), new Color(0f, 0f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0f), new Color(0.5019607843137255f, 0f, 0.5019607843137255f), new Color(0f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.7529411764705882f, 0f, 0f), new Color(0f, 0.7529411764705882f, 0f), new Color(0f, 0f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0f), new Color(0.7529411764705882f, 0f, 0.7529411764705882f), new Color(0f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.25098039215686274f, 0f, 0f), new Color(0f, 0.25098039215686274f, 0f), new Color(0f, 0f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0f), new Color(0.25098039215686274f, 0f, 0.25098039215686274f), new Color(0f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.12549019607843137f, 0f, 0f), new Color(0f, 0.12549019607843137f, 0f), new Color(0f, 0f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0f), new Color(0.12549019607843137f, 0f, 0.12549019607843137f), new Color(0f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.3764705882352941f, 0f, 0f), new Color(0f, 0.3764705882352941f, 0f), new Color(0f, 0f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0f), new Color(0.3764705882352941f, 0f, 0.3764705882352941f), new Color(0f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.6274509803921569f, 0f, 0f), new Color(0f, 0.6274509803921569f, 0f), new Color(0f, 0f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0f), new Color(0.6274509803921569f, 0f, 0.6274509803921569f), new Color(0f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.8784313725490196f, 0f, 0f), new Color(0f, 0.8784313725490196f, 0f), new Color(0f, 0f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0f), new Color(0.8784313725490196f, 0f, 0.8784313725490196f), new Color(0f, 0.8784313725490196f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0.8784313725490196f) };
 
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying)
             return;
 
-        CharacterManager.SelectedCharacters();
+        // Debug Performers //
 
-        // Debug Groups
-
-        /*for (int i = 0; i < Groups.Count; ++i)
+        foreach (TickedBehaviour entity in Entities)
         {
-            Gizmos.color = EcolorList[i];
+            Gizmos.color = Colors[entity.Performer];
 
-            foreach (Peon peon in Groups[i])
-            {
-                Gizmos.DrawWireSphere(peon.transform.position, TileMapManager.TileSize);
-            }
-        }*/
+            Gizmos.DrawCube(entity.transform.position, Vector3.one * TileMapManager.TileSize / 3f);
+        }
+
+        // Debug Groups //
+
+        List<Character> selected = CharacterManager.SelectedCharacters();
+
+        List<List<Character>> groups = SelectionManager.MakeGroups(selected.ToArray());
+
+        for (int i = 0, j; i < groups.Count; ++i)
+        {
+            Gizmos.color = Colors[i + 4];
+
+            for (j = 0; j < groups[i].Count; ++j)
+                Gizmos.DrawWireSphere(groups[i][j].transform.position, TileMapManager.TileSize);
+        }
 
         // Debug Line Of Sight
 
@@ -296,6 +235,8 @@ public class GameManager : MonoBehaviour
 
         Gizmos.DrawLine(TileMapManager.TilemapCoordsToWorld(PStart), TileMapManager.TilemapCoordsToWorld(PEnd));*/
     }
+
+    #endregion
 
     [Serializable]
     public class RessourceCost

@@ -191,7 +191,9 @@ public partial class NetworkManager : MonoBehaviour
     #region Init & Variables
 
     public static float TickPeriod => _instance._tickPeriod;
-    public static int ID => _instance._id;
+
+    public static int Me => _instance._id;
+    public static int RoomSize => _instance._roomSize;
 
     private float _tickPeriod;
 
@@ -201,6 +203,7 @@ public partial class NetworkManager : MonoBehaviour
 
     private int _tick;
 
+    private int _roomSize;
     private int _id;
 
     private Dictionary<int, Tick> _ticks;
@@ -262,12 +265,10 @@ public partial class NetworkManager : MonoBehaviour
 
                     _tickPeriod = BaseTickPeriod;
 
-                    GameManager.Clear();
+                    _id = message.GetInt(1);
+                    _roomSize = message.GetInt(0);
 
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(.25f, .25f)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(.75f, 1.25f)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(3.25f, 4.75f)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(-.75f, -3.25f)));
+                    GameManager.Prepare();
 
                     StartCoroutine(Loop());
 
@@ -300,14 +301,6 @@ public partial class NetworkManager : MonoBehaviour
 
         message.Add((int)input.Type);
 
-        void Spread<T>(T[] array)
-        {
-            message.Add(array.Length);
-
-            for (int i = 0; i < array.Length; ++i)
-                message.Add(array[i]);
-        }
-
         switch (input.Type)
         {
             case InputType.Spawn:
@@ -316,17 +309,16 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Move:
-                Spread(input.Targets);
+                Spread(message, input.Targets);
 
-                message.Add(input.Position);
+                message.Add(input.Position.x, input.Position.y);
 
                 break;
 
             case InputType.Build:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 
-                for (int i = 0; i < input.Targets.Length; ++i) // TODO : Clean
-                    message.Add(input.Targets[i]);
+                Spread(message, input.Targets);
 
                 break;
         }
@@ -471,11 +463,23 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Tools
 
-    private T[] ExtractArray<T>(Message message, uint startIndex = 0)
+    private static void Spread<T>(Message message, T[] array)
     {
-        T[] items = new T[message.Count - startIndex];
+        message.Add(array.Length);
 
-        for (uint i = startIndex; i < message.Count; ++i)
+        for (int i = 0; i < array.Length; ++i)
+            message.Add(array[i]);
+    }
+
+    private static T[] Extract<T>(Message message, uint startIndex, out uint finalIndex)
+    {
+        uint count = (uint)message.GetInt(startIndex++);
+
+        finalIndex = startIndex + count;
+
+        T[] items = new T[count];
+
+        for (uint i = startIndex; i < finalIndex; ++i)
             items[i - startIndex] = (T)message[i];
 
         return items;

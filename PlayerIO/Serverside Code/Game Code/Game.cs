@@ -74,23 +74,35 @@ public partial class GameRoom : Game<Player>
     {
         _players.Add(newcomer);
 
-        newcomer.Index = _players.Count;
+        UpdateIndexes();
 
         BroadcastPlayers();
     }
 
     public override void UserLeft(Player player)
     {
-        if (_state != State.Hosting)
-            DisconnectAll();
+        if (_state == State.Hosting)
+        {
+            _players.Remove(player);
 
-        _players.Remove(player);
+            UpdateIndexes();
+        }
+        else
+            DisconnectAll();
     }
 
     private void DisconnectAll()
     {
         foreach (Player player in _players)
             player.Disconnect();
+
+        _players.Clear();
+    }
+
+    private void UpdateIndexes()
+    {
+        for (int i = 0; i < _players.Count; ++i)
+            _players[i].Index = i;
     }
 
     #endregion
@@ -155,7 +167,7 @@ public partial class GameRoom : Game<Player>
             Reset();
 
             foreach (Player player in _players)
-                player.Send("Start");
+                player.Send("Start", _players.Count, player.Index);
         }
 
         _state = State.Playing;
