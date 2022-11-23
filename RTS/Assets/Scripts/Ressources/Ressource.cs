@@ -31,8 +31,8 @@ public abstract class Ressource : TickedBehaviour
                 {
                     if (i == 0 && j == 0)
                         continue;
-                    Vector2Int tilePosition = ressourcePosition + new Vector2Int(i, j);
-                    if (TileMapManager.GetTile(tilePosition).State == TileState.Free)
+                    Vector2Int tilePosition = currentPos + new Vector2Int(i, j);
+                    if (TileMapManager.GetLogicalTile(tilePosition).IsFree)
                         availableTiles.Add(tilePosition);
                 }
             }
@@ -47,7 +47,7 @@ public abstract class Ressource : TickedBehaviour
                     if (currentMagnitude < minMagnitude)
                         (minMagnitude, index) = (currentMagnitude, i);
                     /*
-                     * TODO : À magnitudes égales, choisir le plus proche du joueur via pathfinding (optionnel)  
+                     * TODO : ï¿½ magnitudes ï¿½gales, choisir le plus proche du joueur via pathfinding (optionnel)  
                      * Remarque : S'il y a un trou proche de l'arbre cible mais inaccessible, c'est cette tile qui sera retenue
                      */
                 }

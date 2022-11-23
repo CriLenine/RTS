@@ -79991,9 +79991,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2534765254042609403, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
   m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1344685231 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6830071704997682414, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
+--- !u!156049354 &1284263633 stripped
+Grid:
+  m_CorrespondingSourceObject: {fileID: 2534765254042609404, guid: 380aebc890f61ba4da7a3aa5b56e711d, type: 3}
   m_PrefabInstance: {fileID: 1284263631}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1428680247
@@ -80604,13 +80604,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed3c57f6a2fa4b4b916aa93b312ebda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _graphicGroundTilemap: {fileID: 2108888579}
-  _graphicObstaclesTilemap: {fileID: 301894023}
-  _graphicPreviewTilemap: {fileID: 0}
-  _mapOutline: 4
-  _origin: {fileID: 1344685231}
+  _parentGrid: {fileID: 1284263633}
+  _playableTileMap: {fileID: 2108888579}
+  _obstacleTilemaps:
+  - {fileID: 301894023}
   _pathMarker: {fileID: 8839846287654581871, guid: 0a9c11a879be0d64b95bfa4720a7c623, type: 3}
-  _debug: 0
+  _debug: 1
 --- !u!114 &2045357347
 MonoBehaviour:
   m_ObjectHideFlags: 0

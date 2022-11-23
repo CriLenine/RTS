@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
                 ++iy;
             }
 
-            if (TileMapManager.GetTile(start).isObstacle)
+            if (TileMapManager.GetLogicalTile(start).IsObstacle)
                 return false;
         }
 

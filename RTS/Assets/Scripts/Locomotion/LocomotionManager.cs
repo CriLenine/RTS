@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
+
 public class LocomotionManager : MonoBehaviour
 {
     private Mouse _mouse;
@@ -31,12 +32,9 @@ public class LocomotionManager : MonoBehaviour
         Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
         Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
 
-        if (TileMapManager.OutofMap(rallyPointCoords))
-            return;
+        LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
-        LogicalTile rallyTile = TileMapManager.GetTile(rallyPointCoords);
-
-        if (rallyTile.State == TileState.Obstacle) // if the rallypoint tile is an obstacle : nothing happens
+        if (rallyTile == null || !rallyTile.IsFree)
             return;
 
         int[] IDs = new int[characters.Count];
@@ -44,7 +42,10 @@ public class LocomotionManager : MonoBehaviour
         for(int i = 0; i < characters.Count; ++i)
             IDs[i] = characters[i].ID;
 
-        NetworkManager.Input(TickInput.Move(IDs, rallyPointCoords));
+        
+        TileMapManager.FindPath(characters[0].Coords, rallyPointCoords);
+
+        //NetworkManager.Input(TickInput.Move(IDs, rallyPointCoords));
     }
 
     public bool Move(Character character, Vector2 position)
