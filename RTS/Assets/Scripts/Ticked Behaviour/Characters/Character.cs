@@ -31,7 +31,6 @@ public abstract class Character : TickedBehaviour, IDamageable
         _actions = new Queue<Action>();
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
-        CharacterManager.AddSelectableCharacter(this);
     }
 
     private void Update()
@@ -64,10 +63,5 @@ public abstract class Character : TickedBehaviour, IDamageable
     public void DebugCoordinates()
     {
         Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
-    }
-
-    private void OnDestroy()
-    {
-        CharacterManager.RemoveSelectableCharacter(this);
     }
 }

@@ -84,7 +84,7 @@ public partial class NetworkManager : MonoBehaviour
             {
                 GUILayout.Label($"Tick N° : {_tick}");
                 GUILayout.Label($"Retard : {_lateness}");
-                GUILayout.Label($"Tick Period : {TickPeriod:0.000}");
+                GUILayout.Label($"Tick Period : {_tickPeriod:0.000}");
             }
             else
             {
@@ -190,13 +190,18 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Init & Variables
 
-    public static float TickPeriod { get; private set; }
+    public static float TickPeriod => _instance._tickPeriod;
+    public static int ID => _instance._id;
+
+    private float _tickPeriod;
 
     private int _lateness = 0;
 
     private bool _wait = false;
 
     private int _tick;
+
+    private int _id;
 
     private Dictionary<int, Tick> _ticks;
 
@@ -226,7 +231,7 @@ public partial class NetworkManager : MonoBehaviour
         if (UnityEngine.Input.GetKeyDown(KeyCode.F3))
             _showGUI = !_showGUI;
 
-        TickPeriod = Mathf.Lerp(TickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
+        _tickPeriod = Mathf.Lerp(_tickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
 
         #region Messages
 
@@ -253,7 +258,9 @@ public partial class NetworkManager : MonoBehaviour
 
                     _tick = 0;
 
-                    TickPeriod = BaseTickPeriod;
+                    _lateness = 0;
+
+                    _tickPeriod = BaseTickPeriod;
 
                     GameManager.Clear();
 
@@ -333,7 +340,7 @@ public partial class NetworkManager : MonoBehaviour
 
         while (IsPlaying)
         {
-            yield return new WaitForSeconds(TickPeriod);
+            yield return new WaitForSeconds(_tickPeriod);
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 

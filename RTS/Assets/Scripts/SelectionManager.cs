@@ -122,7 +122,7 @@ public class SelectionManager : MonoBehaviour
             if (!_shifting)
                 CharacterManager.DeselectAll();
 
-            foreach (Character character in CharacterManager.SelectableCharacters())
+            foreach (Character character in GameManager.Entities)
             {
                 if (_selectionBox.Contains(_camera.WorldToScreenPoint(character.transform.position)))
                 {
