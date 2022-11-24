@@ -12,7 +12,9 @@ public class UIManager : MonoBehaviour
     private ViewManager[] _tickedBehaviourUI;
 
     private Dictionary<Type,ViewManager> _viewManagers;
+
     private ViewManager _currentViewManager;
+    public static ViewManager CurrentManager => _instance._currentViewManager;
     protected void Awake()
     {
         if (_instance == null)
@@ -22,28 +24,31 @@ public class UIManager : MonoBehaviour
             Destroy(this);
             return;
         }
+        _viewManagers = new Dictionary<Type, ViewManager>();
 
-        _viewManagers = new Dictionary<Type,ViewManager>();
+    }
+    private void Start()
+    {
 
         foreach (var tb in _tickedBehaviourUI)
         {
-            _viewManagers.Add(tb.Owner.GetType(), tb);
+            _viewManagers.Add(tb.Owner, tb);
             tb.Initialize();
-            tb.Hide();
+            tb.HideUI();
         }
     }
 
 
     public static void ShowTickedBehaviourUI<T>(T owner) where T : TickedBehaviour
     {
-        if (!_instance._viewManagers.TryGetValue(owner.GetType(), out ViewManager viewManager))
+        if (!_instance._viewManagers.TryGetValue(typeof(T), out ViewManager viewManager))
         {
             throw new NotImplementedException("Missing viewManager");
         }
 
         HideCurrentUI();
 
-        viewManager.Show();
+        viewManager.ShowUI(owner);
         _instance._currentViewManager = viewManager;
 
     }
@@ -52,7 +57,8 @@ public class UIManager : MonoBehaviour
     {
         if (_instance._currentViewManager != null)
         {
-            _instance._currentViewManager.Hide();
+            _instance._currentViewManager.HideUI();
         }
     }
+
 }

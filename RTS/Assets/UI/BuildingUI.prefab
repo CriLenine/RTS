@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 8598195549867156420}
   - component: {fileID: 2139675986669268617}
   m_Layer: 5
-  m_Name: BuildingUI
+  m_Name: ItemUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,6 +285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _image: {fileID: 8598195549882293496}
   _text: {fileID: 1577504236529973409}
+  _button: {fileID: 8598195549867156420}
 --- !u!1 &8598195549882293494
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,3 +362,4 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+  

@@ -16,4 +16,8 @@ public abstract class BuildingData : ScriptableObject
     public int TotalWorkforce => _totalWorkforce;
     public int MaxHealth => _maxHealth;
     public Sprite[] ConstructionSteps => _constructionSteps;
+
+    [SerializeField]
+    private UtilsView[] _views;
+    public UtilsView[] Views => _views;
 }

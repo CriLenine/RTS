@@ -17,6 +17,7 @@ public class Peon : Character
     protected override void Start()
     {
         base.Start();
+        _type = Type.Peon;
         _specificData = (PeonData)_data;
     }
 

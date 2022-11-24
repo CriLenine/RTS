@@ -112,6 +112,9 @@ public class SelectionManager : MonoBehaviour
                         }
                     }
                 }
+                else if(!_shifting) // If we didn't hit anything and shift is not being held
+                    CharacterManager.DeselectAll();
+
 
             }
             else

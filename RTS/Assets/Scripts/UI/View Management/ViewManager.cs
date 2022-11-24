@@ -1,38 +1,51 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
+public enum UiType
+{
+    Chara,
+    Building
+}
+
+public enum UtilsView
+{
+    Default,
+    Construction,
+    Spawn,
+}
 public abstract class ViewManager : MonoBehaviour
 {
-    [SerializeField] 
-    private View[] _views;
+    #region Manager UI
+    [SerializeField] protected TextMeshProUGUI _title;
+    #endregion
+
+    #region Data fields
+    protected UtilsView[] UtilViews;
+    public UtilsView[] ViewsType=> UtilViews;
+    #endregion
 
     [SerializeField]
-    private TickedBehaviour _owner;
-    public TickedBehaviour Owner => _owner;
+    private UiType _owner;
+    public Type Owner => _owner==0 ? typeof(Character): typeof(Building);
+
+    //Viewmanagement
+    [SerializeField]
+    protected View[] _views;
+    public View[] Views => _views;
 
     private View _currentView=null;
 
     private readonly Stack<View> _history = new();
 
-    private void Awake()
+    public virtual void Initialize()
     {
         for (int i = 0; i < _views.Length; i++)
         {
-            _views[i].Initialize();
+            _views[i].Initialize(this);
             _views[i].Hide();
         }
-
-    }
-    private void OnEnable()
-    {
-        for (int i = 0; i < _views.Length; i++)
-        {
-
-            _views[i].Hide();
-        }
-
-        Show<DefaultView>();
     }
     public T GetView<T>() where T : View
     {
@@ -100,8 +113,19 @@ public abstract class ViewManager : MonoBehaviour
         }
     }
 
-    public abstract void Initialize();
-    public virtual void Hide() => gameObject.SetActive(false);
-    public virtual void Show() => gameObject.SetActive(true);
+    public virtual void HideUI() => gameObject.SetActive(false);
+    public virtual void ShowUI<T>(T uiOwner) where T : TickedBehaviour
+    {
+        gameObject.SetActive(true);
+
+        for (int i = 0; i < _views.Length; i++)
+        {
+
+            _views[i].Hide();
+        }
+
+        Show<DefaultView>();
+
+    }
 
 }
