@@ -39,14 +39,8 @@ public abstract class ViewManager : MonoBehaviour
 
     private readonly Stack<View> _history = new();
 
-    public virtual void Initialize()
-    {
-        for (int i = 0; i < _views.Length; i++)
-        {
-            _views[i].Initialize(this);
-            _views[i].Hide();
-        }
-    }
+    public abstract void Initialize();
+
     public T GetView<T>() where T : View
     {
         for (int i = 0; i < _views.Length; i++)

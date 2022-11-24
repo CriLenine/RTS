@@ -15,6 +15,7 @@ public class CharacterManager : MonoBehaviour
     private Locomotion _locomotionInputActions;
 
     private List<Character> _charactersSelected = new List<Character>();
+    private Building _buildingSelected = null;
 
     private void Awake()
     {
@@ -51,14 +52,28 @@ public class CharacterManager : MonoBehaviour
         return _instance._locomotionManager.Move(character, position);
     }
 
-    public static void ChangeView()
+    public static void ChangeView<T>(T owner) where T : TickedBehaviour
     {
-        UIManager.ShowTickedBehaviourUI(_instance._charactersSelected[0]);
+        UIManager.ShowTickedBehaviourUI(owner);
     }
 
     public static List<Character> SelectedCharacters()
     {
         return _instance._charactersSelected;
+    }
+    public static Building SelectedBuilding()
+    {
+        return _instance._buildingSelected;
+    }
+
+    public static bool AddBuildingToSelected(Building building)
+    {
+        if (!_instance._buildingSelected)
+        {
+            _instance._buildingSelected = building;
+            return true;
+        }
+        else return false;
     }
 
     public static void AddCharacterToSelection(Character character)
@@ -79,6 +94,8 @@ public class CharacterManager : MonoBehaviour
     public static void DeselectAll()
     {
         UIManager.HideCurrentUI();
+
+        _instance._buildingSelected = null;
 
         foreach (Character characterToRemove in _instance._charactersSelected)
             characterToRemove.SelectionMarker.SetActive(false);

@@ -12,7 +12,7 @@ public abstract class View : MonoBehaviour
 
 
 
-    public abstract void Initialize(ViewManager parentManager);
+    public abstract void Initialize<T>(T parentManager) where T: ViewManager;
 
     public virtual void Hide()
     {

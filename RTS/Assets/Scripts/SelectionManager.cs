@@ -44,7 +44,6 @@ public class SelectionManager : MonoBehaviour
 
     private void Update()
     {
-
         if (_clicking)
         {
             _endpos = _mouse.position.ReadValue();
@@ -84,7 +83,7 @@ public class SelectionManager : MonoBehaviour
 
             if (hit.collider != null) // if we hit a clickable object
             {
-                if (hit.collider.gameObject.TryGetComponent(out Character selectedCharacter))
+                if (hit.collider.gameObject.TryGetComponent(out Character selectedCharacter)) // Collider = character
                 {
                     if (!_shifting) // Normal click
                     {
@@ -94,7 +93,7 @@ public class SelectionManager : MonoBehaviour
                         CharacterManager.SelectedCharacters().Add(selectedCharacter);
                         selectedCharacter.SelectionMarker.SetActive(true);
 
-                        CharacterManager.ChangeView();
+                        CharacterManager.ChangeView(selectedCharacter);
                         if (_debug)
                             selectedCharacter.DebugCoordinates();
                     }
@@ -111,6 +110,12 @@ public class SelectionManager : MonoBehaviour
                             selectedCharacter.SelectionMarker.SetActive(false);
                         }
                     }
+                }
+                else if(hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
+                {
+                        CharacterManager.DeselectAll();
+                        CharacterManager.AddBuildingToSelected(selectedBuilding);
+                        CharacterManager.ChangeView(selectedBuilding);
                 }
                 else if(!_shifting) // If we didn't hit anything and shift is not being held
                     CharacterManager.DeselectAll();
@@ -139,7 +144,7 @@ public class SelectionManager : MonoBehaviour
             }
 
             if (CharacterManager.SelectedCharacters().Count > 0)
-                CharacterManager.ChangeView();
+                CharacterManager.ChangeView(CharacterManager.SelectedCharacters()[0]);
         }
 
         _startpos = Vector2.zero;

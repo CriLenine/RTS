@@ -6,7 +6,7 @@ public class ConstructionView : View
 {
     [SerializeField] private ItemUI _buildingUI;
     [SerializeField] private Transform _buildingsParent;
-    public override void Initialize(ViewManager parentManager) 
+    public override void Initialize<T>(T parentManager) 
     {
         foreach (var building in PrefabManager.DataBuildings)
         {

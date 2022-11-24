@@ -10,7 +10,7 @@ public class DefaultView : View
     [SerializeField] private Transform _itemParent;
 
     private ViewManager manager;
-    public override void Initialize(ViewManager parentManager)
+    public override void Initialize<T>(T parentManager)
     {
         manager = parentManager;
         _utilViews = new Dictionary<UtilsView,ItemUI>();
