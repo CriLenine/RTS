@@ -14,7 +14,6 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
-    private HashSet<Character> _charactersSelectable = new HashSet<Character>();
     private List<Character> _charactersSelected = new List<Character>();
 
     private void Awake()
@@ -62,11 +61,6 @@ public class CharacterManager : MonoBehaviour
         return _instance._charactersSelected;
     }
 
-    public static HashSet<Character> SelectableCharacters()
-    {
-        return _instance._charactersSelectable;
-    }
-
     public static void AddCharacterToSelection(Character character)
     {
         _instance._charactersSelected.Add(character);
@@ -89,16 +83,6 @@ public class CharacterManager : MonoBehaviour
         foreach (Character characterToRemove in _instance._charactersSelected)
             characterToRemove.SelectionMarker.SetActive(false);
         _instance._charactersSelected.Clear();
-    }
-
-    public static void AddSelectableCharacter(Character characterToAdd) // Every time a new character is created
-    {
-        _instance._charactersSelectable.Add(characterToAdd);
-    }
-
-    public static void RemoveSelectableCharacter(Character characterToRemove) // Every time a character dies
-    {
-        _instance._charactersSelectable.Remove(characterToRemove);
     }
 
     public static int[] GetSelectedIds()

@@ -23,6 +23,11 @@ public abstract class TickedBehaviour : MonoBehaviour
         return Create(performer, prefab, position, Quaternion.identity);
     }
 
+    public static T Create<T>(int performer, T prefab) where T : TickedBehaviour
+    {
+        return Create(performer, prefab, Vector3.zero, Quaternion.identity);
+    }
+
     #endregion
 
     public int ID { get; private set; }

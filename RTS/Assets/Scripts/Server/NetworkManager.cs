@@ -82,9 +82,9 @@ public partial class NetworkManager : MonoBehaviour
 
             if (IsPlaying)
             {
-                GUILayout.Label($"Tick N° : {_tick}");
+                GUILayout.Label($"Tick Nï¿½ : {_tick}");
                 GUILayout.Label($"Retard : {_lateness}");
-                GUILayout.Label($"Tick Period : {TickPeriod:0.000}");
+                GUILayout.Label($"Tick Period : {_tickPeriod:0.000}");
             }
             else
             {
@@ -115,7 +115,7 @@ public partial class NetworkManager : MonoBehaviour
 
                 style.normal.textColor = IsReady ? Color.green : Color.red;
 
-                if (GUILayout.Button("Prêt", style))
+                if (GUILayout.Button("Prï¿½t", style))
                     _server.Send("Ready");
 
                 style.normal.textColor = color;
@@ -190,13 +190,21 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Init & Variables
 
-    public static float TickPeriod { get; private set; }
+    public static float TickPeriod => _instance._tickPeriod;
+
+    public static int Me => _instance._id;
+    public static int RoomSize => _instance._roomSize;
+
+    private float _tickPeriod;
 
     private int _lateness = 0;
 
     private bool _wait = false;
 
     private int _tick;
+
+    private int _roomSize;
+    private int _id;
 
     private Dictionary<int, Tick> _ticks;
 
@@ -226,7 +234,7 @@ public partial class NetworkManager : MonoBehaviour
         if (UnityEngine.Input.GetKeyDown(KeyCode.F3))
             _showGUI = !_showGUI;
 
-        TickPeriod = Mathf.Lerp(TickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
+        _tickPeriod = Mathf.Lerp(_tickPeriod, _lateness > 5 ? MinTickPeriod : BaseTickPeriod, Time.deltaTime);
 
         #region Messages
 
@@ -253,14 +261,14 @@ public partial class NetworkManager : MonoBehaviour
 
                     _tick = 0;
 
-                    TickPeriod = BaseTickPeriod;
+                    _lateness = 0;
 
-                    GameManager.Clear();
+                    _tickPeriod = BaseTickPeriod;
 
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(1, 1)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(0, 0)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(3, 3)));
-                    Input(TickInput.Spawn((int)Character.Type.Peon, new Vector2(-1, 7)));
+                    _id = message.GetInt(1);
+                    _roomSize = message.GetInt(0);
+
+                    GameManager.Prepare();
 
                     StartCoroutine(Loop());
 
@@ -293,14 +301,6 @@ public partial class NetworkManager : MonoBehaviour
 
         message.Add((int)input.Type);
 
-        void Spread<T>(T[] array)
-        {
-            message.Add(array.Length);
-
-            for (int i = 0; i < array.Length; ++i)
-                message.Add(array[i]);
-        }
-
         switch (input.Type)
         {
             case InputType.Spawn:
@@ -321,8 +321,7 @@ public partial class NetworkManager : MonoBehaviour
             case InputType.Build:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 
-                for (int i = 0; i < input.Targets.Length; ++i) // TODO : Clean
-                    message.Add(input.Targets[i]);
+                Spread(message, input.Targets);
 
                 break;
         }
@@ -336,7 +335,7 @@ public partial class NetworkManager : MonoBehaviour
 
         while (IsPlaying)
         {
-            yield return new WaitForSeconds(TickPeriod);
+            yield return new WaitForSeconds(_tickPeriod);
 
             yield return new WaitUntil(() => _ticks.ContainsKey(_tick));
 
@@ -467,11 +466,23 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Tools
 
-    private T[] ExtractArray<T>(Message message, uint startIndex = 0)
+    private static void Spread<T>(Message message, T[] array)
     {
-        T[] items = new T[message.Count - startIndex];
+        message.Add(array.Length);
 
-        for (uint i = startIndex; i < message.Count; ++i)
+        for (int i = 0; i < array.Length; ++i)
+            message.Add(array[i]);
+    }
+
+    private static T[] Extract<T>(Message message, uint startIndex, out uint finalIndex)
+    {
+        uint count = (uint)message.GetInt(startIndex++);
+
+        finalIndex = startIndex + count;
+
+        T[] items = new T[count];
+
+        for (uint i = startIndex; i < finalIndex; ++i)
             items[i - startIndex] = (T)message[i];
 
         return items;
