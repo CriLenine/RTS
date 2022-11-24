@@ -198,6 +198,7 @@ public class TileMapManager : MonoBehaviour
     #endregion
 
     #region Displacement
+
     public static bool ObstacleDetection(int minX, int maxX, int minY, int maxY)
     {
         LogicalTile tile;
@@ -209,6 +210,8 @@ public class TileMapManager : MonoBehaviour
 
         return false;
     }
+
+    #endregion
 
     #region PathFinding
 
@@ -340,6 +343,52 @@ public class TileMapManager : MonoBehaviour
 
     #endregion
 
+    #region Tools
+
+    public static bool LineOfSight(Vector2Int start, Vector2Int end)
+    {
+        int dx = end.x - start.x;
+        int dy = end.y - start.y;
+
+        int nx = Mathf.Abs(dx);
+        int ny = Mathf.Abs(dy);
+
+        int signX = dx > 0 ? 1 : -1;
+        int signY = dy > 0 ? 1 : -1;
+
+        int ix = 0, iy = 0;
+
+        while (ix < nx || iy < ny)
+        {
+            int decision = (1 + 2 * ix) * ny - (1 + 2 * iy) * nx;
+
+            if (decision == 0)
+            {
+                start.x += signX;
+                start.y += signY;
+
+                ++ix;
+                ++iy;
+            }
+            else if (decision < 0)
+            {
+                start.x += signX;
+
+                ++ix;
+            }
+            else
+            {
+                start.y += signY;
+
+                ++iy;
+            }
+
+            if (GetLogicalTile(start).IsObstacle)
+                return false;
+        }
+
+        return true;
+    }
+
     #endregion
 }
-

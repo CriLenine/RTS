@@ -10,16 +10,6 @@ public partial class NetworkManager
 
         public Tick(Message message)
         {
-            static T[] Extract<T>(Message message, uint start = 0)
-            {
-                T[] array = new T[message.Count - start];
-
-                for (uint i = 0; i < array.Length; ++i)
-                    array[i] = (T)message[start + i];
-
-                return array;
-            }
-
             List<TickInput> inputs = new List<TickInput>();
 
             uint i = 1;
@@ -45,11 +35,9 @@ public partial class NetworkManager
 
                     case InputType.Move:
                         {
+                            int[] targets = Extract<int>(message, i, out i);
+
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
-
-                            int[] targets = Extract<int>(message, i);
-
-                            i += (uint)targets.Length;
 
                             inputs.Add(TickInput.Move(targets, position, performer));
 
@@ -62,11 +50,9 @@ public partial class NetworkManager
 
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
-                            int[] ids = Extract<int>(message, i);
+                            int[] ids = Extract<int>(message, i, out i);
 
-                            i += (uint)ids.Length;
-
-                            inputs.Add(TickInput.Build(ids, id, position, performer));
+                            inputs.Add(TickInput.Build(id, position, ids, performer));
 
                             break;
                         }

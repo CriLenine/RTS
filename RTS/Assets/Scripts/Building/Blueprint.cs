@@ -53,7 +53,7 @@ public class Blueprint : MonoBehaviour
         {
             int[] selected = CharacterManager.GetSelectedIds();
 
-            NetworkManager.Input(TickInput.Build(selected, (int)_buildType, transform.position));
+            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position, selected));
 
             Destroy(gameObject);
         }

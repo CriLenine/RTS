@@ -5,7 +5,7 @@ public abstract class Character : TickedBehaviour, IDamageable
 {
     private Action _currentAction;
 
-    private Queue<Action> _actions;
+    private Queue<Action> _actions = new Queue<Action>();
 
     public enum Type
     {
@@ -28,8 +28,6 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Start()
     {
-        _actions = new Queue<Action>();
-
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
 

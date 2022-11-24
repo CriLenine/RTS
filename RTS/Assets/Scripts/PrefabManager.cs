@@ -44,18 +44,8 @@ public class PrefabManager : MonoBehaviour
         return _instance._buildingsPrefabs[peonBuilds];
     }
 
-    public static SpawnableDataBuilding GetBuildingData(int peonBuilds)
-    {
-        return GetBuildingData((Building.Type)peonBuilds);
-    }
-
     public static SpawnableDataCharacter GetCharacterData(Character.Type characterType)
     {
         return _instance._charactersPrefabs[characterType];
-    }
-
-    public static SpawnableDataCharacter GetCharacterData(int characterType)
-    {
-        return GetCharacterData((Character.Type)characterType);
     }
 }

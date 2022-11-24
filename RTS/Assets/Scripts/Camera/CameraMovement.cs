@@ -11,10 +11,13 @@ public class CameraMovement : MonoBehaviour
     [Header("Horizontal Translation")]
     [SerializeField]
     private float _max_speed = 5f;
+
     private float _speed;
+
     [Header("Horizontal Translation")]
     [SerializeField]
     private float _acceleration = 10f;
+
     [Header("Horizontal Translation")]
     [SerializeField]
     private float _damping = 15f;
@@ -22,15 +25,19 @@ public class CameraMovement : MonoBehaviour
     [Header("Vertical Translation")]
     [SerializeField]
     private float _stepSize = 2f;
+
     [Header("Vertical Translation")]
     [SerializeField]
     private float _zoomDampening = 7.5f;
+
     [Header("Vertical Translation")]
     [SerializeField]
     private float _minHeight = 5f;
+
     [Header("Vertical Translation")]
     [SerializeField]
     private float _maxHeight = 50f;
+
     [Header("Vertical Translation")]
 
     [Header("Rotation")]
@@ -55,8 +62,12 @@ public class CameraMovement : MonoBehaviour
     //tracks where the dragging action started
     private Vector3 _startDrag;
 
+    private static CameraMovement _instance;
+
     private void Awake()
     {
+        _instance = this;
+
         _cameraActions = new CameraControls();
         _camera = this.GetComponentInChildren<Camera>();
         _cameraTransform = _camera.transform;
@@ -66,7 +77,7 @@ public class CameraMovement : MonoBehaviour
     {
         _zoomHeight = _camera.orthographicSize;
 
-        _lastPosition = this.transform.position;
+        _lastPosition = transform.position;
 
         _movement = _cameraActions.Camera.Move;
         _cameraActions.Camera.RotateCamera.performed += RotateCamera;
@@ -94,11 +105,16 @@ public class CameraMovement : MonoBehaviour
         UpdateCameraPosition();
     }
 
+    public static void SetPosition(Vector2 position)
+    {
+        _instance._lastPosition = _instance.transform.position = position;
+    }
+
     private void UpdateVelocity()
     {
-        _horizontalVelocity = (this.transform.position - _lastPosition) / Time.deltaTime;
+        _horizontalVelocity = (transform.position - _lastPosition) / Time.deltaTime;
         _horizontalVelocity.y = 0f;
-        _lastPosition = this.transform.position;
+        _lastPosition = transform.position;
     }
 
     private void GetKeyboard_movement()
