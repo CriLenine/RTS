@@ -51,7 +51,10 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
     }
+    #endregion
 
+    #region Debug
+    private static Building _buildingToBuild;
     #endregion
 
     public static byte[] Tick(TickInput[] inputs)
@@ -84,6 +87,10 @@ public class GameManager : MonoBehaviour
         foreach (TickedBehaviour entity in _instance._entities)
             entity.Tick();
 
+        #region Debug
+        if(_buildingToBuild != null)
+            _buildingToBuild = _buildingToBuild.AddWorkforce(2)? null : _buildingToBuild;
+        #endregion
         return new byte[1];
     }
 
@@ -118,7 +125,7 @@ public class GameManager : MonoBehaviour
     {
         SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);
 
-        Building building = TickedBehaviour.Create(performer, data.Building);
+        Building building = TickedBehaviour.Create(performer, data.Building,position);
 
         _instance._entities.Add(building);
         _instance._buildings.Add(building);
@@ -131,20 +138,43 @@ public class GameManager : MonoBehaviour
 
         TileMapManager.AddBuilding(data.Outline, position);
 
-        foreach (int ID in targets)
-        {
-            Peon builder = (Peon)_instance._entities[ID];
+            foreach (int ID in targets)
+            {
+                Peon builder = (Peon)_instance._entities[ID];
 
-            if (!builder)
-                continue;
+                if (!builder)
+                    continue;
 
-            builder.SetAction(new Move(builder, position));
-            builder.AddAction(new Build(builder, building));
-        }
+                builder.SetAction(new Move(builder, position));
+                builder.AddAction(new Build(builder, building));
+            }
+
 
         return building;
     }
 
+    private static Building CreateBuilding(int performer, Building.Type type, Vector2 position) //CreateBuildingWithoutPeon
+    {
+        SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);
+
+        Building building = TickedBehaviour.Create(performer, data.Building, position);
+
+        _instance._entities.Add(building);
+        _instance._buildings.Add(building);
+
+        if (performer == NetworkManager.Me)
+        {
+            _instance._myEntities.Add(building);
+            _instance._myBuildings.Add(building);
+        }
+
+        TileMapManager.AddBuilding(data.Outline, position);
+
+            
+        _buildingToBuild = building;
+
+        return building;
+    }
     private static Building CreateBuilding(int performer, int type, Vector2 position, int[] targets)
     {
         return CreateBuilding(performer, (Building.Type)type, position, targets);
@@ -179,13 +209,12 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateBuilding(i, Building.Type.Farm, spawnPoint, new int[]
-            {
-                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f)).ID,
-                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f)).ID,
-                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f)).ID,
-                CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f)).ID,
-            });
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
+
+            CreateBuilding(i, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
