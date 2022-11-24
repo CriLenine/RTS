@@ -35,5 +35,13 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     public abstract void Tick();
 
-    public abstract Hash128 GetHash128();
+    public virtual Hash128 GetHash128()
+    {
+        Hash128 hash = new Hash128();
+
+        hash.Append(Performer);
+        hash.Append(ID);
+
+        return hash;
+    }
 }

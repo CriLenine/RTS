@@ -25,8 +25,8 @@ public partial class NetworkManager : MonoBehaviour
     public static bool Hosted => _instance._server != null;
 
     public static bool IsReady => _instance._me.IsReady;
-    public static bool IsPlaying => _instance._isPlaying;
-    public static bool IsRunning => _instance._isRunning;
+    public static bool IsPlaying => Hosted && _instance._isPlaying;
+    public static bool IsRunning => Hosted && _instance._isRunning;
 
     #endregion
 
@@ -287,6 +287,11 @@ public partial class NetworkManager : MonoBehaviour
                     ++_lateness;
 
                     break;
+
+                case "Disconnect":
+                    Debug.Log("Disconnect : " + message.GetString(0));
+
+                    break;
             }
         }
 
@@ -338,7 +343,7 @@ public partial class NetworkManager : MonoBehaviour
 
             if (IsRunning)
             {
-                byte[] hash = GameManager.Tick(_ticks[_tick].Inputs);
+                int hash = GameManager.Tick(_ticks[_tick].Inputs);
 
                 _server.Send("Tick", hash);
 
@@ -450,6 +455,8 @@ public partial class NetworkManager : MonoBehaviour
     private static void OnDisconnect(object sender, string reason)
     {
         Debug.Log("Disconnected from room.");
+
+        _instance.StopCoroutine(_instance.Loop());
 
         _instance._server = null;
     }

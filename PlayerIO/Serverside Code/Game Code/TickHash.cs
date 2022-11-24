@@ -2,27 +2,20 @@
 {
     private class TickHash
     {
-        public readonly byte[] Hash;
+        public readonly int Hash;
         public int Count { get; private set; }
 
-        public TickHash(byte[] hash)
+        public TickHash(int hash)
         {
             Hash = hash;
             Count = 1;
         }
 
-        public bool Compare(byte[] hash)
+        public bool Compare(int hash)
         {
             ++Count;
 
-            if (hash.Length != Hash.Length)
-                return false;
-
-            for (int i = 0; i < hash.Length; ++i)
-                if (hash[i] != Hash[i])
-                    return false;
-
-            return true;
+            return hash == Hash;
         }
     }
 }

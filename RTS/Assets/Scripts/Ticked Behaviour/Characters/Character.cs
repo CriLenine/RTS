@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -19,27 +19,29 @@ public abstract class Character : TickedBehaviour, IDamageable
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
-    public int MaxHealth => _data.MaxHealth;
+    public int MaxHealth => Data.MaxHealth;
 
     public GameObject SelectionMarker;
     public Vector2Int Coords;
 
     public Stack<LogicalTile> Path;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
 
-    private void Update()
+    protected virtual void Start()
     {
-        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
+
     }
 
     public sealed override void Tick()
     {
         if (_currentAction?.Perform() == true)
             _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+
+        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
 
     public void AddAction(Action action)
@@ -61,5 +63,15 @@ public abstract class Character : TickedBehaviour, IDamageable
     public void DebugCoordinates()
     {
         Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
+    }
+
+    public override Hash128 GetHash128()
+    {
+        Hash128 hash = base.GetHash128();
+
+        hash.Append(Coords.x);
+        hash.Append(Coords.y);
+
+        return hash;
     }
 }

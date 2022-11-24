@@ -1,11 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 
 public class ForestRessource : Ressource
 {
-
     [SerializeField]
     private List<Vector2Int> _trees;
 
@@ -110,6 +108,6 @@ public class ForestRessource : Ressource
 
     public override Hash128 GetHash128()
     {
-        return new Hash128();
+        return base.GetHash128();
     }
 }
