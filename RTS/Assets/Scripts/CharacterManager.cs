@@ -39,12 +39,12 @@ public class CharacterManager : MonoBehaviour
 
         _locomotionInputActions = new Locomotion();
         _locomotionInputActions.Enable(); 
-        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.QueueDisplacement();
+        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters();
     }
 
     public static void QueueDisplacement()
     {
-        _instance._locomotionManager.QueueDisplacement();
+        _instance._locomotionManager.RallySelectedCharacters();
     }
 
     public static bool Move(Character character, Vector2 position)

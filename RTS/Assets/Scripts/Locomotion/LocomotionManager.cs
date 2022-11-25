@@ -11,13 +11,15 @@ public class LocomotionManager : MonoBehaviour
     [SerializeField]
     private bool _debug;
 
+    QuadTreeNode holyNode = QuadTreeNode.Init(4, 20, 13);
+
     private void Start()
     {
         _mouse = Mouse.current;
         _camera = Camera.main;
     }
 
-    public void QueueDisplacement()
+    public void RallySelectedCharacters()
     {
         List<Character> characters = CharacterManager.SelectedCharacters();
 
@@ -39,18 +41,47 @@ public class LocomotionManager : MonoBehaviour
 
         int[] IDs = new int[characters.Count];
 
-        for(int i = 0; i < characters.Count; ++i)
+        for (int i = 0; i < characters.Count; ++i)
             IDs[i] = characters[i].ID;
 
-        
-        //TileMapManager.FindPath(characters[0].Coords, rallyPointCoords);
+        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
 
-        NetworkManager.Input(TickInput.Move(IDs,worldMousePos));
+        // HashSet<int> neighbors = holyNode.GetNeighbours(characters[0].ID, .3f, .5f, characters[0].transform.position);
     }
 
-    public bool Move(Character character, Vector2 position)
+    public static List<Vector2> RetrieveWayPoints(Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
-        character.transform.position = position;
-        return true;
+        List<Vector2Int> wayPoints = TileMapManager.FindPath(leader.Coords, rallyPoint);
+
+        List<Vector2> positionWayPoints = new List<Vector2>() { TileMapManager.TilemapCoordsToWorld(wayPoints[^1]) };
+
+        if (!smooth || (wayPoints.Count < 2)) {
+            for (int i = 0; i < wayPoints.Count - 1; ++i)
+                positionWayPoints.Add(TileMapManager.TilemapCoordsToWorld(wayPoints[i]));
+            return positionWayPoints;
+        }
+
+        int currentWayPointIndex = wayPoints.Count - 1;
+        int index;
+
+        while (currentWayPointIndex != 0)
+        {
+            for (index = 0; index < currentWayPointIndex; ++index)
+                if (TileMapManager.LineOfSight(wayPoints[currentWayPointIndex], wayPoints[index]))
+                    break;
+
+            positionWayPoints.Add(TileMapManager.TilemapCoordsToWorld(wayPoints[index]));
+
+            currentWayPointIndex = index;
+        }
+
+        return positionWayPoints;
+    }
+
+    public bool Move(Character character, Vector3 position)
+    {
+        character.transform.position = Vector2.MoveTowards(character.transform.position, position, TileMapManager.TileSize / 10f);
+
+        return character.transform.position == position;
     }
 }
