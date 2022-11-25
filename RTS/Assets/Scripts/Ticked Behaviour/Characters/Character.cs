@@ -12,6 +12,8 @@ public abstract class Character : TickedBehaviour, IDamageable
         Peon,
         Knight
     }
+    protected Type _type;
+    public Type CharaType;
 
     [SerializeField]
     protected CharacterData _data;

@@ -82,7 +82,7 @@ public partial class NetworkManager : MonoBehaviour
 
             if (IsPlaying)
             {
-                GUILayout.Label($"Tick N° : {_tick}");
+                GUILayout.Label($"Tick Nï¿½ : {_tick}");
                 GUILayout.Label($"Retard : {_lateness}");
                 GUILayout.Label($"Tick Period : {_tickPeriod:0.000}");
             }
@@ -115,7 +115,7 @@ public partial class NetworkManager : MonoBehaviour
 
                 style.normal.textColor = IsReady ? Color.green : Color.red;
 
-                if (GUILayout.Button("Prêt", style))
+                if (GUILayout.Button("Prï¿½t", style))
                     _server.Send("Ready");
 
                 style.normal.textColor = color;
@@ -309,9 +309,11 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Move:
-                Spread(message, input.Targets);
+                
 
-                message.Add(input.Position.x, input.Position.y);
+                message.Add(input.Position.x,input.Position.y);
+
+                Spread(message, input.Targets);
 
                 break;
 

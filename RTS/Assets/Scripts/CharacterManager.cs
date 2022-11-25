@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+using System;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
@@ -15,8 +15,7 @@ public class CharacterManager : MonoBehaviour
     private Locomotion _locomotionInputActions;
 
     private List<Character> _charactersSelected = new List<Character>();
-
-    private View _currentView;
+    private Building _buildingSelected = null;
 
     private void Awake()
     {
@@ -53,14 +52,28 @@ public class CharacterManager : MonoBehaviour
         return _instance._locomotionManager.Move(character, position);
     }
 
-    public static void ChangeView()
+    public static void ChangeView<T>(T owner) where T : TickedBehaviour
     {
-        ViewManager.Show<PeonView>();
+        UIManager.ShowTickedBehaviourUI(owner);
     }
 
     public static List<Character> SelectedCharacters()
     {
         return _instance._charactersSelected;
+    }
+    public static Building SelectedBuilding()
+    {
+        return _instance._buildingSelected;
+    }
+
+    public static bool AddBuildingToSelected(Building building)
+    {
+        if (!_instance._buildingSelected)
+        {
+            _instance._buildingSelected = building;
+            return true;
+        }
+        else return false;
     }
 
     public static void AddCharacterToSelection(Character character)
@@ -80,8 +93,9 @@ public class CharacterManager : MonoBehaviour
 
     public static void DeselectAll()
     {
-        if (_instance._currentView != null)
-            _instance._currentView.Hide();
+        UIManager.HideCurrentUI();
+
+        _instance._buildingSelected = null;
 
         foreach (Character characterToRemove in _instance._charactersSelected)
             characterToRemove.SelectionMarker.SetActive(false);

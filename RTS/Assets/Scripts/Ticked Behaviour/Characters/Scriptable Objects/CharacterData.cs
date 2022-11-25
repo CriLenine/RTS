@@ -9,4 +9,8 @@ public abstract class CharacterData : ScriptableObject
     private int _maxHealth;
 
     public int MaxHealth => _maxHealth;
+
+    [SerializeField]
+    private UtilsView[] _views;
+    public UtilsView[] Views => _views;
 }

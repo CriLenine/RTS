@@ -17,7 +17,10 @@ public class SpawnableDataCharacter : ScriptableObject
     [SerializeField]
     private GameManager.RessourceCost[] _cost;
 
-
+    [Header("UI")]
+    [SerializeField]
+    private Sprite _charaUiIcon;
     public Character.Type Type => _type;
     public Character Character => _character;
+    public Sprite CharaUiIcon => _charaUiIcon;
 }

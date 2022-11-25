@@ -1,15 +1,26 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class View : MonoBehaviour
 {
-    public abstract void Initialize();
+    [Header("UI")]
+    [SerializeField] private UtilsView _type;
+    public UtilsView Type => _type;
 
-    public virtual void Hide() => gameObject.SetActive(false);
+    [SerializeField] private Sprite _viewIcon;
+    public Sprite ViewIcon => _viewIcon;
 
+
+
+    public abstract void Initialize<T>(T parentManager) where T: ViewManager;
+
+    public virtual void Hide()
+    {
+        gameObject.SetActive(false);
+    }
     public virtual void Show()
     {
         gameObject.SetActive(true);
     }
+    
 }

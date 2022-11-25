@@ -16,3 +16,4 @@ MonoBehaviour:
   _character: {fileID: 6059221905173487255, guid: 2d27dceb886f90548b235bfb83e7e23b, type: 3}
   _neededBuildingLevel: 0
   _cost: []
+  _charaUiIcon: {fileID: -1197897939, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}

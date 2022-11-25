@@ -13,6 +13,7 @@ public class PrefabManager : MonoBehaviour
     private List<SpawnableDataBuilding> _dataBuildings;
 
     public static List<SpawnableDataBuilding> DataBuildings => _instance._dataBuildings;
+    public static List<SpawnableDataCharacter> DataCharacters => _instance._dataCharacters;
 
     private Dictionary<Building.Type, SpawnableDataBuilding> _buildingsPrefabs;
     private Dictionary<Character.Type, SpawnableDataCharacter> _charactersPrefabs;

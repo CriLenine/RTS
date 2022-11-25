@@ -1,23 +1,51 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
-public class ViewManager : MonoBehaviour
+public enum UiType
 {
-    private static ViewManager _instance;
+    Chara,
+    Building
+}
 
-    [SerializeField] private View _startingView;
-    [SerializeField] private View[] _views;
+public enum UtilsView
+{
+    Default,
+    Construction,
+    Spawn,
+}
+public abstract class ViewManager : MonoBehaviour
+{
+    #region Manager UI
+    [SerializeField] protected TextMeshProUGUI _title;
+    #endregion
 
-    private View _currentView;
+    #region Data fields
+    protected UtilsView[] UtilViews;
+    public UtilsView[] ViewsType=> UtilViews;
+    #endregion
+
+    [SerializeField]
+    private UiType _owner;
+    public Type Owner => _owner==0 ? typeof(Character): typeof(Building);
+
+    //Viewmanagement
+    [SerializeField]
+    protected View[] _views;
+    public View[] Views => _views;
+
+    private View _currentView=null;
 
     private readonly Stack<View> _history = new();
-    private void Awake() => _instance = this;
 
-    public static T GetView<T>() where T : View
+    public abstract void Initialize();
+
+    public T GetView<T>() where T : View
     {
-        for (int i = 0; i < _instance._views.Length; i++)
+        for (int i = 0; i < _views.Length; i++)
         {
-            if (_instance._views[i] is T tView)
+            if (_views[i] is T tView)
             {
                 return tView;
             }
@@ -26,68 +54,72 @@ public class ViewManager : MonoBehaviour
         return null;
     }
 
-    public static T Show<T>(bool remember = true) where T : View
+    public T Show<T>(bool remember = true) where T : View
     {
-        for (int i = 0; i < _instance._views.Length; i++)
+        for (int i = 0; i < _views.Length; i++)
         {
-            if (_instance._views[i] is T)
+            if (_views[i] is T)
             {
-                if (_instance._currentView != null)
+                if (_currentView != null)
                 {
                     if (remember)
                     {
-                        _instance._history.Push(_instance._currentView);
+                        _history.Push(_currentView);
                     }
 
-                    _instance._currentView.Hide();
+                    _currentView.Hide();
                 }
 
-                _instance._views[i].Show();
+                _views[i].Show();
 
-                _instance._currentView = _instance._views[i];
+                _currentView = _views[i];
 
-                return _instance._views[i] as T;
+                return _views[i] as T;
             }
         }
         Debug.Log("view do not exist");
         return null;
     }
 
-    public static void Show(View view, bool remember = true)
+    public void Show(View view, bool remember = true)
     {
-        if (_instance._currentView != null)
+        if (_currentView != null)
         {
             if (remember)
             {
-                _instance._history.Push(_instance._currentView);
+                _history.Push(_currentView);
             }
 
-            _instance._currentView.Hide();
+            _currentView.Hide();
         }
 
         view.Show();
 
-        _instance._currentView = view;
+        _currentView = view;
     }
 
 
-    public static void ShowLast()
+    public void ShowLast()
     {
-        if (_instance._history.Count != 0)
+        if (_history.Count != 0)
         {
-            Show(_instance._history.Pop(), false);
+            Show(_history.Pop(), false);
         }
     }
 
-    private void Start()
+    public virtual void HideUI() => gameObject.SetActive(false);
+    public virtual void ShowUI<T>(T uiOwner) where T : TickedBehaviour
     {
+        gameObject.SetActive(true);
+
         for (int i = 0; i < _views.Length; i++)
         {
-            _views[i].Initialize();
+
             _views[i].Hide();
         }
 
-        if (_startingView != null)
-            Show(_startingView, true);
+        Show<DefaultView>();
+
     }
+
 }

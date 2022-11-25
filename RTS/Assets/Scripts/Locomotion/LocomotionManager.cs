@@ -43,9 +43,9 @@ public class LocomotionManager : MonoBehaviour
             IDs[i] = characters[i].ID;
 
         
-        TileMapManager.FindPath(characters[0].Coords, rallyPointCoords);
+        //TileMapManager.FindPath(characters[0].Coords, rallyPointCoords);
 
-        //NetworkManager.Input(TickInput.Move(IDs, rallyPointCoords));
+        NetworkManager.Input(TickInput.Move(IDs,worldMousePos));
     }
 
     public bool Move(Character character, Vector2 position)
