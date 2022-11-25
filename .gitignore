@@ -11,6 +11,11 @@
 /RTS/[Ll]ogs/
 /RTS/[Uu]ser[Ss]ettings/
 
+# Clones
+/RTS_clone_0
+/RTS_clone_1
+/RTS_clone_2
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /RTS/[Mm]emoryCaptures/

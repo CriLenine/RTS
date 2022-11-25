@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Peon : Character
@@ -17,13 +15,15 @@ public class Peon : Character
     protected override void Start()
     {
         base.Start();
+
         _type = Type.Peon;
+
         _specificData = (PeonData)_data;
     }
 
     public override Hash128 GetHash128()
     {
-        return new Hash128();
+        return base.GetHash128();
     }
 
     public void SetBuild(Building building)

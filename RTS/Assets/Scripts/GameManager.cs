@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using UnityEngine.Windows;
 using UnityEngine;
 using System;
-using UnityEngine.Windows;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -57,7 +57,15 @@ public class GameManager : MonoBehaviour
     private static Building _buildingToBuild;
     #endregion
 
-    public static byte[] Tick(TickInput[] inputs)
+    [SerializeField]
+    private bool _simulateWrongHash = false;
+
+    private void Update()
+    {
+        _simulateWrongHash = UnityEngine.Input.GetKey(KeyCode.H);
+    }
+
+    public static int Tick(TickInput[] inputs)
     {
         foreach (TickInput input in inputs)
         {
@@ -84,14 +92,19 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (_buildingToBuild != null)
+            _buildingToBuild = _buildingToBuild.AddWorkforce(2) ? null : _buildingToBuild;
+
+        Hash128 hash = new Hash128();
+
         foreach (TickedBehaviour entity in _instance._entities)
+        {
             entity.Tick();
 
-        #region Debug
-        if(_buildingToBuild != null)
-            _buildingToBuild = _buildingToBuild.AddWorkforce(2)? null : _buildingToBuild;
-        #endregion
-        return new byte[1];
+            hash.Append(entity.GetHash128().GetHashCode());
+        }
+
+        return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
 
     #region Create & Destroy TickedBehaviours
@@ -185,6 +198,13 @@ public class GameManager : MonoBehaviour
         Destroy(_instance._entities[id]);
 
         _instance._entities.Remove(id);
+        _instance._myEntities.Remove(id);
+
+        _instance._characters.Remove(id);
+        _instance._myCharacters.Remove(id);
+
+        _instance._buildings.Remove(id);
+        _instance._myBuildings.Remove(id);
     }
 
     public static void DestroyAllEntities()
@@ -193,6 +213,13 @@ public class GameManager : MonoBehaviour
             Destroy(_instance._entities.At(i).gameObject);
 
         _instance._entities.Clear();
+        _instance._myEntities.Clear();
+
+        _instance._characters.Clear();
+        _instance._myCharacters.Clear();
+
+        _instance._buildings.Clear();
+        _instance._myBuildings.Clear();
     }
 
     #endregion

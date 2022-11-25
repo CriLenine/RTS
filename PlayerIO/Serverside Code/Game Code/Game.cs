@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using PlayerIO.GameLibrary;
-using System;
 
 [RoomType("Game")]
 public partial class GameRoom : Game<Player>
@@ -58,7 +57,7 @@ public partial class GameRoom : Game<Player>
 
     public override void GameClosed()
     {
-        DisconnectAll();
+        DisconnectAll("Game closed");
     }
 
     #endregion
@@ -88,13 +87,17 @@ public partial class GameRoom : Game<Player>
             UpdateIndexes();
         }
         else
-            DisconnectAll();
+            DisconnectAll("User left");
     }
 
-    private void DisconnectAll()
+    private void DisconnectAll(string reason)
     {
         foreach (Player player in _players)
+        {
+            player.Send("Disconnect", reason);
+
             player.Disconnect();
+        }
 
         _players.Clear();
     }
@@ -229,8 +232,8 @@ public partial class GameRoom : Game<Player>
                 {
                     sender.EndTick();
 
-                    if (!Compare(sender.Tick, message.GetByteArray(0)))
-                        Console.WriteLine($"Wrong hash {sender.Index}");
+                    if (!Compare(sender.Tick, message.GetInt(0)))
+                        DisconnectAll("Wrong hash");
                 }
 
                 break;
@@ -261,7 +264,7 @@ public partial class GameRoom : Game<Player>
             message.Add(input[i]);
     }
 
-    private bool Compare(int tick, byte[] hash)
+    private bool Compare(int tick, int hash)
     {
         if (!_hashes.ContainsKey(tick))
             _hashes.Add(tick, new TickHash(hash));
