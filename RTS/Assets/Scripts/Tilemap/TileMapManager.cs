@@ -123,7 +123,7 @@ public class TileMapManager : MonoBehaviour
         if (_instance._tiles.ContainsKey(coords))
             return _instance._tiles[coords];
 
-        return null;
+        throw new InvalidOperationException("Tile not Found");
     }
 
     #endregion
@@ -315,6 +315,8 @@ public class TileMapManager : MonoBehaviour
             currentTile = currentTile.Parent;
             lastDirection = currentDirection;
         }
+
+        wayPoints.Add(startCoords);
 
         if (_instance._debug)
         {
