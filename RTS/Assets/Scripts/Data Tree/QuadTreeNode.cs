@@ -10,6 +10,7 @@ public class QuadTreeNode
     private static int _nCharactersThreshold;
     private static float x0, y0;
     private static Dictionary<int, HashSet<QuadTreeNode>> _leaves;
+    private static Dictionary<int, (float width, float height)> _characterHitBox;
 
     private struct CharacterInfo
     {
@@ -28,17 +29,18 @@ public class QuadTreeNode
             yMax = _yMax;
         }
     }
+
     private readonly HashSet<CharacterInfo> _characters;
 
     private QuadTreeNode _leftChild;
     private QuadTreeNode _rightChild;
 
-    public static Dictionary<int, HashSet<QuadTreeNode>> d_Leaves => _leaves;
-    public readonly string d_name = "";
 
     private bool _IsLeave => _leftChild == null;//Cannot have only 1 child so no need to check rightChild
 
     #region Debug
+    public static Dictionary<int, HashSet<QuadTreeNode>> d_Leaves => _leaves;
+    public readonly string d_name = "";
     public int d_NodesCount => 1 + (_IsLeave ? 0 : _leftChild.d_NodesCount + _rightChild.d_NodesCount);
     public int d_Depth => _IsLeave ? 0 : 1 + Mathf.Max(_leftChild.d_Depth, _rightChild.d_Depth);
     #endregion
@@ -67,22 +69,38 @@ public class QuadTreeNode
         return new QuadTreeNode("r");
     }
 
+    public void RegisterCharacter(int ID, float width, float height, Vector2 position)
+    {
+        _characterHitBox.Add(ID, (width, height));
+        _characters.Add(new CharacterInfo(ID,
+                                        position.x + x0 - width / 2,
+                                        position.x + x0 + width / 2,
+                                        position.y + y0 - height / 2,
+                                        position.y + y0 + height / 2));
+    }
+
     /// <summary>
     /// Called when moving a character.
     /// <para>Updates the tree with the character's new position.</para>
     /// </summary>
     /// <param name="ID">The ID of the moved character.</param>
     /// <returns>All the IDs of characters in same leaves than the selected character.</returns>
-    public HashSet<int> GetNeighbours(int ID, float width, float height, Vector2 coords, int nCharactersThreshold = 0)
+    public HashSet<int> GetNeighbours(int ID, Vector2 position, int nCharactersThreshold = 0)
     {
+        if (!_characterHitBox.ContainsKey(ID))
+        {
+            Debug.LogError("ID not registered.");
+        }
+
+        (float width, float height) = _characterHitBox[ID];
         if (nCharactersThreshold != 0)
             _nCharactersThreshold = nCharactersThreshold;
         return GetNeighbours(new CharacterInfo(
                                         ID,
-                                        coords.x + x0 - width / 2, 
-                                        coords.x + x0 + width / 2, 
-                                        coords.y + y0 - height / 2, 
-                                        coords.y + y0 + height / 2));
+                                        position.x + x0 - width / 2, 
+                                        position.x + x0 + width / 2, 
+                                        position.y + y0 - height / 2, 
+                                        position.y + y0 + height / 2));
     }
     
     private HashSet<int> GetNeighbours(CharacterInfo character)
