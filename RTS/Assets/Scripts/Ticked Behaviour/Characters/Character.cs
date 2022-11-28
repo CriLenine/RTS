@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
-    private Action _currentAction;
+    public Action CurrentAction { get; private set; }
 
     private Queue<Action> _actions = new Queue<Action>();
 
@@ -40,8 +40,8 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public sealed override void Tick()
     {
-        if (_currentAction?.Perform() == true)
-            _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+        if (CurrentAction?.Perform() == true)
+            CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
@@ -50,12 +50,12 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         _actions.Enqueue(action);
 
-        _currentAction ??= _actions.Dequeue();
+        CurrentAction ??= _actions.Dequeue();
     }
 
     public void SetAction(Action action)
     {
-        _currentAction = null;
+        CurrentAction = null;
 
         _actions.Clear();
 

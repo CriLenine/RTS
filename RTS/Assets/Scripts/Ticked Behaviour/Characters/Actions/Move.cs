@@ -1,16 +1,25 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Move : Action
 {
-    private Vector2 _position;
+    private List<Vector2> _positions = new List<Vector2>();
 
-    public Move(Character character, Vector2 position) : base(character)
+    public Move(Character character, List<Vector2> positions) : base(character)
     {
-        _position = position;
+        _positions = positions;
     }
 
     public override bool Perform()
     {
-        return CharacterManager.Move(_character, _position);
+        if (CharacterManager.Move(_character, _positions[0]))
+            _positions.RemoveAt(0);
+
+        return _positions.Count == 0;
+    }
+
+    public Vector2 currentWayPoint()
+    {
+        return _positions[0];
     }
 }
