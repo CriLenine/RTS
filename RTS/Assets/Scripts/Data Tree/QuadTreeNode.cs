@@ -24,14 +24,23 @@ public class QuadTreeNode
     public readonly string d_name = "";
     public int d_NodesCount => 1 + (_IsLeave ? 0 : _leftChild.d_NodesCount + _rightChild.d_NodesCount);
     public int d_Depth => _IsLeave ? 0 : 1 + Mathf.Max(_leftChild.d_Depth, _rightChild.d_Depth);
+
+    private float XMAX = x0;
+    private float XMIN = -x0;
+    private float YMAX = y0;
+    private float YMIN = -y0;
     #endregion
 
-    private QuadTreeNode(string d_name, HashSet<int> value = null, QuadTreeNode leftChild = null, QuadTreeNode rightChild = null)
+    private QuadTreeNode(string d_name, float xmax, float xmin, float ymax, float ymin, HashSet<int> value = null, QuadTreeNode leftChild = null, QuadTreeNode rightChild = null)
     {
         _characters = value ?? new HashSet<int>();
         _leftChild = leftChild;
         _rightChild = rightChild;
         this.d_name = d_name;
+        XMAX = xmax;
+        XMIN = xmin;
+        YMAX = ymax;
+        YMIN = ymin;
     }
 
     /// <summary>
@@ -48,7 +57,7 @@ public class QuadTreeNode
         _leaves = new Dictionary<int, HashSet<QuadTreeNode>>();
         _charactersHitBoxes = new Dictionary<int, (float width, float height)>();
         _charactersPositions = new Dictionary<int, Vector2>();
-        QuadTreeRoot = new QuadTreeNode("r");
+        QuadTreeRoot = new QuadTreeNode("r", x0, -x0, y0, -y0);
     }
 
     /// <summary>
@@ -166,8 +175,8 @@ public class QuadTreeNode
                 }
             }
 
-            _leftChild = new QuadTreeNode($"{d_name}g", leftCharacters);
-            _rightChild = new QuadTreeNode($"{d_name}d", rightCharacters);
+            _leftChild = new QuadTreeNode($"{d_name}g", XMAX, XMIN, YMAX, YMIN, leftCharacters);
+            _rightChild = new QuadTreeNode($"{d_name}d", XMAX, XMIN, YMAX, YMIN, rightCharacters);
         }
 
         //Continue to run through the tree
@@ -175,8 +184,8 @@ public class QuadTreeNode
 
         if (depth % 2 == 0) //Discriminate via x
         {
-            GizmosManager.toDrawStart.Add(new Vector3(x - x0, -y0));
-            GizmosManager.toDrawEnd.Add(new Vector3(x - x0, y0));
+            GizmosManager.toDrawStart.Add(new Vector3(x - x0, YMAX));
+            GizmosManager.toDrawEnd.Add(new Vector3(x - x0, YMIN));
 
             float xCurrent = _charactersPositions[ID].x;
             float width = _charactersHitBoxes[ID].width;
@@ -189,8 +198,8 @@ public class QuadTreeNode
         }
         else //Discriminate via y
         {
-            GizmosManager.toDrawStart.Add(new Vector3(-x0, y - y0));
-            GizmosManager.toDrawEnd.Add(new Vector3(x0, y - y0));
+            GizmosManager.toDrawStart.Add(new Vector3(XMAX, y - y0));
+            GizmosManager.toDrawEnd.Add(new Vector3(XMIN, y - y0));
 
             float yCurrent = _charactersPositions[ID].y;
             float height = _charactersHitBoxes[ID].height;
