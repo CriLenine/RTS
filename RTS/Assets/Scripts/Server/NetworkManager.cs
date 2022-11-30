@@ -464,7 +464,7 @@ public partial class NetworkManager : MonoBehaviour
 
     private static void OnDisconnect(object sender, string reason)
     {
-        Debug.Log("Disconnected from room.");
+        Debug.Log("Disconnected from room : " + reason);
 
         _instance.StopCoroutine(_instance.Loop());
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
-    private Action _currentAction;
+    public Action CurrentAction { get; private set; }
 
     private Queue<Action> _actions = new Queue<Action>();
 
@@ -29,16 +29,44 @@ public abstract class Character : TickedBehaviour, IDamageable
     public GameObject SelectionMarker;
     public Vector2Int Coords;
 
-    public Stack<LogicalTile> Path;
+    private LineRenderer _pathRenderer;
 
     protected virtual void Awake()
     {
+        _pathRenderer = GetComponentInChildren<LineRenderer>(true);
+
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
 
     protected virtual void Start()
     {
         Health = MaxHealth;
+    }
+
+    protected virtual void Update()
+    {
+        if (CurrentAction is Move)
+        {
+            Move move = CurrentAction as Move;
+
+            _pathRenderer.positionCount = move.Positions.Length - move.Index + 1;
+
+            int j = 0,  i;
+
+            _pathRenderer.SetPosition(j++, transform.position);
+
+            for (i = move.Index; i < move.Positions.Length; ++i, ++j)
+                _pathRenderer.SetPosition(j, move.Positions[i]);
+
+            _pathRenderer.transform.position = move.Positions[i - 1];
+
+            _pathRenderer.startColor = GameManager.Colors[Performer];
+            _pathRenderer.endColor = GameManager.Colors[Performer];
+
+            _pathRenderer.gameObject.SetActive(true);
+        }
+        else
+            _pathRenderer.gameObject.SetActive(false);
     }
 
     public sealed override void Tick()
@@ -53,12 +81,12 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         _actions.Enqueue(action);
 
-        _currentAction ??= _actions.Dequeue();
+        CurrentAction ??= _actions.Dequeue();
     }
 
     public void SetAction(Action action)
     {
-        _currentAction = null;
+        CurrentAction = null;
 
         _actions.Clear();
 
