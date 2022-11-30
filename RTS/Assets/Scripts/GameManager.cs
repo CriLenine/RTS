@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
     {
         _simulateWrongHash = Input.GetKey(KeyCode.H);
 
-        fog.visualEffectAsset.
+        // fog.visualEffectAsset.
     }
 
     public static int Tick(TickInput[] inputs)
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                    group[i].SetAction(new Move(group[i], new List<Vector2>(wayPoints)));
+                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
             }
             else
                 throw new Exception("Path not Found");

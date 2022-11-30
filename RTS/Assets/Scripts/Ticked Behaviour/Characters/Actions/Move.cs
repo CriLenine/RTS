@@ -15,13 +15,16 @@ public class Move : Action
         Positions = positions;
     }
 
-    public Move(Character character, List<Vector2> positions) : base(character)
+    public Move(Character character, Vector2 position) : base(character)
     {
         Positions = new Vector2[] { position };
     }
 
     public override bool Perform()
     {
+        if (Index == Positions.Length - 1 && (Position - (Vector2)_character.transform.position).sqrMagnitude < .2f)
+            return true;
+
         if (CharacterManager.Move(_character, Position))
             ++Index;
 

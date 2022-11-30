@@ -20,7 +20,7 @@ public class QuadTreeManager : MonoBehaviour
     public void CreateQuadTree()
     {
         Stopwatch sw = Stopwatch.StartNew();
-        holyNode = QuadTreeNode.Init(nCharThresh, x0, y0);
+        QuadTreeNode.Init(nCharThresh, x0, y0);
         sw.Stop();
         Debug.Log($"QuadTree created in {sw.Elapsed.TotalMilliseconds} ms, contains {holyNode.d_NodesCount} nodes, and a depth of {holyNode.d_Depth}.");
     }
@@ -30,7 +30,7 @@ public class QuadTreeManager : MonoBehaviour
     {
         string s = "";
         Stopwatch sw = Stopwatch.StartNew();
-        HashSet<int> neighbors = holyNode.GetNeighbours(j, width, height, transformList[j].position, nCharThresh);
+        HashSet<int> neighbors = QuadTreeNode.GetNeighbours(j, transformList[j].position, nCharThresh);
         sw.Stop();
         foreach (int neighbor in neighbors)
         {

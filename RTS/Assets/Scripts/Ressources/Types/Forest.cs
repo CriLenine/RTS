@@ -107,8 +107,8 @@ public class Forest : Ressource
                 if (i == 0 && j == 0)
                     continue;
                 Vector2Int tilePosition = lastTree + new Vector2Int(i, j);
-                if (ressourcesManager.HasTree(tilePosition) /*&& pathfindingOK*/)
-                    availableTiles.Add(tilePosition);
+                //if (ressourcesManager.HasTree(tilePosition) /*&& pathfindingOK*/)
+                //    availableTiles.Add(tilePosition);
             }
         }
         //If we found at least one candidate
