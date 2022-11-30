@@ -9,7 +9,7 @@ public class CharacterManager : MonoBehaviour
     private static CharacterManager _instance;
 
     private SelectionManager _selectionManager;
-    private LocomotionManager _locomotionManager;
+    public LocomotionManager _locomotionManager;
 
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;

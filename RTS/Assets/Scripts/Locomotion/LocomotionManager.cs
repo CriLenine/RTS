@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
 
-
 public class LocomotionManager : MonoBehaviour
 {
     private Mouse _mouse;
@@ -11,7 +10,9 @@ public class LocomotionManager : MonoBehaviour
     [SerializeField]
     private bool _debug;
 
-    QuadTreeNode holyNode = QuadTreeNode.Init(4, 20, 13);
+    //private System.Random _random = new System.Random(10);
+
+    private HashSet<int> neighborsID;
 
     private void Start()
     {
@@ -25,9 +26,6 @@ public class LocomotionManager : MonoBehaviour
 
         if (characters.Count == 0)
             return;
-
-        //if (characters.Count > 1)
-        //    Debug.Log(TileMapManager.RetreiveClusters(characters).Count);
 
         // Retrieve the rallypoint's coordinates according to the input.
 
@@ -45,17 +43,19 @@ public class LocomotionManager : MonoBehaviour
             IDs[i] = characters[i].ID;
 
         NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
-
-        // HashSet<int> neighbors = holyNode.GetNeighbours(characters[0].ID, .3f, .5f, characters[0].transform.position);
     }
 
     public static List<Vector2> RetrieveWayPoints(Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
         List<Vector2Int> wayPoints = TileMapManager.FindPath(leader.Coords, rallyPoint);
 
-        List<Vector2> positionWayPoints = new List<Vector2>() { TileMapManager.TilemapCoordsToWorld(wayPoints[^1]) };
+        if (wayPoints.Count == 0)
+            return null;
 
-        if (!smooth || (wayPoints.Count < 2)) {
+        List<Vector2> positionWayPoints = new List<Vector2>();
+
+        if (!smooth || (wayPoints.Count < 2))
+        {
             for (int i = 0; i < wayPoints.Count - 1; ++i)
                 positionWayPoints.Add(TileMapManager.TilemapCoordsToWorld(wayPoints[i]));
             return positionWayPoints;
@@ -80,8 +80,44 @@ public class LocomotionManager : MonoBehaviour
 
     public bool Move(Character character, Vector3 position)
     {
-        character.transform.position = Vector2.MoveTowards(character.transform.position, position, TileMapManager.TileSize / 10f);
+        character.transform.position = LocalAvoidance(character, position);
 
         return character.transform.position == position;
+    }
+
+    private Vector2 LocalAvoidance(Character character, Vector3 position)
+    {
+        // Récupérer voisins KDTree
+
+        //neighborsID = GameManager.holyNode.GetNeighbours(character.ID, .3f, .5f, character.transform.position);
+
+        List<Vector2> trajectoryAdjustments = new List<Vector2>();
+
+        List<Character> neighbors = new List<Character>(CharacterManager.SelectedCharacters());
+
+        /*foreach (int ID in neighborsID)*/
+        foreach (Character neighbor in neighbors)
+        {
+            if (neighbor == character)
+                continue;
+
+            //Character neighbor = (Character)GameManager.Entities[ID];
+
+            Vector2 deltaPos = neighbor.transform.position - character.transform.position;
+
+            if (deltaPos.sqrMagnitude < .3f)
+                trajectoryAdjustments.Add(neighbor.CurrentAction is Move ? deltaPos.normalized : Vector2.Perpendicular(deltaPos).normalized);
+        }
+
+        if (trajectoryAdjustments.Count == 0)
+            return Vector2.MoveTowards(character.transform.position, position, TileMapManager.TileSize / 10f);
+
+        Vector2 targetPosition = Vector2.zero;
+
+        foreach (Vector2 adjustment in trajectoryAdjustments)
+            targetPosition += adjustment;
+
+        return Vector2.MoveTowards(character.transform.position,
+            (Vector2)character.transform.position - targetPosition /** (float)_random.NextDouble()*/, TileMapManager.TileSize / 10f);
     }
 }
