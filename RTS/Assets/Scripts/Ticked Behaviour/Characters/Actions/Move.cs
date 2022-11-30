@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Move : Action
 {
@@ -14,7 +15,7 @@ public class Move : Action
         Positions = positions;
     }
 
-    public Move(Character character, Vector2 position) : base(character)
+    public Move(Character character, List<Vector2> positions) : base(character)
     {
         Positions = new Vector2[] { position };
     }
