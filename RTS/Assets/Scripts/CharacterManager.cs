@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
@@ -39,12 +41,7 @@ public class CharacterManager : MonoBehaviour
 
         _locomotionInputActions = new Locomotion();
         _locomotionInputActions.Enable(); 
-        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters();
-    }
-
-    public static void QueueDisplacement()
-    {
-        _instance._locomotionManager.RallySelectedCharacters();
+        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters(); ;
     }
 
     public static bool Move(Character character, Vector2 position)

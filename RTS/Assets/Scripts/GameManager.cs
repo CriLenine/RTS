@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.Windows;
 using UnityEngine;
 using System;
+using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour {
@@ -25,7 +27,7 @@ public class GameManager : MonoBehaviour {
 
     private TickedList<TickedBehaviour> _entities = new TickedList<TickedBehaviour>();
     private TickedList<TickedBehaviour> _myEntities = new TickedList<TickedBehaviour>();
-
+    private TickedList<TickedBehaviour> _entitiesToDestroy = new TickedList<TickedBehaviour>();
     public static TickedList<TickedBehaviour> Entities => _instance._entities;
     public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
 
@@ -46,10 +48,6 @@ public class GameManager : MonoBehaviour {
 
         DontDestroyOnLoad(this);
     }
-    #endregion
-
-    #region Debug
-    private static Building _buildingToBuild;
     #endregion
 
     [SerializeField]
@@ -102,11 +100,25 @@ public class GameManager : MonoBehaviour {
                     }
 
                     break;
+                case InputType.Attack:
+
+                    if (!_instance._entities[input.ID].TryGetComponent(out TickedBehaviour target))
+                        break;
+
+                    foreach (int ID in input.Targets)
+                    {
+                        Character attacker = (Character)_instance._entities[ID];
+
+                        if (!attacker)
+                            continue;
+
+                        attacker.SetAction(new Move(attacker, input.Position));
+                        attacker.AddAction(new Attack(attacker, target,input.isIt));
+                    }
+                    break;
             }
         }
 
-        if (_buildingToBuild != null)
-            _buildingToBuild = _buildingToBuild.AddWorkforce(2) ? null : _buildingToBuild;
 
         Hash128 hash = new Hash128();
 
@@ -117,6 +129,11 @@ public class GameManager : MonoBehaviour {
             hash.Append(entity.GetHash128().GetHashCode());
         }
 
+       if(_instance._entitiesToDestroy.Count>0)
+       {
+            _instance.DestroyEntitys();
+       }
+            
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
 
@@ -191,8 +208,7 @@ public class GameManager : MonoBehaviour {
 
         TileMapManager.AddBuilding(data.Outline, position);
 
-            
-        _buildingToBuild = building;
+        building.AddWorkforce(building.Data.TotalWorkforce);
 
         return building;
     }
@@ -201,32 +217,44 @@ public class GameManager : MonoBehaviour {
         return CreateBuilding(performer, (Building.Type)type, position, targets);
     }
 
-    public static void DestroyEntity(int id) {
-        Destroy(_instance._entities[id]);
+    public static void DestroyEntity(int id)
+    {
+        if (_instance._entitiesToDestroy.Contains(id)) return;
 
-        _instance._entities.Remove(id);
-        _instance._myEntities.Remove(id);
+        _instance._entitiesToDestroy.Add(_instance._entities[id]);
+    }
+    private void DestroyEntitys() {
 
-        _instance._characters.Remove(id);
-        _instance._myCharacters.Remove(id);
+        foreach(var entitie in _entitiesToDestroy)
+        {
+            _entities.Remove(entitie);
+            _myEntities.Remove(entitie);
 
-        _instance._buildings.Remove(id);
-        _instance._myBuildings.Remove(id);
+            int id = entitie.ID;
+            _characters.Remove(id);
+            _myCharacters.Remove(id);
+
+            _buildings.Remove(id);
+            _myBuildings.Remove(id);
+
+            Destroy(entitie.gameObject);
+        }
+        _entitiesToDestroy.Clear();
     }
 
-    public static void DestroyAllEntities() {
-        for (int i = 0; i < _instance._entities.Count; ++i)
-            Destroy(_instance._entities.At(i).gameObject);
+    //public static void DestroyAllEntities() {
+    //    for (int i = 0; i < _instance._entities.Count; ++i)
+    //        Destroy(_instance._entities.At(i).gameObject);
 
-        _instance._entities.Clear();
-        _instance._myEntities.Clear();
+    //    _instance._entities.Clear();
+    //    _instance._myEntities.Clear();
 
-        _instance._characters.Clear();
-        _instance._myCharacters.Clear();
+    //    _instance._characters.Clear();
+    //    _instance._myCharacters.Clear();
 
-        _instance._buildings.Clear();
-        _instance._myBuildings.Clear();
-    }
+    //    _instance._buildings.Clear();
+    //    _instance._myBuildings.Clear();
+    //}
 
     #endregion
 
@@ -242,7 +270,7 @@ public class GameManager : MonoBehaviour {
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
+            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
             CreateBuilding(i, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
 

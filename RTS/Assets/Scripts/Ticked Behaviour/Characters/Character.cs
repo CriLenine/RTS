@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Character : TickedBehaviour, IDamageable
@@ -21,7 +22,9 @@ public abstract class Character : TickedBehaviour, IDamageable
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
-    public int MaxHealth => Data.MaxHealth;
+    protected int MaxHealth => Data.MaxHealth;
+    protected int Health;
+
 
     public GameObject SelectionMarker;
     public Vector2Int Coords;
@@ -35,13 +38,13 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Start()
     {
-
+        Health = MaxHealth;
     }
 
     public sealed override void Tick()
     {
         if (_currentAction?.Perform() == true)
-            _currentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+            _currentAction = _actions.Count > 0 ? _actions.Dequeue() : CheckSurrounding();
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
@@ -62,6 +65,22 @@ public abstract class Character : TickedBehaviour, IDamageable
         AddAction(action);
     }
 
+    private Action CheckSurrounding()
+    {
+        List<Character> charas = GameManager.Characters.ToList();
+        int maxAttackDist = Data.AutoAttackDistance;
+
+        for (int i = 0; i < charas.Count; i++)
+        {
+            Character chara = charas[i];
+            if (!GameManager.Characters.Contains(chara) || Vector2.Distance(transform.position, chara.transform.position) < maxAttackDist) continue; //Si trop loin ou sois meme => next
+
+            //Sinon on renvois l'action d'attaque
+            NetworkManager.Input(TickInput.Attack(chara.ID, chara.transform.position, new int[ID], false));
+            return null;
+        }
+        return null;
+    }
     public void DebugCoordinates()
     {
         Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
@@ -76,4 +95,16 @@ public abstract class Character : TickedBehaviour, IDamageable
 
         return hash;
     }
+
+    public bool TakeDamage(int damage)
+    {
+        return (Health -= damage) <= 0;
+    }
+
+    public void GainHealth(int amount)
+    {
+        if ((Health += amount) > MaxHealth)
+            Health = MaxHealth;
+    }
+
 }

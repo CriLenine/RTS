@@ -4,7 +4,8 @@ public enum InputType
 {
     Spawn,
     Move,
-    Build
+    Build,
+    Attack
 }
 
 public class TickInput
@@ -16,6 +17,8 @@ public class TickInput
     public int[] Targets;
 
     public int ID;
+
+    public bool isIt;
 
     public Vector2 Position;
 
@@ -57,6 +60,24 @@ public class TickInput
 
             Position = position,
             Performer = performer
+        };
+    }
+
+    public static TickInput Attack(int targetID, Vector2 targetpos,int[] attackers,bool isOrder, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Attack,
+
+            Targets = attackers,
+
+            ID = targetID,
+
+            Position = targetpos,
+
+            Performer = performer,
+
+            isIt =isOrder
         };
     }
 }

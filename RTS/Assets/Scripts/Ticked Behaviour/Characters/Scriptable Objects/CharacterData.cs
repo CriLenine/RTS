@@ -7,8 +7,17 @@ public abstract class CharacterData : ScriptableObject
     [SerializeField]
     [Min(0)]
     private int _maxHealth;
-
     public int MaxHealth => _maxHealth;
+
+    [SerializeField]
+    [Min(0)]
+    private int _attackDamage;
+    public int AttackDamage => _attackDamage;
+
+    [SerializeField]
+    [Min(0)]
+    private int _autoAttackDistance;
+    public int AutoAttackDistance => _autoAttackDistance;
 
     [SerializeField]
     private UtilsView[] _views;
