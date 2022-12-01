@@ -69,7 +69,9 @@ public abstract class Character : TickedBehaviour, IDamageable
     public sealed override void Tick()
     {
         if (CurrentAction?.Perform() == true)
+        {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+        }
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }

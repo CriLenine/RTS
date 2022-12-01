@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -19,22 +18,6 @@ public class RessourcesManager : MonoBehaviour
     private void Start()
     {
         Bake();
-        StartCoroutine(CutTree());
-    }
-
-    IEnumerator CutTree()
-    {
-        Vector2Int currentTree = new Vector2Int(22, 11);
-        Vector2Int nextTree;
-        do
-        {
-            Instantiate(prefab, _treesTilemap.CellToWorld(new Vector3Int(currentTree.x, currentTree.y, 0)) + new Vector3(0.25f, 0.25f, -1f), Quaternion.identity);
-            nextTree = forest.GetNextTree(currentTree);
-            if (nextTree == currentTree)
-                break;
-            currentTree = nextTree;
-            yield return new WaitForSeconds(0.2f);
-        } while (true);
     }
 
     public bool HasTree(Vector2Int coords)
@@ -43,8 +26,7 @@ public class RessourcesManager : MonoBehaviour
     }
     public bool HasTree(Vector2 position)
     {
-        Vector2Int coords = (Vector2Int)_treesTilemap.WorldToCell(new Vector3(position.x, position.y));
-        return HasTree(coords);
+        return HasTree(new Vector2Int((int)position.x, (int)position.y));
     }
     public bool HasRock(Vector2Int coords)
     {
@@ -52,8 +34,7 @@ public class RessourcesManager : MonoBehaviour
     }
     public bool HasRock(Vector2 position)
     {
-        Vector2Int coords = (Vector2Int)_rocksTilemap.WorldToCell(new Vector3(position.x, position.y));
-        return HasRock(coords);
+        return HasRock(new Vector2Int((int)position.x, (int)position.y));
     }
 
     public void RemoveTree(Vector2Int coords)

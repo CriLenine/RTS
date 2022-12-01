@@ -16,7 +16,7 @@ public class RessourceData : ScriptableObject
 
     public RessourceType Type => _type;
 
-    public int Amount => _amount;
+    public int Amount { get => _amount; set { _amount = value; } }
 
     public float HarvestingTime => _harvestingTime;
 }

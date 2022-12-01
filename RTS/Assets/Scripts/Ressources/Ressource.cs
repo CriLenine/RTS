@@ -36,6 +36,7 @@ public abstract class Ressource : MonoBehaviour
                     if (i == 0 && j == 0)
                         continue;
                     Vector2Int tilePosition = ressourcePosition + new Vector2Int(i, j);
+                    Debug.Log(tilePosition);
                     if (TileMapManager.GetLogicalTile(tilePosition).IsFree /*&& pathfindingOK*/)
                         availableTiles.Add(tilePosition);
                 }

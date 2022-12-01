@@ -17,15 +17,26 @@ public class Harvest : Action
         if (--_duration < 0f)
         {
             _character.AddAction(new Move(_character, Vector2.zero/*WhereDoIPutMyStuff()*/));
-            Vector2Int? newPosition;
-            newPosition = (_ressource as Forest)?.GetNextTree(_position);
-            newPosition ??= (_ressource as Aggregate)?.Data.Amount > 0 ? _position : null;
-            if ((newPosition ??= _position) != _position)//still things to harvest
+            Vector2Int newPosition = _position;
+            Forest forest = _ressource as Forest;
+            Aggregate aggregate = _ressource as Aggregate;
+            bool continueHarvesting = true;
+            if (forest)
             {
-                Vector2Int harvestingCoords = _ressource.GetHarvestingPosition((Vector2Int)newPosition, _character.Coords);
-                _character.AddAction(new Move(_character, (Vector2)harvestingCoords));
+                newPosition = forest.GetNextTree(_position);
+                continueHarvesting = newPosition != _position;
+            }
+            else if (aggregate)
+            {
+                continueHarvesting = --aggregate.Data.Amount > 0;
+            }
+            if (continueHarvesting)//still things to harvest
+            {
+                Vector2Int harvestingCoords = _ressource.GetHarvestingPosition(newPosition, _character.Coords);
+                _character.AddAction(new Move(_character, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
                 _character.AddAction(new Harvest(_character, _ressource.GetTileToHarvest(harvestingCoords), _ressource));
             }
+            Debug.Log("Harvested");
             return true;
         }
         return false;
