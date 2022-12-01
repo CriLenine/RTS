@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using PlayerIOClient;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 public partial class NetworkManager
@@ -53,6 +54,14 @@ public partial class NetworkManager
 
                             inputs.Add(TickInput.Build(id, position, ids, performer));
 
+                            break;
+                        }
+                    case InputType.Harvest:
+                        {
+                            Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
+                            int target = message.GetInt(i++);
+
+                            inputs.Add(TickInput.Harvest(position, target, performer));
                             break;
                         }
                 }

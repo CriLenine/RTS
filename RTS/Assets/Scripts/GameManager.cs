@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Transform _spawnPoints;
 
+    RessourcesManager ressourcesManager;
     #region Init & Variables
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
@@ -50,6 +51,8 @@ public class GameManager : MonoBehaviour
         _instance = this;
 
         DontDestroyOnLoad(this);
+
+        ressourcesManager = FindObjectOfType<RessourcesManager>();
     }
     #endregion
 
@@ -90,6 +93,23 @@ public class GameManager : MonoBehaviour
                 case InputType.Move:
                     MoveCharacters(input.Position, input.Targets);
 
+                    break;
+
+                case InputType.Harvest:
+                    Peon harvester = (Peon)_instance._myEntities[input.ID];
+                    Ressource ressource = null;
+                    Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
+                    if (_instance.ressourcesManager.HasTree(input.Position))
+                    {
+                        ressource = _instance.ressourcesManager.GetNearestForest(inputCoords);
+                    }
+                    else if (_instance.ressourcesManager.HasRock(input.Position))
+                    {
+                        ressource = _instance.ressourcesManager.GetNearestAggregate(inputCoords);
+                    }
+                    Vector2Int harvestingCoords = ressource.GetHarvestingPosition(inputCoords, harvester.Coords);
+                    harvester.SetAction(new Move(harvester, harvestingCoords));
+                    harvester.AddAction(new Harvest(harvester, ressource.GetTileToHarvest(harvestingCoords), ressource));
                     break;
             }
         }
@@ -250,13 +270,9 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    public static void Prepare()
-    {
-        for (int i = 0; i < _instance._entities.Count; ++i)
-        {
-            Destroy(_instance._entities.At(i).gameObject);
-            _instance._entities.RemoveAt(i);
-        }
+    public static void Prepare() {
+
+        DestroyAllEntities();
 
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {

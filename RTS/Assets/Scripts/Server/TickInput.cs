@@ -4,7 +4,9 @@ public enum InputType
 {
     Spawn,
     Move,
-    Build
+    Build,
+    Harvest,
+    Hunt
 }
 
 public class TickInput
@@ -59,4 +61,31 @@ public class TickInput
             Performer = performer
         };
     }
+
+    public static TickInput Harvest(Vector2 position, int target, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Harvest,
+
+            Targets = new int[1] { target },
+
+            Position = position,
+            Performer = performer
+        };
+    }
+
+    //public static TickInput Hunt(int id, int[] targets, int performer = 0)
+    //{
+    //    return new TickInput()
+    //    {
+    //        Type = InputType.Build,
+
+    //        Targets = targets,
+
+    //        ID = id,
+
+    //        Performer = performer
+    //    };
+    //}
 }

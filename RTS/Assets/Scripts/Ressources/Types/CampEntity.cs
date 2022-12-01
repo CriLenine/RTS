@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CampEntity : Ressource
+public class CampEntity : TickedBehaviour
 {
     private readonly Transform _startingPoint;
     private readonly Transform _endingPoint;

@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class RessourceData : ScriptableObject
+[CreateAssetMenu(fileName = "Ressource", menuName = "Ressource", order = 1)]
+public class RessourceData : ScriptableObject
 {
     [SerializeField]
     private RessourceType _type;
@@ -11,11 +12,11 @@ public abstract class RessourceData : ScriptableObject
     private int _amount;
 
     [SerializeField]
-    private Vector2Int _position;
+    private float _harvestingTime;
 
     public RessourceType Type => _type;
 
     public int Amount => _amount;
 
-    public Vector2Int Position => _position;
+    public float HarvestingTime => _harvestingTime;
 }

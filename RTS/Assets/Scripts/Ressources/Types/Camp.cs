@@ -9,12 +9,9 @@ public class Camp : Ressource
     private List<CampEntity> _entities;
 
     public void AddEntity(CampEntity entity) => _entities.Add(entity);
-    public void Clear() => _entities?.Clear();
 
-    public override void Tick()
-    {
-        return;
-    }
+    public override void Clear() => _entities?.Clear();
+
     /// <summary>
     /// Called when an entity is killed.
     /// Removes the <paramref name="lastEntity"/> from the map.
@@ -38,5 +35,10 @@ public class Camp : Ressource
                 (minMagnitude, index) = (currentMagnitude, i);
         }
         return _entities[index];
+    }
+
+    public override Vector2Int GetTileToHarvest(Vector2Int coords)
+    {
+        return coords;
     }
 }
