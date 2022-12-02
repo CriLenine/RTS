@@ -56,12 +56,24 @@ public partial class NetworkManager
 
                             break;
                         }
+
                     case InputType.Harvest:
                         {
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
                             int target = message.GetInt(i++);
 
                             inputs.Add(TickInput.Harvest(position, target, performer));
+                            break;
+                        }
+                    case InputType.Attack:
+                        {
+                            int targetId = message.GetInt(i++);
+
+                            Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
+
+                            int[] attackersIds = Extract<int>(message, i, out i);
+
+                            inputs.Add(TickInput.Attack(targetId,position, attackersIds));
                             break;
                         }
                 }

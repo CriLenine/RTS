@@ -196,6 +196,7 @@ public partial class NetworkManager : MonoBehaviour
 
     public static int Me => _instance._id;
     public static int RoomSize => _instance._roomSize;
+    public static int CurrentTick => _instance._tick;
 
     private float _tickPeriod;
 
@@ -325,6 +326,12 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Build:
+                message.Add(input.ID, input.Position.x, input.Position.y);
+
+                Spread(message, input.Targets);
+
+                break;
+            case InputType.Attack:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);

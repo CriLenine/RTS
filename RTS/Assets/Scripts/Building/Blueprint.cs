@@ -51,9 +51,7 @@ public class Blueprint : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame && available)
         {
-            int[] selected = CharacterManager.GetSelectedIds();
-
-            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position, selected));
+            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position, CharacterManager.GetSelectedIds()));
 
             Destroy(gameObject);
         }

@@ -4,29 +4,11 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public int CurrentHealth
-    {
-        get
-        {
-            return CurrentHealth;
-        }
-        private set
-        {
-            CurrentHealth = value;
-        }
-    }
-    public abstract int MaxHealth
-    {
-        get;
-    }
-    /// <returns><see langword="true"/> if health falls to zero</returns>
-    public bool TakeDamage(int damage)
-    {
-        return (CurrentHealth -= damage) <= 0;
-    }
-    public void GainHealth(int amount)
-    {
-        if ((CurrentHealth += amount) > MaxHealth)
-            CurrentHealth = MaxHealth;
-    }
+    /// <returns><see langword="true"/> if it dead,
+    /// <see langword="false"/> otherwise </returns>
+    public abstract bool TakeDamage(int damage);
+
+    /// Tu connais
+    public abstract void GainHealth(int amount);
+
 }

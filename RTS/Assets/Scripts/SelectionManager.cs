@@ -83,39 +83,54 @@ public class SelectionManager : MonoBehaviour
 
             if (hit.collider != null) // if we hit a clickable object
             {
+                
                 if (hit.collider.gameObject.TryGetComponent(out Character selectedCharacter)) // Collider = character
                 {
-                    if (!_shifting) // Normal click
+                    if (GameManager.MyEntities.Contains(selectedCharacter)) //Test if I is character owner
                     {
-                        CharacterManager.DeselectAll();
-                       
-
-                        CharacterManager.SelectedCharacters().Add(selectedCharacter);
-                        selectedCharacter.SelectionMarker.SetActive(true);
-
-                        CharacterManager.ChangeView(selectedCharacter);
-                        if (_debug)
-                            selectedCharacter.DebugCoordinates();
-                    }
-                    else    // Shift click
-                    {
-                        if (!CharacterManager.SelectedCharacters().Contains(selectedCharacter)) // If the character is not already selected
+                        if (!_shifting) // Normal click
                         {
-                            CharacterManager.AddCharacterToSelection(selectedCharacter);
+                            CharacterManager.DeselectAll();
+
+
+                            CharacterManager.SelectedCharacters().Add(selectedCharacter);
                             selectedCharacter.SelectionMarker.SetActive(true);
+
+                            CharacterManager.ChangeView(selectedCharacter);
+                            if (_debug)
+                                selectedCharacter.DebugCoordinates();
                         }
-                        else
+                        else    // Shift click
                         {
-                            CharacterManager.RemoveCharacterFromSelection(selectedCharacter);
-                            selectedCharacter.SelectionMarker.SetActive(false);
+                            if (!CharacterManager.SelectedCharacters().Contains(selectedCharacter)) // If the character is not already selected
+                            {
+                                CharacterManager.AddCharacterToSelection(selectedCharacter);
+                            }
+                            else
+                            {
+                                CharacterManager.RemoveCharacterFromSelection(selectedCharacter);
+                            }
                         }
+                    }
+                    else if(CharacterManager.SelectedCharacters().Count > 0)// Ennemy => ATTACK 
+                    {
+                        // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
+                        NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
                 else if(hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
                 {
+                    if (GameManager.MyEntities.Contains(selectedBuilding)) //Test if building owner
+                    {
                         CharacterManager.DeselectAll();
                         CharacterManager.AddBuildingToSelected(selectedBuilding);
                         CharacterManager.ChangeView(selectedBuilding);
+                    }
+                    else if (CharacterManager.SelectedCharacters().Count > 0)// EnnemyBuilding => ATTACK 
+                    {
+                        // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
+                        NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
+                    }
                 }
                 else if(!_shifting) // If we didn't hit anything and shift is not being held
                     CharacterManager.DeselectAll();
@@ -138,7 +153,6 @@ public class SelectionManager : MonoBehaviour
                     if (!(_shifting && CharacterManager.SelectedCharacters().Contains(character)))
                     {
                         CharacterManager.AddCharacterToSelection(character);
-                        character.SelectionMarker.SetActive(true);
                     }
                 }
             }

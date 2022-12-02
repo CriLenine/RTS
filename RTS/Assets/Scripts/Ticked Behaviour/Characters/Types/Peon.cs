@@ -16,7 +16,7 @@ public class Peon : Character
     {
         base.Start();
 
-        _type = Type.Peon;
+        SetType(Type.Peon);
 
         _specificData = (PeonData)_data;
     }

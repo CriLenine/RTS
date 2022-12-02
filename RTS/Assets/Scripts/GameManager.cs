@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.VFX;
 using UnityEngine;
 using System;
+using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     private TickedList<TickedBehaviour> _entities = new TickedList<TickedBehaviour>();
     private TickedList<TickedBehaviour> _myEntities = new TickedList<TickedBehaviour>();
-
+    private TickedList<TickedBehaviour> _entitiesToDestroy = new TickedList<TickedBehaviour>();
     public static TickedList<TickedBehaviour> Entities => _instance._entities;
     public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
 
@@ -57,10 +59,6 @@ public class GameManager : MonoBehaviour
 
         _ressourcesManager = FindObjectOfType<RessourcesManager>();
     }
-    #endregion
-
-    #region Debug
-    private static Building _buildingToBuild;
     #endregion
 
     [SerializeField]
@@ -116,11 +114,36 @@ public class GameManager : MonoBehaviour
                     harvester.SetAction(new Move(harvester, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
                     harvester.AddAction(new Harvest(harvester, ressource.GetTileToHarvest(harvestingCoords), ressource));
                     break;
+                    
+                case InputType.Attack:
+
+                    if (!_instance._entities[input.ID].TryGetComponent(out TickedBehaviour target))
+                        break;
+
+                    if(target is Building building)
+                    {
+                        List<Vector2> positions = TileMapManager.GetRandomFreePosAroundBuilding(building,1);
+                        if (positions.Count == 0)
+                            break;
+                        MoveCharacters(positions[0], input.Targets, true); // TODO : Manage multiple destinations
+                    }
+                    else
+                        MoveCharacters(target.transform.position, input.Targets, true);
+
+
+                    foreach (int ID in input.Targets)
+                    {
+                        Character attacker = (Character)_instance._entities[ID];
+
+                        if (!attacker)
+                            continue;
+
+                        attacker.AddAction(new Attack(attacker, target));
+                    }
+                    break;
             }
         }
 
-        if (_buildingToBuild != null)
-            _buildingToBuild = _buildingToBuild.AddWorkforce(2) ? null : _buildingToBuild;
 
         TileMapManager.ResetFog();
 
@@ -143,6 +166,11 @@ public class GameManager : MonoBehaviour
             hash.Append(entity.GetHash128().GetHashCode());
         }
 
+       if(_instance._entitiesToDestroy.Count>0)
+       {
+            _instance.DestroyEntitys();
+       }
+            
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
 
@@ -175,7 +203,7 @@ public class GameManager : MonoBehaviour
         return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private static void MoveCharacters(int performer, Vector2 position, int[] targets)
+    private static void MoveCharacters(int performer, Vector2 position, int[] targets, bool isAttacking = false)
     {
         List<Character> characters = new List<Character>();
 
@@ -193,7 +221,10 @@ public class GameManager : MonoBehaviour
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
+                {
+                    group[i].SetAction(new Move(group[i], wayPoints.ToArray(),isAttacking));
+                }
+
             }
             else
                 Debug.Log("Path not found!");
@@ -248,8 +279,7 @@ public class GameManager : MonoBehaviour
 
         TileMapManager.AddBuilding(data.Outline, position);
 
-
-        _buildingToBuild = building;
+        building.AddWorkforce(building.Data.TotalWorkforce);
 
         return building;
     }
@@ -260,32 +290,46 @@ public class GameManager : MonoBehaviour
 
     public static void DestroyEntity(int id)
     {
-        Destroy(_instance._entities[id]);
+        if (_instance._entitiesToDestroy.Contains(id)) return;
 
-        _instance._entities.Remove(id);
-        _instance._myEntities.Remove(id);
+        _instance._entitiesToDestroy.Add(_instance._entities[id]);
+    }
+    private void DestroyEntitys() {
 
-        _instance._characters.Remove(id);
-        _instance._myCharacters.Remove(id);
+        foreach(var entitie in _entitiesToDestroy)
+        {
+            CharacterManager.TestEntitieSelection(entitie);
 
-        _instance._buildings.Remove(id);
-        _instance._myBuildings.Remove(id);
+            if (entitie is Building building)
+                TileMapManager.RemoveBuilding(building);
+            _entities.Remove(entitie);
+            _myEntities.Remove(entitie);
+
+            int id = entitie.ID;
+            _characters.Remove(id);
+            _myCharacters.Remove(id);
+
+            _buildings.Remove(id);
+            _myBuildings.Remove(id);
+
+            Destroy(entitie.gameObject);
+        }
+        _entitiesToDestroy.Clear();
     }
 
-    public static void DestroyAllEntities()
-    {
-        for (int i = 0; i < _instance._entities.Count; ++i)
-            Destroy(_instance._entities.At(i).gameObject);
+    //public static void DestroyAllEntities() {
+    //    for (int i = 0; i < _instance._entities.Count; ++i)
+    //        Destroy(_instance._entities.At(i).gameObject);
 
-        _instance._entities.Clear();
-        _instance._myEntities.Clear();
+    //    _instance._entities.Clear();
+    //    _instance._myEntities.Clear();
 
-        _instance._characters.Clear();
-        _instance._myCharacters.Clear();
+    //    _instance._characters.Clear();
+    //    _instance._myCharacters.Clear();
 
-        _instance._buildings.Clear();
-        _instance._myBuildings.Clear();
-    }
+    //    _instance._buildings.Clear();
+    //    _instance._myBuildings.Clear();
+    //}
 
     #endregion
 
@@ -302,9 +346,9 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
+            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
-            CreateBuilding(i, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
+            CreateBuilding(i+1, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);

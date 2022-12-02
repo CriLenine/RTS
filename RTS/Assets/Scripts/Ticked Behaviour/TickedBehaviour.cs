@@ -6,7 +6,7 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     private static int _globalID = 0;
 
-    public static int NextID => _globalID++;
+    private static int NextID => _globalID++;
 
     public static T Create<T>(int performer, T prefab, Vector3 position, Quaternion quaternion) where T : TickedBehaviour
     {
@@ -63,4 +63,5 @@ public abstract class TickedBehaviour : MonoBehaviour
 
         return hash;
     }
+
 }

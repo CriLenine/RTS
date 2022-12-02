@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using UnityEngine.TextCore.Text;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
@@ -39,12 +42,7 @@ public class CharacterManager : MonoBehaviour
 
         _locomotionInputActions = new Locomotion();
         _locomotionInputActions.Enable(); 
-        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters();
-    }
-
-    public static void QueueDisplacement()
-    {
-        _instance._locomotionManager.RallySelectedCharacters();
+        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters(); ;
     }
 
     public static bool Move(Character character, Vector2 position)
@@ -66,31 +64,46 @@ public class CharacterManager : MonoBehaviour
         return _instance._buildingSelected;
     }
 
-    public static bool AddBuildingToSelected(Building building)
+    public static void AddBuildingToSelected(Building building)
     {
-        if (!_instance._buildingSelected)
-        {
             _instance._buildingSelected = building;
-            return true;
-        }
-        else return false;
     }
 
     public static void AddCharacterToSelection(Character character)
     {
         _instance._charactersSelected.Add(character);
+        character.SelectionMarker.SetActive(true);
     }
 
     public static void AddCharactersToSelection(List<Character> characters)
     {
         _instance._charactersSelected.AddRange(characters);
+
+        foreach(var chara in characters)
+        {
+            chara.SelectionMarker.SetActive(true);
+        }
     }
 
     public static void RemoveCharacterFromSelection(Character character)
     {
         _instance._charactersSelected.Remove(character);
+        character.SelectionMarker.SetActive(false);
     }
 
+    public static void TestEntitieSelection(TickedBehaviour entitie)
+    {
+        if(entitie is Character character)
+        {
+            if(_instance._charactersSelected.Contains(character))
+                RemoveCharacterFromSelection(character);
+        }
+        else if(entitie is Building building&& _instance._buildingSelected)
+        {
+            if (_instance._buildingSelected == building)
+                DeselectAll();
+        }
+    }
     public static void DeselectAll()
     {
         UIManager.HideCurrentUI();

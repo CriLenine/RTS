@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using UnityEngine.UIElements;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -12,16 +15,21 @@ public abstract class Character : TickedBehaviour, IDamageable
         Peon,
         Knight
     }
-    protected Type _type;
-    public Type CharaType;
+
+    private Type _type;
+    public Type CharaType => _type;
 
     [SerializeField]
     protected CharacterData _data;
 
+    [SerializeField]
+    private int _currentHealth;
+
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
-    public int MaxHealth => Data.MaxHealth;
+    protected int MaxHealth => Data.MaxHealth;
+    
 
     public GameObject SelectionMarker;
 
@@ -36,7 +44,7 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Start()
     {
-
+        _currentHealth = MaxHealth;
     }
 
     protected virtual void Update()
@@ -45,13 +53,13 @@ public abstract class Character : TickedBehaviour, IDamageable
         {
             Move move = CurrentAction as Move;
 
-            _pathRenderer.positionCount = move.Positions.Length - move.Index + 1;
+            _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
 
             int j = 0,  i;
 
             _pathRenderer.SetPosition(j++, transform.position);
 
-            for (i = move.Index; i < move.Positions.Length; ++i, ++j)
+            for (i = move.Index; i < move.Positions.Count; ++i, ++j)
                 _pathRenderer.SetPosition(j, move.Positions[i]);
 
             _pathRenderer.transform.position = move.Positions[i - 1];
@@ -67,8 +75,10 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public sealed override void Tick()
     {
-        if (CurrentAction?.Perform() == true)
-        {
+        if (CurrentAction is null)
+            CheckSurrounding();
+
+        else if (CurrentAction.Perform() == true)
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
     }
 
@@ -104,6 +114,21 @@ public abstract class Character : TickedBehaviour, IDamageable
         AddAction(action);
     }
 
+    private void CheckSurrounding()
+    {
+        List<Character> charas = GameManager.Characters.ToList();
+        float attackRange = Data.AutoAttackDistance;
+
+        for (int i = 0; i < charas.Count; i++) //On regarde tous les charas du jeux
+        {
+            Character chara = charas[i];
+            if (chara.Performer == Performer || (chara.transform.position - transform.position).sqrMagnitude >= attackRange) continue; //Si trop loin ou meme team => next
+
+            //Sinon on renvois l'action d'attaque
+            SetAction(new Attack(this, chara, false));
+            return;
+        }
+    }
     public void DebugCoordinates()
     {
         Debug.Log($"{gameObject.name} coords : ({Coords.x}, {Coords.y})");
@@ -117,5 +142,21 @@ public abstract class Character : TickedBehaviour, IDamageable
         hash.Append(Coords.y);
 
         return hash;
+    }
+
+    public bool TakeDamage(int damage)
+    {
+        return (_currentHealth -= damage) <= 0;
+    }
+
+    public void GainHealth(int amount)
+    {
+        if ((_currentHealth += amount) > MaxHealth)
+            _currentHealth = MaxHealth;
+    }
+
+    protected void SetType(Type type)
+    {
+        _type = type;
     }
 }

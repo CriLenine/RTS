@@ -21,6 +21,9 @@ public abstract class Building : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
+    private Type _type;
+    public Type BuildingType => _type;
+
     /*Ici on aura les options disponibles en cliquant sur un bâtiment
      * (ex créer une certaine unité dans une caserne)*/
     //[SerializeField]
@@ -28,9 +31,9 @@ public abstract class Building : TickedBehaviour, IDamageable
 
     public BuildingData Data => _buildingData;
 
-    public int MaxHealth => _buildingData.MaxHealth;
+    protected int MaxHealth => _buildingData.MaxHealth;
     public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
-    public float CurrentHealth => _currentHealth / MaxHealth;
+
 
     //SpriteManagement
     private SpriteRenderer _buildingRenderer;
@@ -38,10 +41,11 @@ public abstract class Building : TickedBehaviour, IDamageable
     private float _ratioStep;
     //
 
-    private void Start()
+    private void Awake()
     {
         _buildingRenderer = GetComponent<SpriteRenderer>();
 
+        _currentHealth = MaxHealth;
         _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
         _actualSpriteIndex = 0;
     }
@@ -77,5 +81,21 @@ public abstract class Building : TickedBehaviour, IDamageable
             _isBuilt = true;
         }
         return _isBuilt;
+    }
+
+    public bool TakeDamage(int damage)
+    {
+        return (_currentHealth -= damage) <= 0;
+    }
+
+    public void GainHealth(int amount)
+    {
+        if ((_currentHealth += amount) > MaxHealth)
+            _currentHealth = MaxHealth;
+    }
+
+    protected void SetType(Type type)
+    {
+        _type = type;
     }
 }

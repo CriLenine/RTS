@@ -7,6 +7,7 @@ public enum InputType
     Build,
     Harvest,
     Hunt
+    Attack
 }
 
 public class TickInput
@@ -88,4 +89,19 @@ public class TickInput
     //        Performer = performer
     //    };
     //}
+    public static TickInput Attack(int targetID, Vector2 targetpos,int[] attackers, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Attack,
+
+            Targets = attackers,
+
+            ID = targetID,
+
+            Position = targetpos,
+
+            Performer = performer,
+        };
+    }
 }
