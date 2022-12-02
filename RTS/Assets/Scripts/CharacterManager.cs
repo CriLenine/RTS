@@ -17,7 +17,7 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
-    private List<Character> _charactersSelected = new List<Character>();
+    private List<Character> _charactersSelected = new();
     private Building _buildingSelected = null;
 
     private void Awake()

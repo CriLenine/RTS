@@ -58,14 +58,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private bool _simulateWrongHash = false;
 
-    [SerializeField]
-    private VisualEffect fog;
+    private SpriteMask _fogRepeller;
+
+    private void Start()
+    {
+        _fogRepeller = GetComponent<SpriteMask>();
+    }
 
     private void Update()
     {
         _simulateWrongHash = Input.GetKey(KeyCode.H);
-
-        // fog.visualEffectAsset.
     }
 
     public static int Tick(TickInput[] inputs)
@@ -80,13 +82,13 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Build:
-                    MoveCharacters(input.Position, input.Targets);
+                    MoveCharacters(input.Performer, input.Position, input.Targets);
                     CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
 
                     break;
 
                 case InputType.Move:
-                    MoveCharacters(input.Position, input.Targets);
+                    MoveCharacters(input.Performer, input.Position, input.Targets);
 
                     break;
                 case InputType.Attack:
@@ -118,6 +120,18 @@ public class GameManager : MonoBehaviour
             }
         }
 
+
+        TileMapManager.ResetFog();
+
+        Vector2Int offset = Vector2Int.zero;
+
+        foreach (TickedBehaviour entity in Entities)
+        {
+            for (offset.x = -10; offset.x <= 10; ++offset.x)
+                for (offset.y = -10; offset.y <= 10; ++offset.y)
+                    if (offset.x * offset.x + offset.y * offset.y < entity.ViewSqrtMagnitude)
+                        TileMapManager.ClearView(entity.Performer, entity.Coords + offset);
+        }
 
         Hash128 hash = new Hash128();
 
@@ -153,7 +167,9 @@ public class GameManager : MonoBehaviour
             _instance._myCharacters.Add(character);
         }
 
-        character.transform.position = position;
+        character.SetPosition(position);
+
+        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
 
         return character;
     }
@@ -163,18 +179,18 @@ public class GameManager : MonoBehaviour
         return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private static void MoveCharacters(Vector2 position, int[] targets, bool isAttacking = false)
+    private static void MoveCharacters(int performer, Vector2 position, int[] targets, bool isAttacking = false)
     {
         List<Character> characters = new List<Character>();
 
         for (int i = 0; i < targets.Length; i++)
             characters.Add((Character)_instance._entities[targets[i]]);
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(characters.ToArray());
+        List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
 
         foreach (List<Character> group in groups)
         {
-            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(group[0], TileMapManager.WorldToTilemapCoords(position));
+            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position));
 
             if (wayPoints != null)
             {
@@ -187,7 +203,7 @@ public class GameManager : MonoBehaviour
 
             }
             else
-                throw new Exception("Path not Found");
+                Debug.Log("Path not found!");
         }
     }
 
@@ -301,6 +317,8 @@ public class GameManager : MonoBehaviour
             _instance._entities.RemoveAt(i);
         }
 
+        QuadTreeNode.Init(3, 20, 13);
+
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
@@ -315,6 +333,8 @@ public class GameManager : MonoBehaviour
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
         }
+
+        _instance._fogRepeller.enabled = false;
     }
 
     #region Debug
@@ -339,7 +359,7 @@ public class GameManager : MonoBehaviour
 
         List<Character> selected = CharacterManager.SelectedCharacters();
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(selected.ToArray());
+        List<List<Character>> groups = SelectionManager.MakeGroups(NetworkManager.Me, selected.ToArray());
 
         for (int i = 0, j; i < groups.Count; ++i)
         {

@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Diagnostics;
 using UnityEngine.UIElements;
 using static UnityEditor.PlayerSettings;
+using UnityEngine;
+using System;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -70,6 +70,18 @@ public class TileMapManager : MonoBehaviour
 
         for (int i = 0; i < _obstacleTilemaps.Count; ++i)
             InitLogicalTiles(_obstacleTilemaps[i], TileState.Obstacle);
+    }
+
+    public static void ResetFog()
+    {
+        foreach (LogicalTile tile in _instance._tiles.Values)
+            tile.SetFog(false);
+    }
+
+    public static void ClearView(int performer, Vector2Int coords)
+    {
+        if (_instance._tiles.ContainsKey(coords))
+            _instance._tiles[coords].SetFog(performer, false);
     }
 
     #region Initialization
@@ -140,6 +152,7 @@ public class TileMapManager : MonoBehaviour
     #endregion
 
     #region Buildings
+
     public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
     {
         // Retrieval of the mouse position.
@@ -169,7 +182,7 @@ public class TileMapManager : MonoBehaviour
             {
                 LogicalTile tile;
 
-                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree)
+                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree(NetworkManager.Me))
                     return (_instance._hoveredTilePos, _instance._previousAvailability);
             }
 
@@ -236,13 +249,13 @@ public class TileMapManager : MonoBehaviour
 
     #region Displacement
 
-    public static bool ObstacleDetection(int minX, int maxX, int minY, int maxY)
+    public static bool ObstacleDetection(int performer, int minX, int maxX, int minY, int maxY)
     {
         LogicalTile tile;
 
         for (int y = minY; y <= maxY; y++)
             for (int x = minX; x <= maxX; x++)
-                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || tile.IsObstacle)
+                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree(performer))
                     return true;
 
         return false;
@@ -252,7 +265,7 @@ public class TileMapManager : MonoBehaviour
 
     #region PathFinding
 
-    public static List<Vector2Int> FindPath(Vector2Int startCoords, Vector2Int endCoords)
+    public static List<Vector2Int> FindPath(int performerID, Vector2Int startCoords, Vector2Int endCoords)
     {
         if (_instance._debug)
             _instance._stopwatch = Stopwatch.StartNew();
@@ -288,7 +301,7 @@ public class TileMapManager : MonoBehaviour
 
                 Vector2Int neighborCoords = currentCoords + displacementsToTest[displacementIndex];
 
-                if (!_instance._tiles.TryGetValue(neighborCoords, out neighborTile) || neighborTile.IsObstacle || closed.Contains(neighborCoords))
+                if (!_instance._tiles.TryGetValue(neighborCoords, out neighborTile) || !neighborTile.IsFree(performerID) || closed.Contains(neighborCoords))
                     continue;
 
                 if (open.Contains(neighborCoords))
@@ -383,7 +396,7 @@ public class TileMapManager : MonoBehaviour
 
     #region Tools
 
-    public static bool LineOfSight(Vector2Int start, Vector2Int end)
+    public static bool LineOfSight(int performer, Vector2Int start, Vector2Int end)
     {
         int dx = end.x - start.x;
         int dy = end.y - start.y;
@@ -421,7 +434,7 @@ public class TileMapManager : MonoBehaviour
                 ++iy;
             }
 
-            if (GetLogicalTile(start).IsObstacle)
+            if (!GetLogicalTile(start).IsFree(performer))
                 return false;
         }
 

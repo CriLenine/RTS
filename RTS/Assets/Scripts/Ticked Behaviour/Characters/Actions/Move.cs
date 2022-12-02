@@ -8,6 +8,15 @@ public class Move : Action
 
     public readonly List<Vector2> Positions;
 
+    #region Thresholds
+
+    public float TestThreshold = 1f;
+    private float defaultThreshold = 0;
+    private float thresholdIncrement = .05f;
+    public float CompletionThreshold => defaultThreshold += thresholdIncrement;
+
+    #endregion
+
     public Vector2 Position => Positions[Index];
 
     private float _finalDistanceToDest;
@@ -43,10 +52,14 @@ public class Move : Action
 
     public override bool Perform()
     {
-        //Index == Positions.Count - 1 &&
-     
+        if (CharacterManager.Move(_character, Position))
+            ++Index;
+        
         if(_isAttacking)
         {
+            if ((Position - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest)
+            return true;
+
             Vector2Int postToTest = TileMapManager.WorldToTilemapCoords(_target.transform.position);
             if (postToTest != _lastPos)
             {
@@ -62,11 +75,6 @@ public class Move : Action
             }
         }
 
-        if (CharacterManager.Move(_character, Position))
-                ++Index;
-
-        if ((Position - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest)
-            return true;
 
         return Index == Positions.Count;
     }
