@@ -63,7 +63,7 @@ public class Move : Action
             Vector2Int postToTest = TileMapManager.WorldToTilemapCoords(_target.transform.position);
             if (postToTest != _lastPos)
             {
-                if(TileMapManager.LineOfSight(_character.Coords, postToTest))
+                if(TileMapManager.LineOfSight(_character.Performer,_character.Coords, postToTest))
                 {
                     Positions.Clear();
                     Positions.Add(postToTest);

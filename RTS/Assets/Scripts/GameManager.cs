@@ -125,10 +125,10 @@ public class GameManager : MonoBehaviour
                         List<Vector2> positions = TileMapManager.GetRandomFreePosAroundBuilding(building,1);
                         if (positions.Count == 0)
                             break;
-                        MoveCharacters(positions[0], input.Targets, true); // TODO : Manage multiple destinations
+                        MoveCharacters(input.Performer,positions[0], input.Targets, true); // TODO : Manage multiple destinations
                     }
                     else
-                        MoveCharacters(target.transform.position, input.Targets, true);
+                        MoveCharacters(input.Performer, target.transform.position, input.Targets, true);
 
 
                     foreach (int ID in input.Targets)
@@ -335,7 +335,7 @@ public class GameManager : MonoBehaviour
 
     public static void Prepare() {
 
-        DestroyAllEntities();
+        //DestroyAllEntities(); ---> TOFIX
 
         QuadTreeNode.Init(3, 20, 13);
 

@@ -6,7 +6,7 @@ public enum InputType
     Move,
     Build,
     Harvest,
-    Hunt
+    Hunt,
     Attack
 }
 

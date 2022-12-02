@@ -232,10 +232,10 @@ public class TileMapManager : MonoBehaviour
         for (int x = _buildingMin.x - 1; x <= _buildingMax.x+1; ++x)
             for (int y = _buildingMin.y - 1; y <= _buildingMax.y+1; ++y)
             {
-                Vector2Int posTotest = new Vector2Int(x, y);
+                Vector2Int posTotest = new(x, y);
                 if (!tiles.ContainsKey(posTotest)) continue;
 
-                if (tiles[posTotest].IsFree)
+                if (tiles[posTotest].IsFree(building.Performer))
                     positions.Add(TilemapCoordsToWorld(posTotest));
 
                 if (positions.Count == number)
