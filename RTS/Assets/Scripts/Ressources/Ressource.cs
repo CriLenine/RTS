@@ -8,17 +8,21 @@ public enum RessourceType
     Meat
 }
 
-public abstract class Ressource : TickedBehaviour
+public abstract class Ressource : MonoBehaviour
 {
     [SerializeField]
     private RessourceData _data;
 
     public RessourceData Data => _data;
 
+    public abstract void Clear();
+
+    public abstract Vector2Int GetTileToHarvest(Vector2Int coords);
+
     ///<summary>Called when a new ressource tile is selected to be harvested.</summary>
     /// <returns>The destination for the worker to harvest the ressource at <paramref name="ressourcePosition"/>.
     /// If no suitable tile is found, returns <paramref name="ressourcePosition"/>.</returns>
-    public Vector2Int GetHarvestingPosition(Vector2Int ressourcePosition)
+    public Vector2Int GetHarvestingPosition(Vector2Int ressourcePosition, Vector2Int harvesterPosition)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         //Check all the outlines around the tree
@@ -39,17 +43,13 @@ public abstract class Ressource : TickedBehaviour
             //If we found at least one candidate
             if (availableTiles.Count > 0)
             {
-                //Find the nearest candidate to the tree in magnitude
-                (int minMagnitude, int index) = ((availableTiles[0] - ressourcePosition).sqrMagnitude, 0);
+                //Find the nearest candidate to the harvester in magnitude
+                (int minMagnitude, int index) = ((availableTiles[0] - harvesterPosition).sqrMagnitude, 0);
                 for (int i = 1; i < availableTiles.Count; i++)
                 {
-                    int currentMagnitude = (availableTiles[i] - ressourcePosition).sqrMagnitude;
+                    int currentMagnitude = (availableTiles[i] - harvesterPosition).sqrMagnitude;
                     if (currentMagnitude < minMagnitude)
                         (minMagnitude, index) = (currentMagnitude, i);
-                    /*
-                     * TODO : � magnitudes �gales, choisir le plus proche du joueur via pathfinding (optionnel)  
-                     * Remarque : S'il y a un trou proche de l'arbre cible mais inaccessible, c'est cette tile qui sera retenue
-                     */
                 }
                 return availableTiles[index];
             }

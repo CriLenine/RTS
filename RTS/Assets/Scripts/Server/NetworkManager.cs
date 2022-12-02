@@ -330,6 +330,11 @@ public partial class NetworkManager : MonoBehaviour
                 Spread(message, input.Targets);
 
                 break;
+
+            case InputType.Harvest:
+                message.Add(input.Position.x, input.Position.y, input.Targets[0]);
+
+                break;
         }
 
         _instance._server.Send(message);

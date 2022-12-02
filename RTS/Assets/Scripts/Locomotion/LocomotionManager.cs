@@ -34,6 +34,14 @@ public class LocomotionManager : MonoBehaviour
 
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
+
+        if (characters.Count == 1 && 
+            (GameManager.RessourcesManager.HasRock(rallyPointCoords) || GameManager.RessourcesManager.HasTree(rallyPointCoords)))
+        {
+            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
+            return;
+        }
+
         if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
             return;
 
