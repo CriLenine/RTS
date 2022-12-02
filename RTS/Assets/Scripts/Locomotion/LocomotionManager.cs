@@ -34,7 +34,7 @@ public class LocomotionManager : MonoBehaviour
 
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
-        if (rallyTile == null || !rallyTile.IsFree)
+        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
             return;
 
         int[] IDs = new int[characters.Count];
@@ -80,7 +80,7 @@ public class LocomotionManager : MonoBehaviour
 
     public bool Move(Character character, Vector3 position)
     {
-        character.transform.position = LocalAvoidance(character, position);
+        character.SetPosition(LocalAvoidance(character, position));
 
         return character.transform.position == position;
     }

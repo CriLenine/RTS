@@ -24,15 +24,14 @@ public abstract class Character : TickedBehaviour, IDamageable
     public int MaxHealth => Data.MaxHealth;
 
     public GameObject SelectionMarker;
-    public Vector2Int Coords;
 
     private LineRenderer _pathRenderer;
+
+    public List<Vector2> view = new List<Vector2>();
 
     protected virtual void Awake()
     {
         _pathRenderer = GetComponentInChildren<LineRenderer>(true);
-
-        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
 
     protected virtual void Start()
@@ -70,8 +69,22 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         if (CurrentAction?.Perform() == true)
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+    }
 
-        Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
+    private void OnDrawGizmosSelected()
+    {
+        int radius = 10;
+        int squareRadius = radius * radius;
+
+        Color grey = Color.grey;
+        grey.a = 0.1f;
+
+        Gizmos.color = grey;
+
+        for (int i = Coords.x - 10, j; i <= Coords.x + 10; ++i)
+            for (j = Coords.y - 10; j <= Coords.y + 10; ++j)
+                if ((i - Coords.x) * (i - Coords.x) + (j - Coords.y) * (j - Coords.y) < squareRadius)
+                    Gizmos.DrawWireCube(TileMapManager.TilemapCoordsToWorld(new Vector2Int(i, j)), Vector3.one * TileMapManager.TileSize);
     }
 
     public void AddAction(Action action)

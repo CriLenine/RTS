@@ -6,6 +6,8 @@ using System;
 
 public partial class NetworkManager : MonoBehaviour
 {
+    public const int MaxPlayerCount = 4;
+
     private const float BaseTickPeriod = 0.025f;
     private const float MinTickPeriod = 0.005f;
 
