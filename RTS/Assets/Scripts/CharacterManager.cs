@@ -47,9 +47,9 @@ public class CharacterManager : MonoBehaviour
         _instance._locomotionManager.RallySelectedCharacters();
     }
 
-    public static bool Move(Character character, Vector2 position, bool movingToFinalWayPoint)
+    public static bool Move(Character character, Vector2 position)
     {
-        return _instance._locomotionManager.Move(character, position, movingToFinalWayPoint);
+        return _instance._locomotionManager.Move(character, position);
     }
 
     public static void ChangeView<T>(T owner) where T : TickedBehaviour

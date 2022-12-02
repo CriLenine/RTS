@@ -11,8 +11,6 @@ public class LogicalTile
 {
     public TileState State = TileState.Obstacle;
 
-    public bool IsObstacle => State == TileState.Obstacle;
-
     public bool[] Fog = new bool[4];
 
     public bool IsFree(int performer)

@@ -45,9 +45,9 @@ public class LocomotionManager : MonoBehaviour
         NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
     }
 
-    public static List<Vector2> RetrieveWayPoints(Character leader, Vector2Int rallyPoint, bool smooth = true)
+    public static List<Vector2> RetrieveWayPoints(int performer, Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
-        List<Vector2Int> wayPoints = TileMapManager.FindPath(leader.Coords, rallyPoint);
+        List<Vector2Int> wayPoints = TileMapManager.FindPath(performer, leader.Coords, rallyPoint);
 
         if (wayPoints.Count == 0)
             return null;
@@ -67,7 +67,7 @@ public class LocomotionManager : MonoBehaviour
         while (currentWayPointIndex != 0)
         {
             for (index = 0; index < currentWayPointIndex; ++index)
-                if (TileMapManager.LineOfSight(wayPoints[currentWayPointIndex], wayPoints[index]))
+                if (TileMapManager.LineOfSight(performer, wayPoints[currentWayPointIndex], wayPoints[index]))
                     break;
 
             positionWayPoints.Add(TileMapManager.TilemapCoordsToWorld(wayPoints[index]));
@@ -78,15 +78,18 @@ public class LocomotionManager : MonoBehaviour
         return positionWayPoints;
     }
 
-    public bool Move(Character character, Vector3 position, bool movingToFinalWayPoint)
+    public bool Move(Character character, Vector3 position)
     {
         Vector3 projectedPosition = LocalAvoidance(character, position);
 
         if ((position - character.transform.position).sqrMagnitude < (character.CurrentAction as Move).TestThreshold)
-            if(MoveComplete(character, projectedPosition, position))
+            if (MoveComplete(character, projectedPosition, position))
                 return true;
 
-        projectedPosition = ObstacleAvoidance(character, projectedPosition);            
+        projectedPosition = ObstacleAvoidance(character, projectedPosition);
+        if (projectedPosition == Vector3.zero)
+            return true;
+
         Vector2 targetPosition = Vector2.MoveTowards(character.transform.position, projectedPosition, TileMapManager.TileSize / 10f);
         character.SetPosition(targetPosition);
 
@@ -110,19 +113,21 @@ public class LocomotionManager : MonoBehaviour
     {
         Vector2 characterPos = (Vector2)character.transform.position;
 
-        if (!TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(projectedPosition)).IsObstacle)
+        if (TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(projectedPosition)).IsFree(character.Performer))
             return projectedPosition;
+
+        Debug.Log("Obstacle detected");
 
         Vector2 collisionPosition = projectedPosition - characterPos;
 
         Vector2 rightPath = characterPos + Vector2.Perpendicular(collisionPosition);
 
-        if (!TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(rightPath)).IsObstacle)
+        if (TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(rightPath)).IsFree(character.Performer))
             return characterPos + rightPath;
 
         Vector2 leftPath = characterPos - Vector2.Perpendicular(collisionPosition);
 
-         if (!TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(leftPath)).IsObstacle)
+        if (TileMapManager.GetLogicalTile(TileMapManager.WorldToTilemapCoords(leftPath)).IsFree(character.Performer))
             return characterPos + leftPath;
 
         return Vector2.zero;
@@ -151,7 +156,7 @@ public class LocomotionManager : MonoBehaviour
             Vector2 deltaPos = (Vector2)neighbor.transform.position - characterPos;
 
             if (deltaPos.sqrMagnitude < .1f)
-                trajectoryAdjustments.Add(neighbor.CurrentAction is Move ? - deltaPos.normalized : Vector2.Perpendicular(deltaPos).normalized);
+                trajectoryAdjustments.Add(neighbor.CurrentAction is Move ? -deltaPos.normalized : Vector2.Perpendicular(deltaPos).normalized);
         }
 
         if (trajectoryAdjustments.Count == 0)

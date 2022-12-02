@@ -84,13 +84,13 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Build:
-                    MoveCharacters(input.Position, input.Targets);
+                    MoveCharacters(input.Performer, input.Position, input.Targets);
                     CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
 
                     break;
 
                 case InputType.Move:
-                    MoveCharacters(input.Position, input.Targets);
+                    MoveCharacters(input.Performer, input.Position, input.Targets);
 
                     break;
             }
@@ -140,7 +140,7 @@ public class GameManager : MonoBehaviour
             _instance._myCharacters.Add(character);
         }
 
-        character.transform.position = position;
+        character.SetPosition(position);
 
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
 
@@ -152,18 +152,18 @@ public class GameManager : MonoBehaviour
         return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private static void MoveCharacters(Vector2 position, int[] targets)
+    private static void MoveCharacters(int performer, Vector2 position, int[] targets)
     {
         List<Character> characters = new List<Character>();
 
         for (int i = 0; i < targets.Length; i++)
             characters.Add((Character)_instance._entities[targets[i]]);
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(characters.ToArray());
+        List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
 
         foreach (List<Character> group in groups)
         {
-            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(group[0], TileMapManager.WorldToTilemapCoords(position));
+            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position));
 
             if (wayPoints != null)
             {
@@ -316,7 +316,7 @@ public class GameManager : MonoBehaviour
 
         List<Character> selected = CharacterManager.SelectedCharacters();
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(selected.ToArray());
+        List<List<Character>> groups = SelectionManager.MakeGroups(NetworkManager.Me, selected.ToArray());
 
         for (int i = 0, j; i < groups.Count; ++i)
         {

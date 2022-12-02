@@ -161,7 +161,7 @@ public class SelectionManager : MonoBehaviour
     /// <para name="peons">Characters to clusterize</para>
     /// <para name="maxSqrtMagnitude">The square of the maximum distance to the leader of a group</para>
     /// <returns>A list of Character list</returns>
-    public static List<List<Character>> MakeGroups(Character[] peons, float maxSqrtMagnitude = 100f)
+    public static List<List<Character>> MakeGroups(int performer, Character[] peons, float maxSqrtMagnitude = 100f)
     {
         /// <summary>
         /// Check if all characters can be contained in a square without obstacles
@@ -193,7 +193,7 @@ public class SelectionManager : MonoBehaviour
                     maxY = coords.y;
             }
 
-            return TileMapManager.ObstacleDetection(minX, maxX, minY, maxY);
+            return TileMapManager.ObstacleDetection(performer, minX, maxX, minY, maxY);
         }
 
         List<List<Character>> groups = new List<List<Character>>();
@@ -253,7 +253,7 @@ public class SelectionManager : MonoBehaviour
             {
                 if (Vector2.SqrMagnitude(openSet[i].transform.position - leader.transform.position) <= maxSqrtMagnitude)
                 {
-                    if (TileMapManager.LineOfSight(leader.Coords, openSet[i].Coords))
+                    if (TileMapManager.LineOfSight(performer, leader.Coords, openSet[i].Coords))
                     {
                         group.Add(openSet[i]);
 

@@ -18,7 +18,6 @@ public class Move : Action
     #endregion
 
     public Vector2 Position => Positions[Index];
-    private bool _movingToFinalWayPoint => Index == Positions.Length - 1;
 
     public Move(Character character, Vector2[] positions) : base(character)
     {
@@ -32,7 +31,7 @@ public class Move : Action
 
     public override bool Perform()
     {
-        if (CharacterManager.Move(_character, Position, _movingToFinalWayPoint))
+        if (CharacterManager.Move(_character, Position))
             ++Index;
 
         return Index == Positions.Length;
