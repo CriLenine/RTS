@@ -50,18 +50,17 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Update()
     {
-        Debug.Log(CurrentAction?.GetType().ToString());
         if (CurrentAction is Move)
         {
             Move move = CurrentAction as Move;
 
-            _pathRenderer.positionCount = move.Positions.Length - move.Index + 1;
+            _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
 
             int j = 0,  i;
 
             _pathRenderer.SetPosition(j++, transform.position);
 
-            for (i = move.Index; i < move.Positions.Length; ++i, ++j)
+            for (i = move.Index; i < move.Positions.Count; ++i, ++j)
                 _pathRenderer.SetPosition(j, move.Positions[i]);
 
             _pathRenderer.transform.position = move.Positions[i - 1];
@@ -105,12 +104,12 @@ public abstract class Character : TickedBehaviour, IDamageable
     private void CheckSurrounding()
     {
         List<Character> charas = GameManager.Characters.ToList();
-        float maxAttackDist = Data.AutoAttackDistance;
+        float attackRange = Data.AutoAttackDistance;
 
         for (int i = 0; i < charas.Count; i++) //On regarde tous les charas du jeux
         {
             Character chara = charas[i];
-            if (chara.Performer == Performer || ((Vector2)chara.transform.position - (Vector2)transform.position).sqrMagnitude > maxAttackDist) continue; //Si trop loin ou meme team => next
+            if (chara.Performer == Performer || (chara.transform.position - transform.position).sqrMagnitude >= attackRange) continue; //Si trop loin ou meme team => next
 
             //Sinon on renvois l'action d'attaque
             SetAction(new Attack(this, chara, false));

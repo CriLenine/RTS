@@ -31,7 +31,7 @@ public class Attack : Action
 
     public override bool Perform()
     {
-        if (!_target) return true;//tareget already dead no point
+        if (!_target) return true;//target already dead no point 
 
         if (((Vector2)_targetTransform.position - (Vector2)_charaTransform.position).sqrMagnitude > _maxAttackDist) // si trop loin on arrete d'attaquer 
         {
