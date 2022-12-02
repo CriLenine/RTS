@@ -8,7 +8,17 @@ public class Move : Action
 
     public readonly Vector2[] Positions;
 
+    #region Thresholds
+
+    public float TestThreshold = 1f;
+    private float defaultThreshold = 0;
+    private float thresholdIncrement = .05f;
+    public float CompletionThreshold => defaultThreshold += thresholdIncrement;
+
+    #endregion
+
     public Vector2 Position => Positions[Index];
+    private bool _movingToFinalWayPoint => Index == Positions.Length - 1;
 
     public Move(Character character, Vector2[] positions) : base(character)
     {
@@ -22,10 +32,7 @@ public class Move : Action
 
     public override bool Perform()
     {
-        if (Index == Positions.Length - 1 && (Position - (Vector2)_character.transform.position).sqrMagnitude < .2f)
-            return true;
-
-        if (CharacterManager.Move(_character, Position))
+        if (CharacterManager.Move(_character, Position, _movingToFinalWayPoint))
             ++Index;
 
         return Index == Positions.Length;

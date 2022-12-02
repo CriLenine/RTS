@@ -142,6 +142,8 @@ public class GameManager : MonoBehaviour
 
         character.transform.position = position;
 
+        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
+
         return character;
     }
 
@@ -171,7 +173,7 @@ public class GameManager : MonoBehaviour
                     group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
             }
             else
-                throw new Exception("Path not Found");
+                Debug.Log("Path not found!");
         }
     }
 
@@ -271,6 +273,8 @@ public class GameManager : MonoBehaviour
             Destroy(_instance._entities.At(i).gameObject);
             _instance._entities.RemoveAt(i);
         }
+
+        QuadTreeNode.Init(3, 20, 13);
 
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {

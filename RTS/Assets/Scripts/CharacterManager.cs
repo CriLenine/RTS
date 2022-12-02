@@ -14,7 +14,7 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
-    private List<Character> _charactersSelected = new List<Character>();
+    private List<Character> _charactersSelected = new();
     private Building _buildingSelected = null;
 
     private void Awake()
@@ -47,9 +47,9 @@ public class CharacterManager : MonoBehaviour
         _instance._locomotionManager.RallySelectedCharacters();
     }
 
-    public static bool Move(Character character, Vector2 position)
+    public static bool Move(Character character, Vector2 position, bool movingToFinalWayPoint)
     {
-        return _instance._locomotionManager.Move(character, position);
+        return _instance._locomotionManager.Move(character, position, movingToFinalWayPoint);
     }
 
     public static void ChangeView<T>(T owner) where T : TickedBehaviour
