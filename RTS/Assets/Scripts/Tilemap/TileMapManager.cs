@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Diagnostics;
+using UnityEngine;
+using System;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -68,6 +68,18 @@ public class TileMapManager : MonoBehaviour
 
         for (int i = 0; i < _obstacleTilemaps.Count; ++i)
             InitLogicalTiles(_obstacleTilemaps[i], TileState.Obstacle);
+    }
+
+    public static void ResetFog()
+    {
+        foreach (LogicalTile tile in _instance._tiles.Values)
+            tile.SetFog(false);
+    }
+
+    public static void ClearView(int performer, Vector2Int coords)
+    {
+        if (_instance._tiles.ContainsKey(coords))
+            _instance._tiles[coords].SetFog(performer, false);
     }
 
     #region Initialization
@@ -138,6 +150,7 @@ public class TileMapManager : MonoBehaviour
     #endregion
 
     #region Buildings
+
     public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
     {
         // Retrieval of the mouse position.
@@ -167,7 +180,7 @@ public class TileMapManager : MonoBehaviour
             {
                 LogicalTile tile;
 
-                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree)
+                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree(NetworkManager.Me))
                     return (_instance._hoveredTilePos, _instance._previousAvailability);
             }
 

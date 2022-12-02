@@ -60,14 +60,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private bool _simulateWrongHash = false;
 
-    [SerializeField]
-    private VisualEffect fog;
+    private SpriteMask _fogRepeller;
+
+    private void Start()
+    {
+        _fogRepeller = GetComponent<SpriteMask>();
+    }
 
     private void Update()
     {
         _simulateWrongHash = Input.GetKey(KeyCode.H);
-
-        // fog.visualEffectAsset.
     }
 
     public static int Tick(TickInput[] inputs)
@@ -96,6 +98,18 @@ public class GameManager : MonoBehaviour
 
         if (_buildingToBuild != null)
             _buildingToBuild = _buildingToBuild.AddWorkforce(2) ? null : _buildingToBuild;
+
+        TileMapManager.ResetFog();
+
+        Vector2Int offset = Vector2Int.zero;
+
+        foreach (TickedBehaviour entity in Entities)
+        {
+            for (offset.x = -10; offset.x <= 10; ++offset.x)
+                for (offset.y = -10; offset.y <= 10; ++offset.y)
+                    if (offset.x * offset.x + offset.y * offset.y < entity.ViewSqrtMagnitude)
+                        TileMapManager.ClearView(entity.Performer, entity.Coords + offset);
+        }
 
         Hash128 hash = new Hash128();
 
@@ -272,6 +286,8 @@ public class GameManager : MonoBehaviour
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
         }
+
+        _instance._fogRepeller.enabled = false;
     }
 
     #region Debug

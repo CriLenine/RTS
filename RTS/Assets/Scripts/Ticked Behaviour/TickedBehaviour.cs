@@ -33,6 +33,25 @@ public abstract class TickedBehaviour : MonoBehaviour
     public int ID { get; private set; }
     public int Performer { get; private set; }
 
+    public Vector2Int Coords { get; protected set; }
+
+    [SerializeField]
+    private int _viewSqrtRadius = 10;
+
+    public int ViewSqrtMagnitude
+    {
+        get => _viewSqrtRadius;
+        
+        protected set => _viewSqrtRadius = value;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+
+        Coords = TileMapManager.WorldToTilemapCoords(position);
+    }
+
     public abstract void Tick();
 
     public virtual Hash128 GetHash128()
