@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Diagnostics;
+using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -132,7 +134,7 @@ public class TileMapManager : MonoBehaviour
 
     public static bool OutofMap(Vector2Int coords)
     {
-        return _instance._tiles.ContainsKey(coords);
+        return !_instance._tiles.ContainsKey(coords);
     }
 
     #endregion
@@ -187,12 +189,47 @@ public class TileMapManager : MonoBehaviour
         UpdateTilesState(_buildingMin, _buildingMax, TileState.BuildingOutline);
 
         for (int x = _buildingMin.x + 1; x < _buildingMax.x; ++x)
-            for (int y = _buildingMin.y; y < _buildingMax.y; ++y)
+            for (int y = _buildingMin.y + 1; y < _buildingMax.y; ++y)
                 UpdateTileState(new Vector2Int(x, y), TileState.Obstacle);
     }
-    public static void RemoveBuilding(Vector2Int coords)
+    public static void RemoveBuilding(Building building)
     {
-        throw new NotImplementedException("RemoveBuildingToImplement");
+        Vector2Int centerCoords = WorldToTilemapCoords(building.transform.position);
+        SpawnableDataBuilding data = PrefabManager.GetBuildingData(building.BuildingType);
+        int outlineCount = data.Outline;
+        //Set building tiles
+        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlineCount, centerCoords.y - outlineCount);
+        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlineCount, centerCoords.y + outlineCount);
+
+        UpdateTilesState(_buildingMin, _buildingMax, TileState.Free);
+    }
+
+    public static List<Vector2> GetRandomFreePosAroundBuilding(Building building,int number)
+    {
+        Vector2Int pos = WorldToTilemapCoords(building.transform.position);
+        SpawnableDataBuilding data = PrefabManager.GetBuildingData(building.BuildingType);
+        int outlineCount = data.Outline;
+        Dictionary<Vector2Int, LogicalTile> tiles = _instance._tiles;
+
+        Vector2Int _buildingMin = new(pos.x - outlineCount, pos.y - outlineCount);
+        Vector2Int _buildingMax = new(pos.x + outlineCount, pos.y + outlineCount);
+
+        List<Vector2> positions = new();
+
+        for (int x = _buildingMin.x - 1; x <= _buildingMax.x+1; ++x)
+            for (int y = _buildingMin.y - 1; y <= _buildingMax.y+1; ++y)
+            {
+                Vector2Int posTotest = new Vector2Int(x, y);
+                if (!tiles.ContainsKey(posTotest)) continue;
+
+                if (tiles[posTotest].IsFree)
+                    positions.Add(TilemapCoordsToWorld(posTotest));
+
+                if (positions.Count == number)
+                    return positions;
+            }
+
+        return positions;
     }
 
     #endregion
@@ -224,9 +261,8 @@ public class TileMapManager : MonoBehaviour
         HashSet<Vector2Int> open = new HashSet<Vector2Int>();
         HashSet<Vector2Int> closed = new HashSet<Vector2Int>();
 
-        LogicalTile currentTile;
 
-        if (!_instance._tiles.TryGetValue(startCoords, out currentTile) || !_instance._tiles.ContainsKey(endCoords))
+        if (!_instance._tiles.TryGetValue(startCoords, out LogicalTile currentTile) || !_instance._tiles.ContainsKey(endCoords))
             return wayPoints;
 
         closed.Add(startCoords);

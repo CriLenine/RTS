@@ -16,8 +16,8 @@ public abstract class CharacterData : ScriptableObject
 
     [SerializeField]
     [Min(0)]
-    private int _autoAttackDistance;
-    public int AutoAttackDistance => _autoAttackDistance;
+    private float _autoAttackDistance;
+    public float AutoAttackDistance => _autoAttackDistance;
 
     [SerializeField]
     private UtilsView[] _views;

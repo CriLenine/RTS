@@ -61,11 +61,9 @@ public partial class NetworkManager
 
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
-                            bool isOrder = message.GetBoolean(i++);
-
                             int[] attackersIds = Extract<int>(message, i, out i);
 
-                            inputs.Add(TickInput.Attack(targetId,position, attackersIds,isOrder));
+                            inputs.Add(TickInput.Attack(targetId,position, attackersIds));
                             break;
                         }
                 }

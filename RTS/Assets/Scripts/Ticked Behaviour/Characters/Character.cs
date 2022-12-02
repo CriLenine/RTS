@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using UnityEngine.UIElements;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -13,18 +15,21 @@ public abstract class Character : TickedBehaviour, IDamageable
         Peon,
         Knight
     }
-    protected Type _type;
-    public Type CharaType;
+
+    private Type _type;
+    public Type CharaType => _type;
 
     [SerializeField]
     protected CharacterData _data;
+
+    [SerializeField]
+    private int _currentHealth;
 
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
     protected int MaxHealth => Data.MaxHealth;
-    protected int Health;
-
+    
 
     public GameObject SelectionMarker;
     public Vector2Int Coords;
@@ -40,11 +45,12 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Start()
     {
-        Health = MaxHealth;
+        _currentHealth = MaxHealth;
     }
 
     protected virtual void Update()
     {
+        Debug.Log(CurrentAction?.GetType().ToString());
         if (CurrentAction is Move)
         {
             Move move = CurrentAction as Move;
@@ -71,8 +77,11 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public sealed override void Tick()
     {
-        if (_currentAction?.Perform() == true)
-            _currentAction = _actions.Count > 0 ? _actions.Dequeue() : CheckSurrounding();
+        if (CurrentAction is null)
+            CheckSurrounding();
+
+        else if (CurrentAction.Perform() == true)
+            CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
 
         Coords = TileMapManager.WorldToTilemapCoords(gameObject.transform.position);
     }
@@ -93,21 +102,20 @@ public abstract class Character : TickedBehaviour, IDamageable
         AddAction(action);
     }
 
-    private Action CheckSurrounding()
+    private void CheckSurrounding()
     {
         List<Character> charas = GameManager.Characters.ToList();
-        int maxAttackDist = Data.AutoAttackDistance;
+        float maxAttackDist = Data.AutoAttackDistance;
 
-        for (int i = 0; i < charas.Count; i++)
+        for (int i = 0; i < charas.Count; i++) //On regarde tous les charas du jeux
         {
             Character chara = charas[i];
-            if (!GameManager.Characters.Contains(chara) || Vector2.Distance(transform.position, chara.transform.position) < maxAttackDist) continue; //Si trop loin ou sois meme => next
+            if (chara.Performer == Performer || ((Vector2)chara.transform.position - (Vector2)transform.position).sqrMagnitude > maxAttackDist) continue; //Si trop loin ou meme team => next
 
             //Sinon on renvois l'action d'attaque
-            NetworkManager.Input(TickInput.Attack(chara.ID, chara.transform.position, new int[ID], false));
-            return null;
+            SetAction(new Attack(this, chara, false));
+            return;
         }
-        return null;
     }
     public void DebugCoordinates()
     {
@@ -126,13 +134,17 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public bool TakeDamage(int damage)
     {
-        return (Health -= damage) <= 0;
+        return (_currentHealth -= damage) <= 0;
     }
 
     public void GainHealth(int amount)
     {
-        if ((Health += amount) > MaxHealth)
-            Health = MaxHealth;
+        if ((_currentHealth += amount) > MaxHealth)
+            _currentHealth = MaxHealth;
     }
 
+    protected void SetType(Type type)
+    {
+        _type = type;
+    }
 }

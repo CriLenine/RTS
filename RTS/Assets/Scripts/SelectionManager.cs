@@ -105,19 +105,17 @@ public class SelectionManager : MonoBehaviour
                             if (!CharacterManager.SelectedCharacters().Contains(selectedCharacter)) // If the character is not already selected
                             {
                                 CharacterManager.AddCharacterToSelection(selectedCharacter);
-                                selectedCharacter.SelectionMarker.SetActive(true);
                             }
                             else
                             {
                                 CharacterManager.RemoveCharacterFromSelection(selectedCharacter);
-                                selectedCharacter.SelectionMarker.SetActive(false);
                             }
                         }
                     }
                     else if(CharacterManager.SelectedCharacters().Count > 0)// Ennemy => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
-                        NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds(),true));
+                        NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
                 else if(hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
@@ -131,7 +129,7 @@ public class SelectionManager : MonoBehaviour
                     else if (CharacterManager.SelectedCharacters().Count > 0)// EnnemyBuilding => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
-                        NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds(),true));
+                        NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
                 else if(!_shifting) // If we didn't hit anything and shift is not being held
@@ -155,7 +153,6 @@ public class SelectionManager : MonoBehaviour
                     if (!(_shifting && CharacterManager.SelectedCharacters().Contains(character)))
                     {
                         CharacterManager.AddCharacterToSelection(character);
-                        character.SelectionMarker.SetActive(true);
                     }
                 }
             }

@@ -18,8 +18,6 @@ public class TickInput
 
     public int ID;
 
-    public bool isIt;
-
     public Vector2 Position;
 
     public static TickInput Spawn(int id, Vector2 position, int performer = 0)
@@ -63,7 +61,7 @@ public class TickInput
         };
     }
 
-    public static TickInput Attack(int targetID, Vector2 targetpos,int[] attackers,bool isOrder, int performer = 0)
+    public static TickInput Attack(int targetID, Vector2 targetpos,int[] attackers, int performer = 0)
     {
         return new TickInput()
         {
@@ -76,8 +74,6 @@ public class TickInput
             Position = targetpos,
 
             Performer = performer,
-
-            isIt =isOrder
         };
     }
 }

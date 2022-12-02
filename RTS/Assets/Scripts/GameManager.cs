@@ -94,6 +94,17 @@ public class GameManager : MonoBehaviour
                     if (!_instance._entities[input.ID].TryGetComponent(out TickedBehaviour target))
                         break;
 
+                    if(target is Building building)
+                    {
+                        List<Vector2> positions = TileMapManager.GetRandomFreePosAroundBuilding(building,1);
+                        if (positions.Count == 0)
+                            break;
+                        MoveCharacters(positions[0], input.Targets, true); // TODO : Manage multiple destinations
+                    }
+                    else
+                        MoveCharacters(target.transform.position, input.Targets, true);
+
+
                     foreach (int ID in input.Targets)
                     {
                         Character attacker = (Character)_instance._entities[ID];
@@ -101,8 +112,7 @@ public class GameManager : MonoBehaviour
                         if (!attacker)
                             continue;
 
-                        attacker.SetAction(new Move(attacker, input.Position));
-                        attacker.AddAction(new Attack(attacker, target,input.isIt));
+                        attacker.AddAction(new Attack(attacker, target));
                     }
                     break;
             }
@@ -153,7 +163,7 @@ public class GameManager : MonoBehaviour
         return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private static void MoveCharacters(Vector2 position, int[] targets)
+    private static void MoveCharacters(Vector2 position, int[] targets, bool isAttacking = false)
     {
         List<Character> characters = new List<Character>();
 
@@ -171,7 +181,10 @@ public class GameManager : MonoBehaviour
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
+                {
+                    group[i].SetAction(new Move(group[i], wayPoints.ToArray(),isAttacking));
+                }
+
             }
             else
                 throw new Exception("Path not Found");
@@ -245,6 +258,10 @@ public class GameManager : MonoBehaviour
 
         foreach(var entitie in _entitiesToDestroy)
         {
+            CharacterManager.TestEntitieSelection(entitie);
+
+            if (entitie is Building building)
+                TileMapManager.RemoveBuilding(building);
             _entities.Remove(entitie);
             _myEntities.Remove(entitie);
 
@@ -293,7 +310,7 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f));
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
-            CreateBuilding(i, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
+            CreateBuilding(i+1, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);

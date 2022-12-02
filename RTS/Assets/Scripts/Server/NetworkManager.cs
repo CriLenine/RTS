@@ -329,7 +329,7 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
             case InputType.Attack:
-                message.Add(input.ID, input.Position.x, input.Position.y,input.isIt);
+                message.Add(input.ID, input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);
 
