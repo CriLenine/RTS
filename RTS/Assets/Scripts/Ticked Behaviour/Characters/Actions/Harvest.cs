@@ -12,7 +12,7 @@ public class Harvest : Action
         _duration = ressource.Data.HarvestingTime / 0.025f;
     }
 
-    public override bool Perform()
+    protected override bool Update()
     {
         if (--_duration < 0f)
         {
@@ -33,12 +33,14 @@ public class Harvest : Action
             if (continueHarvesting)//still things to harvest
             {
                 Vector2Int harvestingCoords = _ressource.GetHarvestingPosition(newPosition, _character.Coords);
-                _character.AddAction(new Move(_character, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
-                _character.AddAction(new Harvest(_character, _ressource.GetTileToHarvest(harvestingCoords), _ressource));
+
+                AddAction(new Move(_character, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
+                AddAction(new Harvest(_character, _ressource.GetTileToHarvest(harvestingCoords), _ressource));
             }
             Debug.Log("Harvested");
             return true;
         }
+
         return false;
     }
 }

@@ -11,7 +11,7 @@ public class Build : Action
         _building = building;   
     }
 
-    public override bool Perform()
+    protected override bool Update()
     {
         return _building.AddWorkforce(_peon.Data.WorkPower);
     }
