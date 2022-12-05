@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -24,17 +23,18 @@ public class Move : Action
     private TickedBehaviour _target;
     private Vector2Int _lastPos;
     private bool _isAttacking;
+
     public Move(Character character, Vector2[] positions, bool isAttacking = false) : base(character)
     {
         _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance : .2f;
 
         Positions = new List<Vector2>(positions);
     }
+
     public Move(Character character, Vector2[] positions, TickedBehaviour target , bool isAttacking = true) : base(character)
     {
         _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance : .2f;
         Positions = new List<Vector2>(positions);
-
 
         _target= target;
         _lastPos =TileMapManager.WorldToTilemapCoords( target.transform.position);
@@ -48,9 +48,7 @@ public class Move : Action
         Positions.Add(position);
     }
 
-
-
-    public override bool Perform()
+    protected override bool Update()
     {
         if (CharacterManager.Move(_character, Position))
             ++Index;
@@ -58,7 +56,7 @@ public class Move : Action
         if(_isAttacking)
         {
             if ((Position - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest)
-            return true;
+                return true;
 
             Vector2Int postToTest = TileMapManager.WorldToTilemapCoords(_target.transform.position);
             if (postToTest != _lastPos)
@@ -74,7 +72,6 @@ public class Move : Action
                 _lastPos = postToTest;
             }
         }
-
 
         return Index == Positions.Count;
     }

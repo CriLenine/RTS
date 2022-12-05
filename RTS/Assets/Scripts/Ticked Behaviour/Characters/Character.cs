@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using UnityEngine.UIElements;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -77,9 +75,10 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         if (CurrentAction is null)
             CheckSurrounding();
-
-        else if (CurrentAction.Perform() == true)
+        else if (CurrentAction.Perform())
+        {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
+        }
     }
 
     private void OnDrawGizmosSelected()

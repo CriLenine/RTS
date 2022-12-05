@@ -29,7 +29,7 @@ public class Attack : Action
         _charaTransform = character.transform;
     }
 
-    public override bool Perform()
+    protected override bool Update()
     {
         if (!_target) return true;//target already dead no point 
 
