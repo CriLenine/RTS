@@ -52,9 +52,9 @@ public class LocomotionManager : MonoBehaviour
             if (MoveComplete(character, projectedPosition, position))
                 return true;
 
-        projectedPosition = ObstacleAvoidance(character, projectedPosition);
-        if (projectedPosition == Vector3.zero)
-            return true;
+        //projectedPosition = ObstacleAvoidance(character, projectedPosition);
+        //if (projectedPosition == Vector3.zero)
+        //    return true;
 
         Vector2 targetPosition = Vector2.MoveTowards(character.transform.position, projectedPosition, TileMapManager.TileSize / 10f);
         character.SetPosition(targetPosition);
@@ -105,23 +105,21 @@ public class LocomotionManager : MonoBehaviour
 
         // Récupérer voisins KDTree
 
-        neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
+        //neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
 
         List<Vector2> trajectoryAdjustments = new();
 
-        //List<Character> neighbors = new(CharacterManager.SelectedCharacters());
-
-        foreach (int ID in neighborsID)
-        //foreach (Character neighbor in neighbors)
+        //foreach (int ID in neighborsID)
+        foreach (Character neighbor in GameManager.Characters)
         {
-            //if (neighbor == character)
-            //    continue;
+            if (neighbor == character)
+                continue;
 
-            Character neighbor = (Character)GameManager.Entities[ID];
+            //Character neighbor = (Character)GameManager.Entities[ID];
 
             Vector2 deltaPos = (Vector2)neighbor.transform.position - characterPos;
 
-            if (deltaPos.sqrMagnitude < .1f)
+            if (deltaPos.sqrMagnitude < .15f)
                 trajectoryAdjustments.Add(neighbor.CurrentAction is Move ? -deltaPos.normalized : Vector2.Perpendicular(deltaPos).normalized);
         }
 
