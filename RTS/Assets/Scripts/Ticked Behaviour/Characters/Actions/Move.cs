@@ -23,29 +23,31 @@ public class Move : Action
     private TickedBehaviour _target;
     private Vector2Int _lastPos;
     private bool _isAttacking;
-
-    public Move(Character character, Vector2[] positions, bool isAttacking = false) : base(character)
-    {
-        _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance : .2f;
-
-        Positions = new List<Vector2>(positions);
-    }
-
-    public Move(Character character, Vector2[] positions, TickedBehaviour target , bool isAttacking = true) : base(character)
+    public Move(Character character, Vector2[] positions, TickedBehaviour target=null, bool isAttacking = false) : base(character)
     {
         _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance : .2f;
         Positions = new List<Vector2>(positions);
 
-        _target= target;
-        _lastPos =TileMapManager.WorldToTilemapCoords( target.transform.position);
-        _isAttacking = isAttacking;
+        if(isAttacking)
+        {
+            _target = target;
+            _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
+            _isAttacking = isAttacking;
+        }
     }
 
-    public Move(Character character, Vector2 position, bool isAttacking=false) : base(character)
+    public Move(Character character, Vector2 position, TickedBehaviour target =null, bool isAttacking=false) : base(character)
     {
         _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance: .2f;
         Positions = Positions = new List<Vector2>();
         Positions.Add(position);
+
+        if (isAttacking)
+        {
+            _target = target;
+            _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
+            _isAttacking = isAttacking;
+        }
     }
 
     protected override bool Update()

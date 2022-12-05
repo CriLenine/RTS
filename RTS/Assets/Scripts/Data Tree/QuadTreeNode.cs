@@ -78,6 +78,17 @@ public class QuadTreeNode
     }
 
     /// <summary>
+    /// Called at the destruction of an entitie
+    /// </summary>
+    /// <param name="characterID"></param>
+    public static void RemoveCharacter(int characterID)
+    {
+        _charactersHitBoxes.Remove(characterID);
+        _charactersPositions.Remove(characterID);
+        _leaves.Remove(characterID);
+    }
+
+    /// <summary>
     /// Called when moving a character.
     /// <para>Updates the tree with the character's new position.</para>
     /// </summary>
@@ -88,6 +99,7 @@ public class QuadTreeNode
         if (!_charactersHitBoxes.ContainsKey(ID))
         {
             Debug.LogError("ID not registered.");
+            return null;
         }
         _charactersPositions[ID] = position;
         if (nCharactersThreshold > 0)
@@ -101,7 +113,7 @@ public class QuadTreeNode
         HashSet<int> neighbours = new HashSet<int>();
         foreach (QuadTreeNode leave in _leaves[ID])
             foreach (int characterID in leave._characters)
-                if (characterID != ID)
+                if (characterID != ID && _charactersHitBoxes.ContainsKey(characterID))
                     neighbours.Add(characterID);
         return neighbours;
     }
@@ -150,6 +162,8 @@ public class QuadTreeNode
             {
                 foreach (int IDToSort in _characters)
                 {
+                    if (!_charactersHitBoxes.ContainsKey(IDToSort))
+                        continue;
                     float xCurrent = _charactersPositions[IDToSort].x;
                     float width = _charactersHitBoxes[IDToSort].width;
                     float xMin = xCurrent - width / 2f;
@@ -164,6 +178,9 @@ public class QuadTreeNode
             {
                 foreach (int IDToSort in _characters)
                 {
+                    if (!_charactersHitBoxes.ContainsKey(IDToSort))
+                        continue;
+
                     float yCurrent = _charactersPositions[IDToSort].y;
                     float height = _charactersHitBoxes[IDToSort].height;
                     float yMin = yCurrent - height / 2f;

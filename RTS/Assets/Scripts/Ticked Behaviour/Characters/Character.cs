@@ -33,8 +33,6 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     private LineRenderer _pathRenderer;
 
-    public List<Vector2> view = new List<Vector2>();
-
     protected virtual void Awake()
     {
         _pathRenderer = GetComponentInChildren<LineRenderer>(true);

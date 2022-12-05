@@ -19,16 +19,17 @@ public class TickInput
     public int[] Targets;
 
     public int ID;
+    public int Prefab;
 
     public Vector2 Position;
 
-    public static TickInput Spawn(int id, Vector2 position, int performer = 0)
+    public static TickInput Spawn(int prefab, Vector2 position, int performer = 0)
     {
         return new TickInput()
         {
             Type = InputType.Spawn,
 
-            ID = id,
+            Prefab = prefab,
 
             Position = position,
             Performer = performer
@@ -48,7 +49,7 @@ public class TickInput
         };
     }
 
-    public static TickInput Build(int id, Vector2 position, int[] targets, int performer = 0)
+    public static TickInput Build(int prefab, Vector2 position, int[] targets, int performer = 0)
     {
         return new TickInput()
         {
@@ -56,7 +57,7 @@ public class TickInput
 
             Targets = targets,
 
-            ID = id,
+            Prefab = prefab,
 
             Position = position,
             Performer = performer

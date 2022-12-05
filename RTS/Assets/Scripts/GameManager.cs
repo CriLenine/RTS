@@ -80,6 +80,21 @@ public class GameManager : MonoBehaviour
     {
         foreach (TickInput input in inputs)
         {
+            //test of entity existances
+            if(!_instance._entities.Contains(input.ID)) continue;
+
+            List<int> targets = new();
+
+            for (int i = 0; i < input.Targets.Length; i++)
+            {
+                if (_instance._entities.Contains(input.Targets[i]))
+                    targets.Add(input.Targets[i]);
+            }
+
+            if (targets.Count == 0) continue;
+
+            input.Targets = targets.ToArray();
+
             switch (input.Type)
             {
                 case InputType.Spawn:
@@ -116,19 +131,17 @@ public class GameManager : MonoBehaviour
                     break;
                     
                 case InputType.Attack:
-
-                    if (!_instance._entities[input.ID].TryGetComponent(out TickedBehaviour target))
-                        break;
+                    TickedBehaviour target = _instance._entities[input.ID];
 
                     if(target is Building building)
                     {
                         List<Vector2> positions = TileMapManager.GetRandomFreePosAroundBuilding(building,1);
                         if (positions.Count == 0)
                             break;
-                        MoveCharacters(input.Performer,positions[0], input.Targets, true); // TODO : Manage multiple destinations
+                        MoveCharacters(input.Performer,positions[0], input.Targets); // Destination point fixe
                     }
                     else
-                        MoveCharacters(input.Performer, target.transform.position, input.Targets, true);
+                        MoveCharacters(input.Performer, target.transform.position, input.Targets, target, true); // Destination point qui bouge
 
 
                     foreach (int ID in input.Targets)
@@ -203,7 +216,7 @@ public class GameManager : MonoBehaviour
         return CreateCharacter(performer, (Character.Type)id, position);
     }
 
-    private static void MoveCharacters(int performer, Vector2 position, int[] targets, bool isAttacking = false)
+    private static void MoveCharacters(int performer, Vector2 position, int[] targets, TickedBehaviour target = null,bool isAttacking = false)
     {
         List<Character> characters = new List<Character>();
 
@@ -222,7 +235,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray(),isAttacking));
+                    group[i].SetAction(new Move(group[i], wayPoints.ToArray(),target,isAttacking));
                 }
 
             }
@@ -296,23 +309,26 @@ public class GameManager : MonoBehaviour
     }
     private void DestroyEntitys() {
 
-        foreach(var entitie in _entitiesToDestroy)
+        foreach(var entity in _entitiesToDestroy)
         {
-            CharacterManager.TestEntitieSelection(entitie);
+            CharacterManager.TestEntitieSelection(entity);
 
-            if (entitie is Building building)
+            if (entity is Building building)
                 TileMapManager.RemoveBuilding(building);
-            _entities.Remove(entitie);
-            _myEntities.Remove(entitie);
+            else if (entity is Character character)
+                QuadTreeNode.RemoveCharacter(character.ID);
 
-            int id = entitie.ID;
+            _entities.Remove(entity);
+            _myEntities.Remove(entity);
+
+            int id = entity.ID;
             _characters.Remove(id);
             _myCharacters.Remove(id);
 
             _buildings.Remove(id);
             _myBuildings.Remove(id);
 
-            Destroy(entitie.gameObject);
+            Destroy(entity.gameObject);
         }
         _entitiesToDestroy.Clear();
     }

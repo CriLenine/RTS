@@ -19,6 +19,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Peon
       objectReference: {fileID: 0}
+    - target: {fileID: 2180299175470727936, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4670712230874212594, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -117,4 +121,3 @@ MonoBehaviour:
   _data: {fileID: 11400000, guid: 6af51e8e1fe6a34439a5104355b7f6c1, type: 2}
   _currentHealth: 0
   SelectionMarker: {fileID: 1605752978157292089}
-  view: []

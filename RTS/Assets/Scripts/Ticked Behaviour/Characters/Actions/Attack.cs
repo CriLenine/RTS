@@ -37,7 +37,7 @@ public class Attack : Action
         {
             if (_isOrder)//Si on a cliquer a la mano sur lennemie on le suit jusqua la mort
             {
-                _character.AddAction(new Move(_character, _target.transform.position, true));
+                _character.AddAction(new Move(_character, _target.transform.position,_target, true));
                 _character.AddAction(new Attack(_character, _target));
             }
 
