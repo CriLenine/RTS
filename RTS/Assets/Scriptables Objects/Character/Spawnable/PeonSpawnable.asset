@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PeonSpawnable
   m_EditorClassIdentifier: 
   _type: 0
-  _character: {fileID: 6059221905173487255, guid: 2d27dceb886f90548b235bfb83e7e23b, type: 3}
+  _character: {fileID: 1300237163801353399, guid: 84535e00d9cd9ef4ea82208c2ab37bab, type: 3}
   _neededBuildingLevel: 0
   _cost: []
   _charaUiIcon: {fileID: -1197897939, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}

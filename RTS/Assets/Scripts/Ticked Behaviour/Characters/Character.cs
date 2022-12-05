@@ -84,6 +84,9 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     private void OnDrawGizmosSelected()
     {
+        if (!Application.isPlaying)
+            return;
+
         int radius = 10;
         int squareRadius = radius * radius;
 
