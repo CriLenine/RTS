@@ -1,15 +1,15 @@
-using UnityEngine;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using UnityEngine.TextCore.Text;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
 public class CharacterManager : MonoBehaviour
 {
     private static CharacterManager _instance;
+
+    private Camera _camera;
+    private Mouse _mouse;
 
     private SelectionManager _selectionManager;
     public LocomotionManager _locomotionManager;
@@ -26,6 +26,9 @@ public class CharacterManager : MonoBehaviour
             Destroy(this.gameObject);
         else
             _instance = this;
+
+        _mouse = Mouse.current;
+        _camera = Camera.main;
     }
 
     private void Start()
@@ -41,13 +44,45 @@ public class CharacterManager : MonoBehaviour
         _characterSelectionInputActions.Selection.Shift.canceled += _ => _selectionManager._shifting = false;
 
         _locomotionInputActions = new Locomotion();
-        _locomotionInputActions.Enable(); 
-        _locomotionInputActions.Displacement.RightClick.performed += _ => _locomotionManager.RallySelectedCharacters(); ;
+        _locomotionInputActions.Enable();
+        _locomotionInputActions.Displacement.RightClick.performed += _ => GiveOrder(); ;
     }
 
     public static bool Move(Character character, Vector2 position)
     {
         return _instance._locomotionManager.Move(character, position);
+    }
+
+    public void GiveOrder()
+    {
+        List<Character> characters = SelectedCharacters();
+
+        if (characters.Count == 0)
+            return;
+
+        // Retrieve the rallypoint's coordinates according to the input.
+
+        Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
+        Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
+
+        LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
+
+        if (characters.Count == 1 &&
+            (GameManager.RessourcesManager.HasRock(rallyPointCoords) || GameManager.RessourcesManager.HasTree(rallyPointCoords)))
+        {
+            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
+            return;
+        }
+
+        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
+            return;
+
+        int[] IDs = new int[characters.Count];
+
+        for (int i = 0; i < characters.Count; ++i)
+            IDs[i] = characters[i].ID;
+
+        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
     }
 
     public static void ChangeView<T>(T owner) where T : TickedBehaviour
@@ -66,7 +101,7 @@ public class CharacterManager : MonoBehaviour
 
     public static void AddBuildingToSelected(Building building)
     {
-            _instance._buildingSelected = building;
+        _instance._buildingSelected = building;
     }
 
     public static void AddCharacterToSelection(Character character)
@@ -79,7 +114,7 @@ public class CharacterManager : MonoBehaviour
     {
         _instance._charactersSelected.AddRange(characters);
 
-        foreach(var chara in characters)
+        foreach (var chara in characters)
         {
             chara.SelectionMarker.SetActive(true);
         }
@@ -93,12 +128,12 @@ public class CharacterManager : MonoBehaviour
 
     public static void TestEntitieSelection(TickedBehaviour entitie)
     {
-        if(entitie is Character character)
+        if (entitie is Character character)
         {
-            if(_instance._charactersSelected.Contains(character))
+            if (_instance._charactersSelected.Contains(character))
                 RemoveCharacterFromSelection(character);
         }
-        else if(entitie is Building building&& _instance._buildingSelected)
+        else if (entitie is Building building && _instance._buildingSelected)
         {
             if (_instance._buildingSelected == building)
                 DeselectAll();

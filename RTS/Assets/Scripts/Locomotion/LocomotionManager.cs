@@ -4,54 +4,12 @@ using UnityEngine;
 
 public class LocomotionManager : MonoBehaviour
 {
-    private Mouse _mouse;
-    private Camera _camera;
-
     [SerializeField]
     private bool _debug;
 
     //private System.Random _random = new System.Random(10);
 
     private HashSet<int> neighborsID;
-
-    private void Start()
-    {
-        _mouse = Mouse.current;
-        _camera = Camera.main;
-    }
-
-    public void RallySelectedCharacters()
-    {
-        List<Character> characters = CharacterManager.SelectedCharacters();
-
-        if (characters.Count == 0)
-            return;
-
-        // Retrieve the rallypoint's coordinates according to the input.
-
-        Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
-        Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
-
-        LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
-
-
-        if (characters.Count == 1 && 
-            (GameManager.RessourcesManager.HasRock(rallyPointCoords) || GameManager.RessourcesManager.HasTree(rallyPointCoords)))
-        {
-            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
-            return;
-        }
-
-        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
-            return;
-
-        int[] IDs = new int[characters.Count];
-
-        for (int i = 0; i < characters.Count; ++i)
-            IDs[i] = characters[i].ID;
-
-        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
-    }
 
     public static List<Vector2> RetrieveWayPoints(int performer, Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
