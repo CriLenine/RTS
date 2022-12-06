@@ -25,7 +25,6 @@ public class UIManager : MonoBehaviour
             return;
         }
         _viewManagers = new Dictionary<Type, ViewManager>();
-
     }
     private void Start()
     {
@@ -60,5 +59,4 @@ public class UIManager : MonoBehaviour
             _instance._currentViewManager.HideUI();
         }
     }
-
 }
