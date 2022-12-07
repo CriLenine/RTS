@@ -14,9 +14,14 @@ public class RessourceData : ScriptableObject
     [SerializeField]
     private float _harvestingTime;
 
+    [SerializeField]
+    private int _amountPerHarvest;
+
     public RessourceType Type => _type;
 
     public int Amount { get => _amount; set { _amount = value; } }
 
     public float HarvestingTime => _harvestingTime;
+
+    public int AmountPerHarvest => _amountPerHarvest;
 }

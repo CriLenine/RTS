@@ -53,15 +53,16 @@ public class Forest : Ressource
         if (_trees.Count < 1)
             return lastTree;
         List<Vector2Int> availableTiles = new List<Vector2Int>();
-        for (int i = -1; i <= 1; ++i)
+        for (int i = -3; i <= 3; ++i)
         {
-            for (int j = -1; j <= 1; ++j)
+            for (int j = -3; j <= 3; ++j)
             {
                 if (i == 0 && j == 0)
                     continue;
-                Vector2Int tilePosition = lastTree + new Vector2Int(i, j);
-                if (ressourcesManager.HasTree(tilePosition) /*&& pathfindingOK*/)
-                    availableTiles.Add(tilePosition);
+                Vector2Int tileCoords = lastTree + new Vector2Int(i, j);
+                if (ressourcesManager.HasTree(tileCoords) && 
+                    TileMapManager.FindPath(NetworkManager.Me, lastTree, tileCoords).Count > 0)
+                    availableTiles.Add(tileCoords);
             }
         }
         //If we found at least one candidate

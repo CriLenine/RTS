@@ -20,6 +20,10 @@ public class RessourcesManager : MonoBehaviour
         Bake();
     }
 
+    public bool Harvestable(Vector2Int coords)
+    {
+        return HasTree(coords) || HasRock(coords);
+    }
     public bool HasTree(Vector2Int coords)
     {
         return _treesTilemap.HasTile(new Vector3Int(coords.x, coords.y));

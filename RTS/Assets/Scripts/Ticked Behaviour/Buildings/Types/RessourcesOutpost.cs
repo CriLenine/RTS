@@ -1,18 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class RessourcesOutpost : Building
+public class RessourcesOutpost : Building, IRessourceStorer
 {
     private void Start()
     {
-        SetType(Type.Ressourcesoutpost);
+        SetType(Type.RessourcesOutpost);
     }
     public override Hash128 GetHash128()
     {
-        throw new System.NotImplementedException();
+        return base.GetHash128();
     }
 
     public override void Tick()
     {
-        throw new System.NotImplementedException();
+        
     }
 }

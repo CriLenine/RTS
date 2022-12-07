@@ -51,13 +51,20 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
+    private Dictionary<RessourceType, int> _myRessources = new Dictionary<RessourceType, int>();
+
     private void Awake()
     {
         _instance = this;
 
         DontDestroyOnLoad(this);
 
-        _ressourcesManager = FindObjectOfType<RessourcesManager>();
+        _ressourcesManager = GetComponent<RessourcesManager>();
+
+        foreach (RessourceType type in Enum.GetValues(typeof(RessourceType)))
+        {
+            _myRessources[type] = 0;
+        }
     }
     #endregion
 
@@ -65,6 +72,19 @@ public class GameManager : MonoBehaviour
     private bool _simulateWrongHash = false;
 
     private SpriteMask _fogRepeller;
+
+    public static void AddRessource(RessourceType type, int amount)
+    {
+        _instance._myRessources[type] += amount;
+    }
+    
+    public static bool Pay(RessourceType type, int amount)
+    {
+        if (_instance._myRessources[type] < amount)
+            return false;
+        _instance._myRessources[type] -= amount;
+        return true;
+    }
 
     private void Start()
     {
@@ -420,16 +440,16 @@ public class GameManager : MonoBehaviour
     #endregion
 
     [Serializable]
-    public class RessourceCost
+    public class RessourceAmount
     {
         [SerializeField]
-        private Ressource _ressource;
+        private RessourceType _ressourceType;
 
         [SerializeField]
-        private int _cost;
+        private int _amount;
 
-        public Ressource Ressource => _ressource;
+        public RessourceType RessourceType => _ressourceType;
 
-        public int Cost => _cost;
+        public int Amount => _amount;
     }
 }
