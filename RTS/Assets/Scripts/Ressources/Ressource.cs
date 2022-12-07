@@ -1,28 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RessourceType
+public enum ResourceType
 {
     Coins,
     Plutonium,
     Meat
 }
 
-public abstract class Ressource : MonoBehaviour
+public abstract class Resource : MonoBehaviour
 {
     [SerializeField]
-    private RessourceData _data;
+    private ResourceData _data;
 
-    public RessourceData Data => _data;
+    public ResourceData Data => _data;
 
     public abstract void Clear();
 
     public abstract Vector2Int GetTileToHarvest(Vector2Int coords);
 
-    ///<summary>Called when a new ressource tile is selected to be harvested.</summary>
-    /// <returns>The destination for the worker to harvest the ressource at <paramref name="ressourcePosition"/>.
-    /// If no suitable tile is found, returns <paramref name="ressourcePosition"/>.</returns>
-    public Vector2Int GetHarvestingPosition(Vector2Int ressourcePosition, Vector2Int harvesterPosition)
+    ///<summary>Called when a new resource tile is selected to be harvested.</summary>
+    /// <returns>The destination for the worker to harvest the resource at <paramref name="resourcePosition"/>.
+    /// If no suitable tile is found, returns <paramref name="resourcePosition"/>.</returns>
+    public Vector2Int GetHarvestingPosition(Vector2Int resourcePosition, Vector2Int harvesterPosition)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         //Check all the outlines around the tree
@@ -35,7 +35,7 @@ public abstract class Ressource : MonoBehaviour
                 {
                     if (i == 0 && j == 0)
                         continue;
-                    Vector2Int tilePosition = ressourcePosition + new Vector2Int(i, j);
+                    Vector2Int tilePosition = resourcePosition + new Vector2Int(i, j);
                     if (TileMapManager.GetLogicalTile(tilePosition).IsFree(0)) // TODO : performer
                         availableTiles.Add(tilePosition);
                 }
@@ -55,6 +55,6 @@ public abstract class Ressource : MonoBehaviour
             }
         }
         Debug.LogError("No free tile found !");
-        return ressourcePosition;
+        return resourcePosition;
     }
 }

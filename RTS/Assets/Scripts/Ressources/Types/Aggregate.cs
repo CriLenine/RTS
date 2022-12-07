@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Aggregate : Ressource
+public class Aggregate : Resource
 {
     [SerializeField]
     private List<Vector2Int> _rocks;
 
     #region DEBUG
-    public RessourcesManager ressourcesManager;
+    public ResourcesManager ResourcesManager;
     #endregion
 
     public void AddRock(Vector2Int newRock) => _rocks.Add(newRock);
@@ -33,6 +33,6 @@ public class Aggregate : Ressource
 
     private void Start()
     {
-        ressourcesManager = FindObjectOfType<RessourcesManager>();
+        ResourcesManager = FindObjectOfType<ResourcesManager>();
     }
 }

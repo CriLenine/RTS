@@ -24,7 +24,7 @@ public class SpawnableDataBuilding : ScriptableObject
     private int _neededPlayerLevel;
 
     [SerializeField]
-    private GameManager.RessourceAmount[] _cost;
+    private GameManager.ResourceAmount[] _cost;
 
     [Header("UI")]
     [SerializeField]

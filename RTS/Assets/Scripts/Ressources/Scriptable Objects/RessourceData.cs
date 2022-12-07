@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Ressource", menuName = "Ressource", order = 1)]
-public class RessourceData : ScriptableObject
+[CreateAssetMenu(fileName = "Resource", menuName = "Resource", order = 1)]
+public class ResourceData : ScriptableObject
 {
     [SerializeField]
-    private RessourceType _type;
+    private ResourceType _type;
 
     [SerializeField]
     private int _amount;
@@ -17,7 +17,7 @@ public class RessourceData : ScriptableObject
     [SerializeField]
     private int _amountPerHarvest;
 
-    public RessourceType Type => _type;
+    public ResourceType Type => _type;
 
     public int Amount { get => _amount; set { _amount = value; } }
 

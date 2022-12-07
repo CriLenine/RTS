@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Forest : Ressource
+public class Forest : Resource
 {
     [SerializeField]
     private List<Vector2Int> _trees;
@@ -10,7 +10,7 @@ public class Forest : Ressource
     private Node<Vector2Int> _holyNode;
 
     #region DEBUG
-    public RessourcesManager ressourcesManager;
+    public ResourcesManager resourcesManager;
     #endregion
 
     public int NTrees => _trees.Count;
@@ -24,7 +24,7 @@ public class Forest : Ressource
 
     private void Start()
     {
-        ressourcesManager = FindObjectOfType<RessourcesManager>();
+        resourcesManager = FindObjectOfType<ResourcesManager>();
     }
 
     public override Vector2Int GetTileToHarvest(Vector2Int coords)
@@ -48,7 +48,7 @@ public class Forest : Ressource
     /// <returns>The position of the next tree to cut, or <paramref name="lastTree"/> if forest is empty</returns>
     public Vector2Int GetNextTree(Vector2Int lastTree)
     {
-        ressourcesManager.RemoveTree(lastTree);
+        resourcesManager.RemoveTree(lastTree);
         _trees.Remove(lastTree);
         if (_trees.Count < 1)
             return lastTree;
@@ -60,7 +60,7 @@ public class Forest : Ressource
                 if (i == 0 && j == 0)
                     continue;
                 Vector2Int tileCoords = lastTree + new Vector2Int(i, j);
-                if (ressourcesManager.HasTree(tileCoords) && 
+                if (resourcesManager.HasTree(tileCoords) && 
                     TileMapManager.FindPath(NetworkManager.Me, lastTree, tileCoords).Count > 0)
                     availableTiles.Add(tileCoords);
             }

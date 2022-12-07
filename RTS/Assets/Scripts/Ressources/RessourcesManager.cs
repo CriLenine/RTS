@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class RessourcesManager : MonoBehaviour
+public class ResourcesManager : MonoBehaviour
 {
     [SerializeField]
     private Tilemap _treesTilemap;
@@ -52,7 +52,7 @@ public class RessourcesManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Dispatch every ressource tile in the appropriate <see cref="Forest"/>, <see cref="Camp"/> or <see cref="Aggregate"/> 
+    /// Dispatch every resource tile in the appropriate <see cref="Forest"/>, <see cref="Camp"/> or <see cref="Aggregate"/> 
     /// found in the scene.
     /// </summary>
     private void Bake()
@@ -61,17 +61,17 @@ public class RessourcesManager : MonoBehaviour
         _aggregates = FindObjectsOfType<Aggregate>();
         _camps = FindObjectsOfType<Camp>();
 
-        Ressource[] ressources = new Ressource[_forests.Length + _aggregates.Length + _camps.Length];
+        Resource[] resources = new Resource[_forests.Length + _aggregates.Length + _camps.Length];
 
-        if (ressources.Length < 1)
+        if (resources.Length < 1)
             return;
 
-        _forests.CopyTo(ressources, 0);
-        _aggregates.CopyTo(ressources, _forests.Length);
-        _camps.CopyTo(ressources, _forests.Length + _aggregates.Length);
+        _forests.CopyTo(resources, 0);
+        _aggregates.CopyTo(resources, _forests.Length);
+        _camps.CopyTo(resources, _forests.Length + _aggregates.Length);
 
-        foreach (Ressource ressource in ressources)
-            ressource.Clear();
+        foreach (Resource resource in resources)
+            resource.Clear();
 
         foreach (Vector3Int position in _treesTilemap.cellBounds.allPositionsWithin)
         {

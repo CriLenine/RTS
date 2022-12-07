@@ -3,12 +3,12 @@
 public class MoveHarvest : Move
 {
     private readonly Vector2? _harvestPosition;
-    private readonly IRessourceStorer _ressourceStorer;
-    public MoveHarvest(Character character, Vector2 depositPosition, Vector2? harvestPosition, IRessourceStorer ressourceStorer)
+    private readonly IResourceStorer _resourceStorer;
+    public MoveHarvest(Character character, Vector2 depositPosition, Vector2? harvestPosition, IResourceStorer resourceStorer)
         : base(character, depositPosition)
     {
         _harvestPosition = harvestPosition;
-        _ressourceStorer = ressourceStorer;
+        _resourceStorer = resourceStorer;
     }
 
     protected override bool Update()
@@ -20,9 +20,9 @@ public class MoveHarvest : Move
             else
             {
                 Peon harvester = _character as Peon;
-                (RessourceType type, int amount) = harvester.CarriedRessource;
-                _ressourceStorer.Fill(type, amount);
-                harvester.CarriedRessource = (type, 0);
+                (ResourceType type, int amount) = harvester.CarriedResource;
+                _resourceStorer.Fill(type, amount);
+                harvester.CarriedResource = (type, 0);
                 Positions[Index] = (Vector2)_harvestPosition;
             }
         }

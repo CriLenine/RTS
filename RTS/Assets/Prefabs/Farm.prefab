@@ -98,8 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eabd2ce35cf38644b2f2e09c38522e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _viewSqrtRadius: 10
   _isBuilt: 0
-  _buildingData: {fileID: 11400000, guid: c9b64956bcc14c648ab613676af17f89, type: 2}
+  _data: {fileID: 11400000, guid: c9b64956bcc14c648ab613676af17f89, type: 2}
   _currentWorkforce: 0
   _currentHealth: 0
 --- !u!61 &1147523428050123474

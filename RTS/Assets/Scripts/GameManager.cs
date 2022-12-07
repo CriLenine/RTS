@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine.VFX;
 using UnityEngine;
 using System;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -14,9 +12,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Transform _spawnPoints;
 
-    private RessourcesManager _ressourcesManager;
+    private ResourcesManager _resourcesManager;
 
-    public static RessourcesManager RessourcesManager => _instance._ressourcesManager;
+    public static ResourcesManager resourcesManager => _instance._resourcesManager;
 
     #region Init & Variables
 
@@ -51,7 +49,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
-    private Dictionary<RessourceType, int> _myRessources = new Dictionary<RessourceType, int>();
+    private Dictionary<ResourceType, int> _myresources = new Dictionary<ResourceType, int>();
 
     private void Awake()
     {
@@ -59,11 +57,11 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-        _ressourcesManager = GetComponent<RessourcesManager>();
+        _resourcesManager = GetComponent<ResourcesManager>();
 
-        foreach (RessourceType type in Enum.GetValues(typeof(RessourceType)))
+        foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
         {
-            _myRessources[type] = 0;
+            _myresources[type] = 0;
         }
     }
     #endregion
@@ -73,16 +71,16 @@ public class GameManager : MonoBehaviour
 
     private SpriteMask _fogRepeller;
 
-    public static void AddRessource(RessourceType type, int amount)
+    public static void AddResource(ResourceType type, int amount)
     {
-        _instance._myRessources[type] += amount;
+        _instance._myresources[type] += amount;
     }
     
-    public static bool Pay(RessourceType type, int amount)
+    public static bool Pay(ResourceType type, int amount)
     {
-        if (_instance._myRessources[type] < amount)
+        if (_instance._myresources[type] < amount)
             return false;
-        _instance._myRessources[type] -= amount;
+        _instance._myresources[type] -= amount;
         return true;
     }
 
@@ -135,19 +133,19 @@ public class GameManager : MonoBehaviour
 
                 case InputType.Harvest:
                     Peon harvester = (Peon)_instance._myEntities[input.ID];
-                    Ressource ressource = null;
+                    Resource resource = null;
                     Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
-                    if (_instance._ressourcesManager.HasTree(input.Position))
+                    if (_instance._resourcesManager.HasTree(input.Position))
                     {
-                        ressource = _instance._ressourcesManager.GetNearestForest(inputCoords);
+                        resource = _instance._resourcesManager.GetNearestForest(inputCoords);
                     }
-                    else if (_instance._ressourcesManager.HasRock(input.Position))
+                    else if (_instance._resourcesManager.HasRock(input.Position))
                     {
-                        ressource = _instance._ressourcesManager.GetNearestAggregate(inputCoords);
+                        resource = _instance._resourcesManager.GetNearestAggregate(inputCoords);
                     }
-                    Vector2Int harvestingCoords = ressource.GetHarvestingPosition(inputCoords, harvester.Coords);
+                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords);
                     harvester.SetAction(new Move(harvester, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
-                    harvester.AddAction(new Harvest(harvester, ressource.GetTileToHarvest(harvestingCoords), ressource));
+                    harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords), resource));
                     break;
                     
                 case InputType.Attack:
@@ -440,15 +438,15 @@ public class GameManager : MonoBehaviour
     #endregion
 
     [Serializable]
-    public class RessourceAmount
+    public class ResourceAmount
     {
         [SerializeField]
-        private RessourceType _ressourceType;
+        private ResourceType _resourceType;
 
         [SerializeField]
         private int _amount;
 
-        public RessourceType RessourceType => _ressourceType;
+        public ResourceType resourceType => _resourceType;
 
         public int Amount => _amount;
     }

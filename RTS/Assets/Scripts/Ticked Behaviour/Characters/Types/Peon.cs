@@ -5,15 +5,15 @@ public class Peon : Character
 {
     private Building _workedOnBuilding;
 
-    private Ressource _harvestedRessource;
+    private Resource _harvestedresource;
 
     private PeonData _specificData;
 
     public new PeonData Data => _specificData;
 
-    public override bool Idle => _workedOnBuilding == null && _harvestedRessource == null;
+    public override bool Idle => _workedOnBuilding == null && _harvestedresource == null;
 
-    public (RessourceType, int) CarriedRessource;
+    public (ResourceType, int) CarriedResource;
 
     protected override void Start()
     {
@@ -34,8 +34,8 @@ public class Peon : Character
         _workedOnBuilding = building;
     }
 
-    public void SetRessource(Ressource harvestedRessource)
+    public void Setresource(Resource harvestedresource)
     {
-        _harvestedRessource = harvestedRessource;
+        _harvestedresource = harvestedresource;
     }
 }
