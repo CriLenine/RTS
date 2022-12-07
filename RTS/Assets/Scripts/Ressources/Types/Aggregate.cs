@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Aggregate : Ressource
+public class Aggregate : Resource
 {
     [SerializeField]
     private List<Vector2Int> _rocks;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Forest : Ressource
+public class Forest : Resource
 {
     [SerializeField]
     private List<Vector2Int> _trees;

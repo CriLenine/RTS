@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
 
                 case InputType.Harvest:
                     Peon harvester = (Peon)_instance._myEntities[input.ID];
-                    Ressource ressource = null;
+                    Resource ressource = null;
                     Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
                     if (_instance._ressourcesManager.HasTree(input.Position))
                     {
@@ -423,12 +423,12 @@ public class GameManager : MonoBehaviour
     public class RessourceCost
     {
         [SerializeField]
-        private Ressource _ressource;
+        private Resource _ressource;
 
         [SerializeField]
         private int _cost;
 
-        public Ressource Ressource => _ressource;
+        public Resource Ressource => _ressource;
 
         public int Cost => _cost;
     }

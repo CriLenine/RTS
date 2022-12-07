@@ -23,6 +23,8 @@ public abstract class Character : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
+    public int CurrentHealth => _currentHealth;
+
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 

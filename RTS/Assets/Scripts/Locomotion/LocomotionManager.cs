@@ -119,7 +119,7 @@ public class LocomotionManager : MonoBehaviour
 
             Vector2 deltaPos = (Vector2)neighbor.transform.position - characterPos;
 
-            if (deltaPos.sqrMagnitude < .15f)
+            if (deltaPos.sqrMagnitude < .1f)
                 trajectoryAdjustments.Add(neighbor.CurrentAction is Move ? -deltaPos.normalized : Vector2.Perpendicular(deltaPos).normalized);
         }
 

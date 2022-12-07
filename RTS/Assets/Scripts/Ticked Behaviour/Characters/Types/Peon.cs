@@ -4,11 +4,12 @@ public class Peon : Character
 {
     private Building _workedOnBuilding;
 
-    private Ressource _recoltedRessource;
+    private Resource _recoltedRessource;
 
     private PeonData _specificData;
 
     public new PeonData Data => _specificData;
+    public Resource Resource => _recoltedRessource;
 
     public override bool Idle => _workedOnBuilding == null && _recoltedRessource == null;
 

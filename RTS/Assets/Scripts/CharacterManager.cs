@@ -85,11 +85,6 @@ public class CharacterManager : MonoBehaviour
         NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
     }
 
-    public static void ChangeView<T>(T owner) where T : TickedBehaviour
-    {
-        UIManager.ShowTickedBehaviourUI(owner);
-    }
-
     public static List<Character> SelectedCharacters()
     {
         return _instance._charactersSelected;
@@ -141,8 +136,6 @@ public class CharacterManager : MonoBehaviour
     }
     public static void DeselectAll()
     {
-        UIManager.HideCurrentUI();
-
         _instance._buildingSelected = null;
 
         foreach (Character characterToRemove in _instance._charactersSelected)

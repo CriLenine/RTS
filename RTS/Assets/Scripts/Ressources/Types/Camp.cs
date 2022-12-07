@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Camp : Ressource
+public class Camp : Resource
 {
     [SerializeField]
     private List<CampEntity> _entities;

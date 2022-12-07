@@ -1,20 +1,20 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using System.Collections.Generic;
 
-public enum RessourceType
+public enum ResourceType
 {
     Coins,
     Plutonium,
     Meat
 }
 
-public abstract class Ressource : MonoBehaviour
+public abstract class Resource : MonoBehaviour
 {
     [SerializeField]
     private RessourceData _data;
 
     public RessourceData Data => _data;
-
     public abstract void Clear();
 
     public abstract Vector2Int GetTileToHarvest(Vector2Int coords);
@@ -56,5 +56,30 @@ public abstract class Ressource : MonoBehaviour
         }
         Debug.LogError("No free tile found !");
         return ressourcePosition;
+    }
+}
+
+[Serializable]
+public struct Amount
+{
+    public Amount(ResourceType type, int value = 0)
+    {
+        _type = type;
+        _value = value;
+    }
+
+    [SerializeField]
+    private ResourceType _type;
+
+    [SerializeField]
+    private int _value;
+
+    public ResourceType Type => _type;
+
+    public int Value => _value;
+
+    public void AddQuantity(int quantity)
+    {
+        _value += quantity;
     }
 }

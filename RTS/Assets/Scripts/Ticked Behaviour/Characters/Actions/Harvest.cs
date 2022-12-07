@@ -3,9 +3,9 @@ using UnityEngine;
 public class Harvest : Action
 {
     private Vector2Int _position;
-    private Ressource _ressource;
+    private Resource _ressource;
     private float _duration;
-    public Harvest(Character character, Vector2 position, Ressource ressource) : base(character)
+    public Harvest(Character character, Vector2 position, Resource ressource) : base(character)
     {
         _position = new Vector2Int((int)position.x, (int)position.y);
         _ressource = ressource;

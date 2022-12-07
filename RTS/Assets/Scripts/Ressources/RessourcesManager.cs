@@ -57,7 +57,7 @@ public class RessourcesManager : MonoBehaviour
         _aggregates = FindObjectsOfType<Aggregate>();
         _camps = FindObjectsOfType<Camp>();
 
-        Ressource[] ressources = new Ressource[_forests.Length + _aggregates.Length + _camps.Length];
+        Resource[] ressources = new Resource[_forests.Length + _aggregates.Length + _camps.Length];
 
         if (ressources.Length < 1)
             return;
@@ -66,7 +66,7 @@ public class RessourcesManager : MonoBehaviour
         _aggregates.CopyTo(ressources, _forests.Length);
         _camps.CopyTo(ressources, _forests.Length + _aggregates.Length);
 
-        foreach (Ressource ressource in ressources)
+        foreach (Resource ressource in ressources)
             ressource.Clear();
 
         foreach (Vector3Int position in _treesTilemap.cellBounds.allPositionsWithin)

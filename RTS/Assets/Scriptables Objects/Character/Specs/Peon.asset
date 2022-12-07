@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e308f00de90bb45897f4bb87f43712, type: 3}
   m_Name: Peon
   m_EditorClassIdentifier: 
+  _unitName: Peon
   _maxHealth: 100
-  _attackDamage: 1
-  _autoAttackDistance: 0.5
-  _views: 01000000
+  _attackDamage: 25
+  _meleeArmor: 10
+  _rangeArmor: 10
+  _autoAttackDistance: 2
+  _weapon: {fileID: 21300000, guid: a0a5a4c0833176e4195e90ca217a9965, type: 3}
   _workPower: 1
