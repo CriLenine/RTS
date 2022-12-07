@@ -312,7 +312,7 @@ public partial class NetworkManager : MonoBehaviour
         switch (input.Type)
         {
             case InputType.Spawn:
-                message.Add(input.ID, input.Position.x, input.Position.y);
+                message.Add(input.ID,input.Prefab, input.Position.x, input.Position.y);
 
                 break;
 
@@ -326,7 +326,7 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Build:
-                message.Add(input.ID, input.Position.x, input.Position.y);
+                message.Add(input.Prefab, input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);
 

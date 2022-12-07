@@ -3,7 +3,7 @@ using System.Collections.Generic;
 public abstract class Action
 {
     protected readonly Character _character;
-
+    private bool _isRunningUpdate = false;
     public Action(Character character)
     {
         _character = character;
@@ -15,18 +15,21 @@ public abstract class Action
     /// <returns><see langword="true"/> if the action is completed</returns>
     public bool Perform()
     {
-        if (_current is null)
-            return Update();
+        if (_current is null || _isRunningUpdate)
+        {
+            _isRunningUpdate = true;
+            if(Update())
+            {
+                _isRunningUpdate = false;
+                return _queue.Count == 0;
+            }
+        }
         else if (_current.Perform())
         {
             if (_queue.Count > 0)
-            {
                 _current = _queue.Dequeue();
-
-                return false;
-            }
-
-            return true;
+            else
+                _current = null;
         }
 
         return false;

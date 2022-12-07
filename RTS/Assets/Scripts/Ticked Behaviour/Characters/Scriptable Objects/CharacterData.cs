@@ -5,19 +5,24 @@ using UnityEngine;
 public abstract class CharacterData : ScriptableObject
 {
     [SerializeField]
-    [Min(0)]
+    [Min(1)]
     private int _maxHealth;
     public int MaxHealth => _maxHealth;
 
     [SerializeField]
-    [Min(0)]
+    [Min(0.1f)]
     private int _attackDamage;
     public int AttackDamage => _attackDamage;
 
     [SerializeField]
-    [Min(0)]
-    private float _autoAttackDistance;
-    public float AutoAttackDistance => _autoAttackDistance;
+    [Min(0.1f)]
+    private float _attackRange;
+    public float AttackRange => _attackRange;
+
+    [SerializeField]
+    [Min(0.1f)]
+    private float _attackSpeed;
+    public float AttackSpeed => _attackSpeed;
 
     [SerializeField]
     private UtilsView[] _views;

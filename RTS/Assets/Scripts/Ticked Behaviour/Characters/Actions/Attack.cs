@@ -8,13 +8,32 @@ public class Attack : Action
     private TickedBehaviour _target;
     private IDamageable Itarget;
     private int _attackDamage;
-    private float _maxAttackDist;
+    private float _attackRange;
+    private float _attackSpeed;
 
-    private UnityEngine.Transform _targetTransform;
+    private Vector2 _posToAttack;
     private UnityEngine.Transform _charaTransform;
 
     private bool _isOrder;
+
+    private float _attackSpeedTimer = 0;
     public Attack(Character character, TickedBehaviour target, bool isOrder = true) : base(character)
+    {
+        _target = target;
+
+        if (!target.TryGetComponent(out Itarget))
+            throw new NotImplementedException("the attack target is not damageable");
+
+        _attackDamage = character.Data.AttackDamage;
+        _attackRange = character.Data.AttackRange;
+        _attackSpeed = character.Data.AttackSpeed;
+        _isOrder = isOrder;
+
+
+        _posToAttack = target.transform.position;
+        _charaTransform = character.transform;
+    }
+    public Attack(Character character, TickedBehaviour target,Vector2 posToAttack, bool isOrder = true) : base(character)
     {
         _target = target;
 
@@ -22,10 +41,12 @@ public class Attack : Action
             throw new NotImplementedException("the attack target is not damageable");
 
         _attackDamage = character.Data.AttackDamage;
-        _maxAttackDist = character.Data.AutoAttackDistance;
+        _attackRange = character.Data.AttackRange;
+        _attackSpeed = character.Data.AttackSpeed;
         _isOrder = isOrder;
 
-        _targetTransform = target.transform;
+        
+        _posToAttack = posToAttack;
         _charaTransform = character.transform;
     }
 
@@ -33,23 +54,26 @@ public class Attack : Action
     {
         if (!_target) return true;//target already dead no point 
 
-        if (((Vector2)_targetTransform.position - (Vector2)_charaTransform.position).sqrMagnitude > _maxAttackDist) // si trop loin on arrete d'attaquer 
+        if ((_posToAttack - (Vector2)_charaTransform.position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
         {
             if (_isOrder)//Si on a cliquer a la mano sur lennemie on le suit jusqua la mort
             {
-                _character.AddAction(new Move(_character, _target.transform.position,_target, true));
-                _character.AddAction(new Attack(_character, _target));
+                SetAction(new MoveAttack(_character, _target.transform.position, _target));
             }
 
             return true;
         }
 
+        if(_attackSpeedTimer == 0)
+            if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
+            {
+                GameManager.DestroyEntity(_target.ID);
+                return true;
+            }
 
-        if(Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
-        {
-            GameManager.DestroyEntity(_target.ID);
-            return true;
-        }
+        var newTime = _attackSpeedTimer + NetworkManager.TickPeriod;
+        _attackSpeedTimer = newTime  >= _attackSpeed ? 0 : newTime;
+
         return false;
     }
 }

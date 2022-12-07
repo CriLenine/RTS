@@ -21,6 +21,9 @@ public abstract class Building : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
+    [SerializeField]
+    protected HealthBar HealthBar;
+
     private Type _type;
     public Type BuildingType => _type;
 
@@ -46,6 +49,7 @@ public abstract class Building : TickedBehaviour, IDamageable
         _buildingRenderer = GetComponent<SpriteRenderer>();
 
         _currentHealth = MaxHealth;
+        HealthBar.SetMaxHealth(MaxHealth);
         _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
         _actualSpriteIndex = 0;
     }
@@ -85,12 +89,25 @@ public abstract class Building : TickedBehaviour, IDamageable
 
     public bool TakeDamage(int damage)
     {
-        return (_currentHealth -= damage) <= 0;
+        if (_currentHealth == MaxHealth)
+            HealthBar.gameObject.SetActive(true);
+
+        _currentHealth -= damage;
+        HealthBar.SetHealth(_currentHealth);
+        return _currentHealth <= 0;
     }
 
     public void GainHealth(int amount)
     {
-        if ((_currentHealth += amount) > MaxHealth)
+        _currentHealth += amount;
+
+
+        HealthBar.SetHealth(_currentHealth);
+
+        if (_currentHealth >= MaxHealth)
+            HealthBar.gameObject.SetActive(false);
+
+        if (_currentHealth > MaxHealth)
             _currentHealth = MaxHealth;
     }
 

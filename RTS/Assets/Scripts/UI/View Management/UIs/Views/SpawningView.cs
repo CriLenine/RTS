@@ -22,6 +22,6 @@ public class SpawningView : View
 
     private void OnClick(Character.Type type)
     {
-        NetworkManager.Input(TickInput.Spawn((int)type, (Vector2)_manager.Building.transform.position+new Vector2(0.5f,0.5f)));
+        NetworkManager.Input(TickInput.Spawn((int)type, _manager.Building.ID,(Vector2)_manager.Building.transform.position));
     }
 }

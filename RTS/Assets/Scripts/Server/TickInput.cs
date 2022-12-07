@@ -23,12 +23,13 @@ public class TickInput
 
     public Vector2 Position;
 
-    public static TickInput Spawn(int prefab, Vector2 position, int performer = 0)
+    public static TickInput Spawn(int prefab, int spawnerID, Vector2 position, int performer = 0)
     {
         return new TickInput()
         {
             Type = InputType.Spawn,
 
+            ID = spawnerID,
             Prefab = prefab,
 
             Position = position,

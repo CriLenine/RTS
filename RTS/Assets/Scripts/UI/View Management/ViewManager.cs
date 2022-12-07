@@ -14,6 +14,7 @@ public enum UtilsView
     Default,
     Construction,
     Spawn,
+    SetRallyPoint
 }
 public abstract class ViewManager : MonoBehaviour
 {
