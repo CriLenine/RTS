@@ -5,8 +5,8 @@ using UnityEngine;
 public interface IResourceStorer
 {
     public List<ResourceType> StorableResources { get; }
-    public void Fill(ResourceType type, int amount)
+    public void Fill(Resource.Amount _ressourceAmount)
     {
-        GameManager.AddResource(type, amount);
+        GameManager.AddResource(_ressourceAmount.Type, _ressourceAmount.Value);
     }
 }

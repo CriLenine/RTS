@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,31 @@ public enum ResourceType
 
 public abstract class Resource : MonoBehaviour
 {
+    [Serializable]
+    public struct Amount
+    {
+        public Amount(ResourceType type, int value = 0)
+        {
+            _type = type;
+            _value = value;
+        }
+
+        [SerializeField]
+        private ResourceType _type;
+
+        [SerializeField]
+        private int _value;
+
+        public ResourceType Type => _type;
+
+        public int Value => _value;
+
+        public void AddQuantity(int quantity)
+        {
+            _value += quantity;
+        }
+    }
+
     [SerializeField]
     private ResourceData _data;
 

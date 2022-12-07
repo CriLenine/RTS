@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
-    private Dictionary<ResourceType, int> _myresources = new Dictionary<ResourceType, int>();
+    private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
 
     private void Awake()
     {
@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
 
         foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
         {
-            _myresources[type] = 0;
+            _myResources[type] = 0;
         }
     }
     #endregion
@@ -73,14 +73,14 @@ public class GameManager : MonoBehaviour
 
     public static void AddResource(ResourceType type, int amount)
     {
-        _instance._myresources[type] += amount;
+        _instance._myResources[type] += amount;
     }
     
     public static bool Pay(ResourceType type, int amount)
     {
-        if (_instance._myresources[type] < amount)
+        if (_instance._myResources[type] < amount)
             return false;
-        _instance._myresources[type] -= amount;
+        _instance._myResources[type] -= amount;
         return true;
     }
 
@@ -436,18 +436,4 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
-
-    [Serializable]
-    public class ResourceAmount
-    {
-        [SerializeField]
-        private ResourceType _resourceType;
-
-        [SerializeField]
-        private int _amount;
-
-        public ResourceType resourceType => _resourceType;
-
-        public int Amount => _amount;
-    }
 }

@@ -34,7 +34,11 @@ public class Harvest : Action
                 TileMapManager.TilemapCoordsToWorld(_resource.GetHarvestingPosition(newCoords, _character.Coords)) : null;
             AddAction(new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building));
             AddAction(new Harvest(_character, newCoords, _resource));
-            ((Peon)_character).CarriedResource = (_resource.Data.Type, _resource.Data.AmountPerHarvest);
+            Peon peon = _character as Peon;
+            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type)
+                peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
+            else
+                peon.CarriedResource.AddQuantity(_resource.Data.Amount);
             Debug.Log("Harvested");
             return true;
         }

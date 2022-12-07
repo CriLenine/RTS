@@ -20,9 +20,8 @@ public class MoveHarvest : Move
             else
             {
                 Peon harvester = _character as Peon;
-                (ResourceType type, int amount) = harvester.CarriedResource;
-                _resourceStorer.Fill(type, amount);
-                harvester.CarriedResource = (type, 0);
+                _resourceStorer.Fill(harvester.CarriedResource);
+                harvester.CarriedResource = new Resource.Amount(harvester.CarriedResource.Type);
                 Positions[Index] = (Vector2)_harvestPosition;
             }
         }
