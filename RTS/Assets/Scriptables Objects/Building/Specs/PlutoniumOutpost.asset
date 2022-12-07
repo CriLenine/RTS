@@ -16,5 +16,6 @@ MonoBehaviour:
   _maxHealth: 100
   _constructionSteps:
   - {fileID: -1802881981, guid: 58239c9cb0b4db045a0bf6ed9793c1f3, type: 3}
+  - {fileID: -1802881981, guid: 58239c9cb0b4db045a0bf6ed9793c1f3, type: 3}
   _views: 00000000
   _storableResources: 01000000

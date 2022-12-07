@@ -116,13 +116,13 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    CreateCharacter(input.Performer, input.ID, input.Position);
+                    CreateCharacter(input.Performer, input.Prefab, input.Position);
 
                     break;
 
                 case InputType.Build:
                     MoveCharacters(input.Performer, input.Position, input.Targets);
-                    CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
+                    CreateBuilding(input.Performer, input.Prefab, input.Position, input.Targets);
 
                     break;
 
