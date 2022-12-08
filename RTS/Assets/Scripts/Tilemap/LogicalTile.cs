@@ -11,37 +11,47 @@ public class LogicalTile
 {
     public TileState State = TileState.Obstacle;
 
-    public bool[] Fog = new bool[4];
+    public readonly bool[] LastState = new bool[4];
 
     public bool IsFree(int performer)
     {
-        return State != TileState.Obstacle || IsFog(performer);
+        return !LastState[performer];
     }
 
-    public void SetFog(bool state)
+    public bool IsObstacle(int performer)
     {
-        for (int i = 0; i < Fog.Length; ++i)
-            Fog[i] = state;
+        return LastState[performer];
     }
 
-    public void SetFog(int performer, bool state)
+    public void Update()
     {
-        Fog[performer] = state;
+        for (int i = 0; i < LastState.Length; ++i)
+            LastState[i] = State == TileState.Obstacle;
     }
 
-    public bool IsFog(int performer)
+    public void Update(int performer)
     {
-        return Fog[performer];
+        LastState[performer] = State == TileState.Obstacle;
+    }
+
+    public void Reset()
+    {
+        for (int i = 0; i < LastState.Length; ++i)
+            LastState[i] = false;
     }
 
     public LogicalTile(Vector2Int coords, TileState state)
     {
         Coords = coords;
         State = state;
+
+        Reset();
     }
 
     public Vector2Int Coords;
-    public float f => g + h;
-    public float g, h;
+    public float F => G + H;
+    public float G, H;
+    public float Weight;
+    public bool Visited;
     public LogicalTile Parent;
 }

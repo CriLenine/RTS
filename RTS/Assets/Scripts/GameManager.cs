@@ -1,13 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using UnityEngine.VFX;
 using UnityEngine;
 using System;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.UIElements;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.Windows;
-using TMPro;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -38,7 +32,7 @@ public class GameManager : MonoBehaviour
 
     private TickedList<TickedBehaviour> _entities = new TickedList<TickedBehaviour>();
     private TickedList<TickedBehaviour> _myEntities = new TickedList<TickedBehaviour>();
-    private TickedList<TickedBehaviour> _entitiesToDestroy = new TickedList<TickedBehaviour>();
+
     public static TickedList<TickedBehaviour> Entities => _instance._entities;
     public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
 
@@ -53,6 +47,8 @@ public class GameManager : MonoBehaviour
 
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
+
+    private HashSet<TickedBehaviour> _destroyedEntities = new HashSet<TickedBehaviour>();
 
     private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
 
@@ -70,9 +66,6 @@ public class GameManager : MonoBehaviour
         }
     }
     #endregion
-
-    [SerializeField]
-    private bool _simulateWrongHash = false;
 
     private SpriteMask _fogRepeller;
 
@@ -96,11 +89,17 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        _simulateWrongHash = UnityEngine.Input.GetKey(KeyCode.H);
+        #region Debug
+
+        _simulateWrongHash = Input.GetKey(KeyCode.H);
+
+        #endregion
     }
 
     public static int Tick(TickInput[] inputs)
     {
+        #region Apply Inputs
+
         foreach (TickInput input in inputs)
         {
             //test of entity existances
@@ -162,18 +161,51 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        #endregion
 
-        TileMapManager.ResetFog();
+        #region Update Views
 
         Vector2Int offset = Vector2Int.zero;
 
         foreach (TickedBehaviour entity in Entities)
-        {
             for (offset.x = -10; offset.x <= 10; ++offset.x)
                 for (offset.y = -10; offset.y <= 10; ++offset.y)
                     if (offset.x * offset.x + offset.y * offset.y < entity.ViewSqrtMagnitude)
-                        TileMapManager.ClearView(entity.Performer, entity.Coords + offset);
+                        TileMapManager.UpdateView(entity.Performer, entity.Coords + offset);
+
+        #endregion
+
+        #region Destroy Pending Entities
+
+        foreach (TickedBehaviour entity in _instance._destroyedEntities)
+        {
+            CharacterManager.TestEntitieSelection(entity);
+
+            _instance._entities.Remove(entity);
+            _instance._myEntities.Remove(entity);
+
+            if (entity is Character character)
+            {
+                _instance._characters.Remove(character);
+                _instance._myCharacters.Remove(character);
+            }
+
+            if (entity is Building building)
+            {
+                _instance._buildings.Remove(building);
+                _instance._myBuildings.Remove(building);
+
+                TileMapManager.RemoveBuilding(building);
+            }
+
+            Destroy(entity.gameObject);
         }
+
+        _instance._destroyedEntities.Clear();
+
+        #endregion
+
+        #region Compute Hash
 
         Hash128 hash = new Hash128();
 
@@ -184,11 +216,8 @@ public class GameManager : MonoBehaviour
             hash.Append(entity.GetHash128().GetHashCode());
         }
 
-       if(_instance._entitiesToDestroy.Count>0)
-       {
-            _instance.DestroyEntitys();
-       }
-            
+        #endregion
+
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
 
@@ -253,7 +282,7 @@ public class GameManager : MonoBehaviour
         List<Character> characters = new List<Character>();
 
         for (int i = 0; i < targets.Length; i++)
-            characters.Add((Character)_instance._entities[targets[i]]);
+            characters.Add(_instance._entities[targets[i]] as Character);
 
         List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
 
@@ -261,15 +290,12 @@ public class GameManager : MonoBehaviour
         {
             List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position));
 
-            if (wayPoints != null)
+            if (wayPoints is not null)
             {
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                {
                     group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
-                }
-
             }
             else
                 Debug.Log("Path not found!");
@@ -375,55 +401,31 @@ public class GameManager : MonoBehaviour
 
     public static void DestroyEntity(int id)
     {
-        if (_instance._entitiesToDestroy.Contains(id)) return;
-
-        _instance._entitiesToDestroy.Add(_instance._entities[id]);
-    }
-    private void DestroyEntitys() {
-
-        foreach(var entity in _entitiesToDestroy)
-        {
-            CharacterManager.TestEntitieSelection(entity);
-
-            if (entity is Building building)
-                TileMapManager.RemoveBuilding(building);
-            else if (entity is Character character)
-                QuadTreeNode.RemoveCharacter(character.ID);
-
-            _entities.Remove(entity);
-            _myEntities.Remove(entity);
-
-            int id = entity.ID;
-            _characters.Remove(id);
-            _myCharacters.Remove(id);
-
-            _buildings.Remove(id);
-            _myBuildings.Remove(id);
-
-            Destroy(entity.gameObject);
-        }
-        _entitiesToDestroy.Clear();
+        _instance._destroyedEntities.Add(_instance._entities[id]);
     }
 
-    //public static void DestroyAllEntities() {
-    //    for (int i = 0; i < _instance._entities.Count; ++i)
-    //        Destroy(_instance._entities.At(i).gameObject);
+    public static void DestroyAllEntities()
+    {
+        for (int i = 0; i < _instance._entities.Count; ++i)
+            Destroy(_instance._entities.At(i).gameObject);
 
-    //    _instance._entities.Clear();
-    //    _instance._myEntities.Clear();
+        _instance._entities.Clear();
+        _instance._myEntities.Clear();
 
-    //    _instance._characters.Clear();
-    //    _instance._myCharacters.Clear();
+        _instance._characters.Clear();
+        _instance._myCharacters.Clear();
 
-    //    _instance._buildings.Clear();
-    //    _instance._myBuildings.Clear();
-    //}
+        _instance._buildings.Clear();
+        _instance._myBuildings.Clear();
+    }
 
     #endregion
 
     public static void Prepare() {
 
-        //DestroyAllEntities(); ---> TOFIX
+        DestroyAllEntities();
+
+        TileMapManager.ResetViews();
 
         QuadTreeNode.Init(3, 20, 13);
 
@@ -449,11 +451,13 @@ public class GameManager : MonoBehaviour
 
     #region Debug
 
+    private bool _simulateWrongHash = false;
+
     public readonly static Color[] Colors = { new Color(1f, 0f, 0f), new Color(0f, 1f, 0f), new Color(0f, 0f, 1f), new Color(1f, 1f, 0f), new Color(1f, 0f, 1f), new Color(0f, 1f, 1f), new Color(0f, 0f, 0f), new Color(0.5019607843137255f, 0f, 0f), new Color(0f, 0.5019607843137255f, 0f), new Color(0f, 0f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0f), new Color(0.5019607843137255f, 0f, 0.5019607843137255f), new Color(0f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.7529411764705882f, 0f, 0f), new Color(0f, 0.7529411764705882f, 0f), new Color(0f, 0f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0f), new Color(0.7529411764705882f, 0f, 0.7529411764705882f), new Color(0f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.25098039215686274f, 0f, 0f), new Color(0f, 0.25098039215686274f, 0f), new Color(0f, 0f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0f), new Color(0.25098039215686274f, 0f, 0.25098039215686274f), new Color(0f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.12549019607843137f, 0f, 0f), new Color(0f, 0.12549019607843137f, 0f), new Color(0f, 0f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0f), new Color(0.12549019607843137f, 0f, 0.12549019607843137f), new Color(0f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.3764705882352941f, 0f, 0f), new Color(0f, 0.3764705882352941f, 0f), new Color(0f, 0f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0f), new Color(0.3764705882352941f, 0f, 0.3764705882352941f), new Color(0f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.6274509803921569f, 0f, 0f), new Color(0f, 0.6274509803921569f, 0f), new Color(0f, 0f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0f), new Color(0.6274509803921569f, 0f, 0.6274509803921569f), new Color(0f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.8784313725490196f, 0f, 0f), new Color(0f, 0.8784313725490196f, 0f), new Color(0f, 0f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0f), new Color(0.8784313725490196f, 0f, 0.8784313725490196f), new Color(0f, 0.8784313725490196f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0.8784313725490196f) };
 
     private void OnDrawGizmos()
     {
-        if (!Application.isPlaying)
+        if (!Application.isPlaying || !Application.isEditor)
             return;
 
         // Debug Performers //

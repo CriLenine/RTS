@@ -1,11 +1,8 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
-using System.Diagnostics;
-//using UnityEngine.UIElements;
-//using static UnityEditor.PlayerSettings;
-using UnityEngine;
-using System;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -46,14 +43,6 @@ public class TileMapManager : MonoBehaviour
     private Vector2Int _previewMin;
     private Vector2Int _previewMax;
 
-    [Header("Debug")]
-    [SerializeField]
-    private GameObject _pathMarker;
-    private List<GameObject> _pathMarkers = new List<GameObject>();
-    [SerializeField]
-    private bool _debug;
-    private Stopwatch _stopwatch;
-
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -72,16 +61,26 @@ public class TileMapManager : MonoBehaviour
             InitLogicalTiles(_obstacleTilemaps[i], TileState.Obstacle);
     }
 
-    public static void ResetFog()
+    private void Update()
     {
-        foreach (LogicalTile tile in _instance._tiles.Values)
-            tile.SetFog(false);
+        #region Debug
+
+        if (Input.GetKeyDown(KeyCode.F4))
+            _debug = !_debug;
+
+        #endregion
     }
 
-    public static void ClearView(int performer, Vector2Int coords)
+    public static void ResetViews()
+    {
+        foreach (LogicalTile tile in _instance._tiles.Values)
+            tile.Reset();
+    }
+
+    public static void UpdateView(int performer, Vector2Int coords)
     {
         if (_instance._tiles.ContainsKey(coords))
-            _instance._tiles[coords].SetFog(performer, false);
+            _instance._tiles[coords].Update(performer);
     }
 
     #region Initialization
@@ -134,10 +133,7 @@ public class TileMapManager : MonoBehaviour
 
     public static LogicalTile GetLogicalTile(Vector2Int coords)
     {
-        if (_instance._tiles.ContainsKey(coords))
-            return _instance._tiles[coords];
-
-        throw new InvalidOperationException("Tile not Found");
+        return _instance._tiles.ContainsKey(coords) ? _instance._tiles[coords] : null;
     }
 
     #endregion
@@ -253,130 +249,125 @@ public class TileMapManager : MonoBehaviour
 
     #region PathFinding
 
-    public static List<Vector2Int> FindPath(int performerID, Vector2Int startCoords, Vector2Int endCoords)
+    [SerializeField]
+    private List<Vector2Int> _wayPoints;
+
+    [SerializeField]
+    private List<Vector2Int> _wayPointsLissed;
+
+    public static List<Vector2Int> FindPath(int performer, Vector2Int startCoords, Vector2Int endCoords)
     {
         if (_instance._debug)
             _instance._stopwatch = Stopwatch.StartNew();
 
-        List<Vector2Int> wayPoints = new List<Vector2Int>();
-        HashSet<Vector2Int> open = new HashSet<Vector2Int>();
-        HashSet<Vector2Int> closed = new HashSet<Vector2Int>();
+        LogicalTile startTile = GetLogicalTile(startCoords);
+        LogicalTile endTile = GetLogicalTile(endCoords);
 
-        if (!_instance._tiles.TryGetValue(startCoords, out LogicalTile currentTile) || !_instance._tiles.ContainsKey(endCoords))
-            return wayPoints;
+        if (startTile is null || endTile is null)
+            return null;
 
-        closed.Add(startCoords);
-        currentTile.g = 0;
-        currentTile.h = 0;
-        currentTile.Parent = null;
+        List<LogicalTile> openTiles = new List<LogicalTile>();
+        HashSet<LogicalTile> closedTiles = new HashSet<LogicalTile>();
 
-        float weight;
-        Vector2Int[] displacementsToTest;
+        startTile.Parent = null;
+        startTile.G = startTile.H = 0;
 
-        List<LogicalTile> validNeighbors = new List<LogicalTile>();
+        openTiles.Add(startTile);
 
-        do
+        while (openTiles.Count > 0)
         {
-            Vector2Int currentCoords = currentTile.Coords;
-            displacementsToTest = _instance._unitDisplacements;
+            int closestTileIndex = 0;
 
-            for (int displacementIndex = 0; displacementIndex < displacementsToTest.Length; ++displacementIndex)
+            for (int i = 1; i < openTiles.Count; ++i)
+                if (openTiles[i].H < openTiles[closestTileIndex].H)
+                    closestTileIndex = i;
+
+            LogicalTile currentTile = openTiles[closestTileIndex];
+            openTiles.RemoveAt(closestTileIndex);
+
+            if (currentTile == endTile)
             {
-                weight = 1 + displacementIndex > 3 ? 0 : .4f;
+                List<Vector2Int> path = new List<Vector2Int>();
+                _instance._wayPoints = new List<Vector2Int>();
 
-                LogicalTile neighborTile;
+                Vector2Int lastDirection = Vector2Int.zero;
 
-                Vector2Int neighborCoords = currentCoords + displacementsToTest[displacementIndex];
-
-                if (!_instance._tiles.TryGetValue(neighborCoords, out neighborTile) || !neighborTile.IsFree(performerID) || closed.Contains(neighborCoords))
-                    continue;
-
-                if (open.Contains(neighborCoords))
+                while (currentTile != startTile)
                 {
-                    float hypotheticG = currentTile.g + weight;
-                    if (hypotheticG < neighborTile.g)
+                    Vector2Int direction = currentTile.Parent.Coords - currentTile.Coords;
+
+                    UnityEngine.Debug.Log(lastDirection.x + " " + lastDirection.y + " / " + direction.x + " " + direction.y);
+
+                    _instance._wayPoints.Add(currentTile.Coords);
+
+                    if (direction != lastDirection)
+                        path.Add(currentTile.Coords);
+
+                    lastDirection = direction;
+                    currentTile = currentTile.Parent;
+                }
+
+                _instance._wayPoints.Add(startTile.Coords);
+                path.Add(startTile.Coords);
+
+                _instance._wayPointsLissed = path;
+
+                if (_instance._debug)
+                {
+                    _instance._stopwatch.Stop();
+
+                    UnityEngine.Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+
+                    foreach (GameObject go in _instance._pathMarkers)
+                        Destroy(go);
+
+                    _instance._pathMarkers.Clear();
+
+                    foreach (Vector2Int tileCoords in path)
                     {
-                        neighborTile.Parent = currentTile;
-                        validNeighbors.Add(neighborTile);
+                        GameObject GO = Instantiate(_instance._pathMarker);
+                        GO.transform.position = TilemapCoordsToWorld(tileCoords);
+                        _instance._pathMarkers.Add(GO);
                     }
                 }
-                else
+
+                return path;
+            }
+
+            for (int moveIndex = 0; moveIndex < _instance._unitDisplacements.Length; ++moveIndex)
+            {
+                float moveWeight = moveIndex < 4 ? 1f : 1.4f;
+
+                LogicalTile neighborTile = GetLogicalTile(currentTile.Coords + _instance._unitDisplacements[moveIndex]);
+
+                if (neighborTile is null || closedTiles.Contains(neighborTile) || neighborTile.IsObstacle(performer))
+                    continue;
+
+                float g = currentTile.G + moveWeight;
+
+                bool isNew = !openTiles.Contains(neighborTile);
+
+                if (g < neighborTile.G || isNew)
                 {
-                    neighborTile.h = (endCoords - neighborCoords).sqrMagnitude;
-                    neighborTile.g = currentTile.g + weight;
+                    neighborTile.G = g;
+
+                    neighborTile.H = (endTile.Coords - neighborTile.Coords).sqrMagnitude;
+
                     neighborTile.Parent = currentTile;
-                    open.Add(neighborCoords);
-                    validNeighbors.Add(neighborTile);
                 }
+
+                if (isNew)
+                    openTiles.Add(neighborTile);
             }
 
-            if (validNeighbors.Count == 0)
-            {
-                if (currentTile.Coords == startCoords)
-                    break;
-                currentTile = currentTile.Parent;
-            }
-            else
-            {
-                LogicalTile bestTile = validNeighbors[0];
-
-                for (int i = 1; i < validNeighbors.Count; ++i)
-                    if (bestTile.f > validNeighbors[i].f)
-                        bestTile = validNeighbors[i];
-
-                bestTile.Parent = currentTile;
-                currentTile = bestTile;
-                closed.Add(currentTile.Coords);
-            }
-
-            validNeighbors.Clear();
-
-        } while (open.Count > 0 && currentTile.Coords != endCoords);
-
-        if (currentTile.Coords == startCoords)
-            return wayPoints;
-
-        wayPoints.Add(currentTile.Coords);
-
-        Vector2Int lastDirection = currentTile.Coords - currentTile.Parent.Coords;
-        Vector2Int currentDirection;
-
-        while (currentTile.Coords != startCoords)
-        {
-            currentDirection = currentTile.Coords - currentTile.Parent.Coords;
-
-            if (lastDirection != currentDirection)
-                wayPoints.Add(currentTile.Coords);
-
-            currentTile = currentTile.Parent;
-            lastDirection = currentDirection;
+            closedTiles.Add(currentTile);
         }
 
-        wayPoints.Add(startCoords);
+        _instance._stopwatch.Stop();
 
-        if (_instance._debug)
-        {
-            _instance._stopwatch.Stop();
+        UnityEngine.Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
 
-            if (wayPoints.Contains(endCoords))
-                UnityEngine.Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
-            else
-                UnityEngine.Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
-
-            foreach (GameObject go in _instance._pathMarkers)
-                Destroy(go);
-
-            _instance._pathMarkers.Clear();
-
-            foreach (Vector2Int tileCoords in wayPoints)
-            {
-                GameObject GO = Instantiate(_instance._pathMarker);
-                GO.transform.position = TilemapCoordsToWorld(tileCoords);
-                _instance._pathMarkers.Add(GO);
-            }
-        }
-
-        return wayPoints;
+        return null;
     }
 
     #endregion
@@ -426,6 +417,50 @@ public class TileMapManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    #endregion
+
+    #region Debug
+
+    private bool _debug = false;
+
+    private Stopwatch _stopwatch;
+
+    [Header("Debug")]
+    [SerializeField]
+    private GameObject _pathMarker;
+
+    private List<GameObject> _pathMarkers = new List<GameObject>();
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || !Application.isEditor)
+            return;
+
+        if (!_debug)
+            return;
+
+        /*foreach (LogicalTile tile in _instance._tiles.Values)
+        {
+            Gizmos.color = tile.IsFree(0) ? Color.green : Color.red;
+
+            Gizmos.DrawWireSphere(TilemapCoordsToWorld(tile.Coords), TileSize / 3f);
+        }*/
+
+        foreach (Vector2Int waypoint in _wayPoints)
+        {
+            Gizmos.color = Color.red;
+
+            Gizmos.DrawWireSphere(TilemapCoordsToWorld(waypoint), TileSize / 3f);
+        }
+
+        foreach (Vector2Int waypoint in _wayPointsLissed)
+        {
+            Gizmos.color = Color.blue;
+
+            Gizmos.DrawWireSphere(TilemapCoordsToWorld(waypoint), TileSize / 5f);
+        }
     }
 
     #endregion
