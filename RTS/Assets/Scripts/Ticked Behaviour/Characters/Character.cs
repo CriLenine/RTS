@@ -45,10 +45,8 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Update()
     {
-        if (CurrentAction is Move)
+        if (CurrentAction?.SpecificAction is Move move)
         {
-            Move move = CurrentAction as Move;
-
             _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
 
             int j = 0,  i;

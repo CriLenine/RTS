@@ -47,8 +47,7 @@ public class LocomotionManager : MonoBehaviour
     public bool Move(Character character, Vector3 position)
     {
         Vector3 projectedPosition = LocalAvoidance(character, position);
-
-        if ((position - character.transform.position).sqrMagnitude < (character.CurrentAction as Move).TestThreshold)
+        if ((position - character.transform.position).sqrMagnitude < (character.CurrentAction.SpecificAction as Move).TestThreshold)
             if (MoveComplete(character, projectedPosition, position))
                 return true;
 
@@ -69,7 +68,7 @@ public class LocomotionManager : MonoBehaviour
         if (Vector2.Dot((projectedPosition - characterPos).normalized, (position - characterPos).normalized) > .9f)
             return false;
 
-        if ((position - characterPos).sqrMagnitude > (character.CurrentAction as Move).CompletionThreshold)
+        if ((position - characterPos).sqrMagnitude > (character.CurrentAction.SpecificAction as Move).CompletionThreshold)
             return false;
 
         return true;

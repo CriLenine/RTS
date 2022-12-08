@@ -17,11 +17,16 @@ public class ResourceData : ScriptableObject
     [SerializeField]
     private int _amountPerHarvest;
 
+    [SerializeField]
+    private int _nMaxHarvestPerTile;
+
     public ResourceType Type => _type;
 
-    public int Amount { get => _amount; set { _amount = value; } }
+    public int Amount => _amount;
 
     public float HarvestingTime => _harvestingTime;
 
     public int AmountPerHarvest => _amountPerHarvest;
+
+    public int NMaxHarvestPerTile => _nMaxHarvestPerTile;
 }

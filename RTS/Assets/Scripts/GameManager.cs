@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 
     private ResourcesManager _resourcesManager;
 
-    public static ResourcesManager resourcesManager => _instance._resourcesManager;
+    public static ResourcesManager ResourcesManager => _instance._resourcesManager;
 
     #region Init & Variables
 
@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Harvest:
-                    Peon harvester = (Peon)_instance._myEntities[input.ID];
+                    Peon harvester = (Peon)_instance._myEntities[input.Targets[0]];
                     Resource resource = null;
                     Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
                     if (_instance._resourcesManager.HasTree(input.Position))
@@ -383,6 +383,8 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
             CreateBuilding(i+1, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
+            CreateBuilding(i, Building.Type.PlutoniumOutpost, spawnPoint + new Vector2(-4f, -2f));
+            CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f));
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);

@@ -10,7 +10,6 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     public static T Create<T>(int performer, T prefab, Vector3 position, Quaternion quaternion) where T : TickedBehaviour
     {
-        Debug.Log(prefab);
         T tickedBehaviour = Instantiate(prefab, position, quaternion);
 
         tickedBehaviour.ID = NextID;

@@ -77,13 +77,16 @@ public class ResourcesManager : MonoBehaviour
         {
             Vector2Int pos2d = (Vector2Int)position;
             if (_treesTilemap.HasTile(position))
-                GetNearestForest(pos2d).AddTree(pos2d);
+                GetNearestForest(pos2d).AddItem(pos2d);
             else if (_rocksTilemap.HasTile(position))
-                GetNearestAggregate(pos2d).AddRock(pos2d);
+                GetNearestAggregate(pos2d).AddItem(pos2d);
         }
 
         foreach (CampEntity campEntity in FindObjectsOfType<CampEntity>())
             GetNearestCamp(campEntity).AddEntity(campEntity);
+
+        foreach (Resource resource in resources)
+            resource.Init();
     }
 
     public Forest GetNearestForest(Vector2Int position)

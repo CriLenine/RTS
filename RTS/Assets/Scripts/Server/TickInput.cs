@@ -71,7 +71,6 @@ public class TickInput
             Type = InputType.Harvest,
 
             Targets = new int[1] { target },
-
             Position = position,
             Performer = performer
         };

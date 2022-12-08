@@ -6,7 +6,8 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         Farm,
         Barracks,
-        ResourcesOutpost
+        PlutoniumOutpost,
+        GoldOutpost
     }
 
     [SerializeField]

@@ -17,33 +17,49 @@ public class Harvest : Action
     {
         if (--_duration < 0f)
         {
-            Vector2Int newCoords = _coords;
-            bool continueHarvesting = false;
-            if (_resource is Forest forest)
+            Vector2Int? newNullableCoords = _resource.GetNext(_coords);
+            if (newNullableCoords == null)
             {
-                newCoords = forest.GetNextTree(_coords);
-                continueHarvesting = newCoords != _coords;
-            }
-            else if (_resource is Aggregate aggregate)
-            {
-                continueHarvesting = --aggregate.Data.Amount > 0;
+                Debug.Log("No available tile found to continue harvest.");
+                return true;
             }
 
             Building building = GetNearestResourceStorer(_resource.Data.Type);
-            Vector2? harvestingPosition = continueHarvesting ? 
-                TileMapManager.TilemapCoordsToWorld(_resource.GetHarvestingPosition(newCoords, _character.Coords)) : null;
-            AddAction(new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building));
-            AddAction(new Harvest(_character, newCoords, _resource));
+            if (building == null)
+            {
+                Debug.Log("No suitable resource storer found");
+                return true;
+            }
+
+            Vector2Int newCoords = (Vector2Int)newNullableCoords;
+
+            Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(_resource.GetHarvestingPosition(newCoords, _character.Coords));
+
+            Debug.Log(harvestingPosition);
             Peon peon = _character as Peon;
+
             if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type)
+            {
                 peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
-            else
-                peon.CarriedResource.AddQuantity(_resource.Data.Amount);
+            }
+
+            peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
+
             Debug.Log("Harvested");
+
+            Action nextAction;
+            if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
+                nextAction = new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building);
+            else
+                nextAction = new Move(_character, harvestingPosition);
+            Debug.Log(nextAction);
+            AddAction(nextAction);
+            AddAction(new Harvest(_character, newCoords, _resource));
+
             return true;
         }
 
-        return !GameManager.resourcesManager.Harvestable(_coords);
+        return !GameManager.ResourcesManager.Harvestable(_coords);
     }
 
     private Building GetNearestResourceStorer(ResourceType type)

@@ -17,3 +17,4 @@ MonoBehaviour:
   _autoAttackDistance: 0.5
   _views: 01000000
   _workPower: 1
+  _nMaxCarriedResources: 3

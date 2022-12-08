@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad1fe046a1be828439277a073d68d0fb, type: 3}
   m_Name: Aggregate
   m_EditorClassIdentifier: 
-  _type: 1
-  _amount: 30
+  _type: 0
+  _amount: 0
   _harvestingTime: 2
+  _amountPerHarvest: 1
+  _nMaxHarvestPerTile: 3
