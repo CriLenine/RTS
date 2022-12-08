@@ -70,7 +70,7 @@ public partial class NetworkManager : MonoBehaviour
         if (lineCount < 1)
             return;
 
-        GUILayout.BeginArea(new Rect(10, 10, 150, lineHeight * (3 * lineCount + 1) / 2), new GUIStyle(GUI.skin.box));
+        GUILayout.BeginArea(new Rect(10, 10, 150, lineHeight * (3 * lineCount + 2) / 2), new GUIStyle(GUI.skin.box));
 
         if (_loading)
         {
@@ -117,7 +117,7 @@ public partial class NetworkManager : MonoBehaviour
 
                 style.normal.textColor = IsReady ? Color.green : Color.red;
 
-                if (GUILayout.Button("Pr�t", style))
+                if (GUILayout.Button("Pret", style))
                     _server.Send("Ready");
 
                 style.normal.textColor = color;

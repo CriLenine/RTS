@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf4181e5a86264047b8a40671b166f3a, type: 3}
   m_Name: PeonSpawnable
   m_EditorClassIdentifier: 
-  _type: 0
+  _type: 1
   _character: {fileID: 1300237163801353399, guid: 84535e00d9cd9ef4ea82208c2ab37bab, type: 3}
   _neededBuildingLevel: 0
   _initialSpawningTime: 1

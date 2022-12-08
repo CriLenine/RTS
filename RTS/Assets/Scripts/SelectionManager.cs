@@ -92,7 +92,8 @@ public class SelectionManager : MonoBehaviour
                         {
                             CharacterManager.DeselectAll();
 
-                            CharacterManager.SelectedCharacters().Add(selectedCharacter);
+
+                            CharacterManager.AddCharacterToSelection(selectedCharacter);
                             selectedCharacter.SelectionMarker.SetActive(true);
 
                             //CharacterManager.ChangeView(selectedCharacter);
@@ -100,12 +101,14 @@ public class SelectionManager : MonoBehaviour
                                 selectedCharacter.DebugCoordinates();
                         }
                         else    // Shift click
-                            if (!CharacterManager.SelectedCharacters().Contains(selectedCharacter)) // If the character is not already selected
+                        {
+                            if (!CharacterManager.SelectedCharacters.Contains(selectedCharacter)) // If the character is not already selected
                                 CharacterManager.AddCharacterToSelection(selectedCharacter);
                             else
                                 CharacterManager.RemoveCharacterFromSelection(selectedCharacter);
+                        }
                     }
-                    else if (CharacterManager.SelectedCharacters().Count > 0)// Ennemy => ATTACK 
+                    else if(CharacterManager.SelectedCharacters.Count > 0)// Ennemy => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
                         NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
@@ -118,7 +121,7 @@ public class SelectionManager : MonoBehaviour
                         CharacterManager.DeselectAll();
                         CharacterManager.AddBuildingToSelected(selectedBuilding);
                     }
-                    else if (CharacterManager.SelectedCharacters().Count > 0)// EnnemyBuilding => ATTACK 
+                    else if (CharacterManager.SelectedCharacters.Count > 0)// EnnemyBuilding => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
                         NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
@@ -139,7 +142,7 @@ public class SelectionManager : MonoBehaviour
 
             foreach (Character character in GameManager.MyCharacters)
                 if (_selectionBox.Contains(_camera.WorldToScreenPoint(character.transform.position)))
-                    if (!(_shifting && CharacterManager.SelectedCharacters().Contains(character)))
+                    if (!(_shifting && CharacterManager.SelectedCharacters.Contains(character)))
                         CharacterManager.AddCharacterToSelection(character);
         }
 
@@ -150,7 +153,7 @@ public class SelectionManager : MonoBehaviour
 
         _clicking = false;
 
-        HUDManager.UpdateHUD(CharacterManager.SelectedCharacters());
+        HUDManager.UpdateHUD(CharacterManager.SelectedCharacters);
     }
 
     /// <summary>

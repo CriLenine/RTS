@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,8 +18,20 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
-    private List<Character> _charactersSelected = new();
+    private Character.Type _selectedType = Character.Type.None;
+    private HashSet<Character.Type> _selectedTypes = new HashSet<Character.Type>();
+
+    private List<Character> _selectedCharacters = new List<Character>();
+    private List<Character> _allSelectedCharacters = new List<Character>();
+
+    public static Character.Type SelectedType => _instance._selectedType;
+    public static HashSet<Character.Type> SelectedTypes => _instance._selectedTypes;
+
+    public static List<Character> SelectedCharacters => _instance._selectedCharacters;
+
     private Building _buildingSelected = null;
+
+    private bool _debug = false;
 
     private void Awake()
     {
@@ -48,6 +61,70 @@ public class CharacterManager : MonoBehaviour
         _locomotionInputActions.Displacement.RightClick.performed += _ => GiveOrder(); ;
     }
 
+    private void Update()
+    {
+        #region Debug
+
+        if (Input.GetKeyDown(KeyCode.F5))
+            _debug = !_debug;
+
+        #endregion
+    }
+
+    #region Debug
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || !Application.isEditor)
+            return;
+
+        if (!_debug)
+            return;
+    }
+
+    private void OnGUI()
+    {
+        if (!Application.isPlaying || !Application.isEditor)
+            return;
+
+        if (!_debug)
+            return;
+
+        const int lineHeight = 15;
+
+        List<Character.Type> types = GetSelectedCharacterTypes();
+
+        int lineCount = types.Count + 1;
+
+        if (lineCount < 1)
+            return;
+
+        GUILayout.BeginArea(new Rect(Screen.width - 50 - 10, 10, 50, lineHeight * (3 * lineCount + 2) / 2), new GUIStyle(GUI.skin.box));
+
+        void AddButton(Character.Type type)
+        {
+            GUIStyle style = GUI.skin.button;
+
+            Color color = style.normal.textColor;
+
+            style.normal.textColor = type == _selectedType ? Color.green : color;
+
+            if (GUILayout.Button(type.ToString()))
+                SpecializesSelection(type);
+
+            style.normal.textColor = color;
+        }
+
+        AddButton(Character.Type.None);
+
+        foreach (Character.Type type in types)
+            AddButton(type);
+
+        GUILayout.EndArea();
+    }
+
+    #endregion Debug
+
     public static bool Move(Character character, Vector2 position)
     {
         return _instance._locomotionManager.Move(character, position);
@@ -55,9 +132,7 @@ public class CharacterManager : MonoBehaviour
 
     public void GiveOrder()
     {
-        List<Character> characters = SelectedCharacters();
-
-        if (characters.Count == 0)
+        if (SelectedCharacters.Count == 0)
             return;
 
         // Retrieve the rallypoint's coordinates according to the input.
@@ -67,31 +142,81 @@ public class CharacterManager : MonoBehaviour
 
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
-        if (characters.Count == 1 &&
+        if (SelectedCharacters.Count == 1 &&
             (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
         {
-            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
+            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, SelectedCharacters[0].ID));
             return;
         }
 
         if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
             return;
 
-        int[] IDs = new int[characters.Count];
+        int[] IDs = new int[SelectedCharacters.Count];
 
-        for (int i = 0; i < characters.Count; ++i)
-            IDs[i] = characters[i].ID;
+        for (int i = 0; i < SelectedCharacters.Count; ++i)
+            IDs[i] = SelectedCharacters[i].ID;
 
         NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
     }
 
-    public static List<Character> SelectedCharacters()
+    public static void ChangeView<T>(T owner) where T : TickedBehaviour
     {
-        return _instance._charactersSelected;
+        UIManager.ShowTickedBehaviourUI(owner);
     }
-    public static Building SelectedBuilding()
+
+    public static void SpecializesSelection(Character.Type type)
     {
-        return _instance._buildingSelected;
+        _instance._selectedType = type;
+
+        _instance.UpdateCharacterSelection();
+    }
+
+    public static List<Character.Type> GetSelectedCharacterTypes()
+    {
+        return _instance._allSelectedCharacters.Select(character => character.CharaType).Distinct().ToList();
+    }
+
+    public static void AddCharacterToSelection(Character character)
+    {
+        _instance._allSelectedCharacters.Add(character);
+
+        SpecializesSelection(Character.Type.None);
+    }
+
+    public static void AddCharactersToSelection(List<Character> characters)
+    {
+        _instance._selectedCharacters.AddRange(characters);
+
+        SpecializesSelection(Character.Type.None);
+    }
+
+    public static void RemoveCharacterFromSelection(Character character)
+    {
+        _instance._allSelectedCharacters.Remove(character);
+
+        _instance.UpdateCharacterSelection();
+    }
+
+    private void UpdateCharacterSelection()
+    {
+        foreach (Character character in GameManager.MyCharacters)
+            character.SelectionMarker.SetActive(false);
+
+        SelectedTypes.Clear();
+        SelectedCharacters.Clear();
+
+        foreach (Character character in _instance._allSelectedCharacters)
+        {
+            SelectedTypes.Add(character.CharaType);
+
+            if (_instance._selectedType == Character.Type.None || character.CharaType == _instance._selectedType)
+            {
+                SelectedCharacters.Add(character);
+
+                character.SelectionMarker.SetActive(true);
+            }
+        }
     }
 
     public static void AddBuildingToSelected(Building building)
@@ -99,33 +224,16 @@ public class CharacterManager : MonoBehaviour
         _instance._buildingSelected = building;
     }
 
-    public static void AddCharacterToSelection(Character character)
+    public static Building SelectedBuilding()
     {
-        _instance._charactersSelected.Add(character);
-        character.SelectionMarker.SetActive(true);
-    }
-
-    public static void AddCharactersToSelection(List<Character> characters)
-    {
-        _instance._charactersSelected.AddRange(characters);
-
-        foreach (var chara in characters)
-        {
-            chara.SelectionMarker.SetActive(true);
-        }
-    }
-
-    public static void RemoveCharacterFromSelection(Character character)
-    {
-        _instance._charactersSelected.Remove(character);
-        character.SelectionMarker.SetActive(false);
+        return _instance._buildingSelected;
     }
 
     public static void TestEntitieSelection(TickedBehaviour entitie)
     {
         if (entitie is Character character)
         {
-            if (_instance._charactersSelected.Contains(character))
+            if (_instance._selectedCharacters.Contains(character))
                 RemoveCharacterFromSelection(character);
         }
         else if (entitie is Building building && _instance._buildingSelected)
@@ -138,17 +246,17 @@ public class CharacterManager : MonoBehaviour
     {
         _instance._buildingSelected = null;
 
-        foreach (Character characterToRemove in _instance._charactersSelected)
-            characterToRemove.SelectionMarker.SetActive(false);
-        _instance._charactersSelected.Clear();
+        _instance._allSelectedCharacters.Clear();
+
+        _instance.UpdateCharacterSelection();
     }
 
     public static int[] GetSelectedIds()
     {
-        int[] ids = new int[_instance._charactersSelected.Count];
+        int[] ids = new int[_instance._selectedCharacters.Count];
 
         for (int i = 0; i < ids.Length; ++i)
-            ids[i] = _instance._charactersSelected[i].ID;
+            ids[i] = _instance._selectedCharacters[i].ID;
 
         return ids;
     }

@@ -435,7 +435,7 @@ public class GameManager : MonoBehaviour
 
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, -0.5f));
+            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.5f, -0.5f));
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
             CreateBuilding(i+1, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
@@ -471,9 +471,7 @@ public class GameManager : MonoBehaviour
 
         // Debug Groups //
 
-        List<Character> selected = CharacterManager.SelectedCharacters();
-
-        List<List<Character>> groups = SelectionManager.MakeGroups(NetworkManager.Me, selected.ToArray());
+        List<List<Character>> groups = SelectionManager.MakeGroups(NetworkManager.Me, CharacterManager.SelectedCharacters.ToArray());
 
         for (int i = 0, j; i < groups.Count; ++i)
         {

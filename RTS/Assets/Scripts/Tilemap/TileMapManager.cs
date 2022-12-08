@@ -296,8 +296,6 @@ public class TileMapManager : MonoBehaviour
                 {
                     Vector2Int direction = currentTile.Parent.Coords - currentTile.Coords;
 
-                    UnityEngine.Debug.Log(lastDirection.x + " " + lastDirection.y + " / " + direction.x + " " + direction.y);
-
                     _instance._wayPoints.Add(currentTile.Coords);
 
                     if (direction != lastDirection)
@@ -317,18 +315,6 @@ public class TileMapManager : MonoBehaviour
                     _instance._stopwatch.Stop();
 
                     UnityEngine.Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
-
-                    foreach (GameObject go in _instance._pathMarkers)
-                        Destroy(go);
-
-                    _instance._pathMarkers.Clear();
-
-                    foreach (Vector2Int tileCoords in path)
-                    {
-                        GameObject GO = Instantiate(_instance._pathMarker);
-                        GO.transform.position = TilemapCoordsToWorld(tileCoords);
-                        _instance._pathMarkers.Add(GO);
-                    }
                 }
 
                 return path;
@@ -427,12 +413,6 @@ public class TileMapManager : MonoBehaviour
 
     private Stopwatch _stopwatch;
 
-    [Header("Debug")]
-    [SerializeField]
-    private GameObject _pathMarker;
-
-    private List<GameObject> _pathMarkers = new List<GameObject>();
-
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || !Application.isEditor)
@@ -441,23 +421,16 @@ public class TileMapManager : MonoBehaviour
         if (!_debug)
             return;
 
-        /*foreach (LogicalTile tile in _instance._tiles.Values)
+        foreach (LogicalTile tile in _instance._tiles.Values)
         {
             Gizmos.color = tile.IsFree(0) ? Color.green : Color.red;
 
             Gizmos.DrawWireSphere(TilemapCoordsToWorld(tile.Coords), TileSize / 3f);
-        }*/
+        }
 
         foreach (Vector2Int waypoint in _wayPoints)
         {
-            Gizmos.color = Color.red;
-
-            Gizmos.DrawWireSphere(TilemapCoordsToWorld(waypoint), TileSize / 3f);
-        }
-
-        foreach (Vector2Int waypoint in _wayPointsLissed)
-        {
-            Gizmos.color = Color.blue;
+            Gizmos.color = _wayPointsLissed.Contains(waypoint) ? Color.yellow : Color.blue;
 
             Gizmos.DrawWireSphere(TilemapCoordsToWorld(waypoint), TileSize / 5f);
         }

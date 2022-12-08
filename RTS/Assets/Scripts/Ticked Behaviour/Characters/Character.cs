@@ -10,8 +10,9 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public enum Type
     {
+        None,
         Peon,
-        Knight
+        Naked
     }
 
     private Type _type;
