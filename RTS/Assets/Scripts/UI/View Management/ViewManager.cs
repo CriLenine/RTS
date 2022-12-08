@@ -38,6 +38,8 @@ public abstract class ViewManager : MonoBehaviour
 
     private View _currentView=null;
 
+    public View CurrentView => _currentView;
+
     private readonly Stack<View> _history = new();
 
     public abstract void Initialize();
@@ -120,7 +122,5 @@ public abstract class ViewManager : MonoBehaviour
         }
 
         Show<DefaultView>();
-
     }
-
 }

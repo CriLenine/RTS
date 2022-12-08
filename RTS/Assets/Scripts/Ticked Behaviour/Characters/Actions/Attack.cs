@@ -71,7 +71,7 @@ public class Attack : Action
                 return true;
             }
 
-        var newTime = _attackSpeedTimer + NetworkManager.TickPeriod;
+        var newTime = _attackSpeedTimer + NetworkManager.NormalTickPeriod;
         _attackSpeedTimer = newTime  >= _attackSpeed ? 0 : newTime;
 
         return false;

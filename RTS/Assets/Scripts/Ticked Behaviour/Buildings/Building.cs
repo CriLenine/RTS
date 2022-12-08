@@ -13,7 +13,7 @@ public abstract class Building : TickedBehaviour, IDamageable
     private bool _isBuilt = false;
 
     [SerializeField]
-    private BuildingData _buildingData; //USE ?
+    private BuildingData _buildingData;
 
     [SerializeField]
     private int _currentWorkforce;
@@ -37,6 +37,8 @@ public abstract class Building : TickedBehaviour, IDamageable
     protected int MaxHealth => _buildingData.MaxHealth;
     public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
 
+    private LineRenderer _pathRenderer;
+    public LineRenderer PathRenderer => _pathRenderer;
 
     //SpriteManagement
     private SpriteRenderer _buildingRenderer;
@@ -47,6 +49,7 @@ public abstract class Building : TickedBehaviour, IDamageable
     private void Awake()
     {
         _buildingRenderer = GetComponent<SpriteRenderer>();
+        _pathRenderer = GetComponentInChildren<LineRenderer>(true);
 
         _currentHealth = MaxHealth;
         HealthBar.SetMaxHealth(MaxHealth);
@@ -54,6 +57,26 @@ public abstract class Building : TickedBehaviour, IDamageable
         _actualSpriteIndex = 0;
     }
 
+    private void Update()
+    {
+        if (UIManager.CurrentManager is BuildingUI buildingUI)
+        {
+            if (!buildingUI.Building.TryGetComponent(out ISpawner spawner)) return;
+
+            Vector2 rallypoint = spawner.GetRallyPoint();
+            _pathRenderer.SetPosition(0, transform.position);
+            _pathRenderer.SetPosition(1, rallypoint);
+
+            _pathRenderer.transform.position = rallypoint;
+
+            _pathRenderer.startColor = Color.cyan;
+            _pathRenderer.endColor = Color.cyan;
+
+            _pathRenderer.gameObject.SetActive(true);
+        }
+        else
+            _pathRenderer.gameObject.SetActive(false);
+    }
     /// <returns><see langword="true"/> if it finishes the building's construction,
     /// <see langword="false"/> otherwise </returns>
     public bool AddWorkforce(int amount)

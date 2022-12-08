@@ -193,7 +193,8 @@ public class GameManager : MonoBehaviour
 
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
 
-        character.AddAction(new Move(character, spawner.GetRallyPoint()));
+        Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
+        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint).ToArray()));
 
         return character;
     }
@@ -270,6 +271,7 @@ public class GameManager : MonoBehaviour
         }
         return output;
     }
+
     private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
     {
         if (target is Building building)

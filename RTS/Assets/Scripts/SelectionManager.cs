@@ -63,7 +63,7 @@ public class SelectionManager : MonoBehaviour
 
     public void InitSelection()
     {
-        if (EventSystem.current.IsPointerOverGameObject())
+        if (EventSystem.current.IsPointerOverGameObject() || UIManager.CurrentManager?.CurrentView?.Blocklick == true)
             return;
 
         _startpos = _mouse.position.ReadValue();

@@ -15,5 +15,6 @@ MonoBehaviour:
   _type: 0
   _character: {fileID: 1300237163801353399, guid: 84535e00d9cd9ef4ea82208c2ab37bab, type: 3}
   _neededBuildingLevel: 0
+  _initialSpawningTime: 1
   _cost: []
   _charaUiIcon: {fileID: -1197897939, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}

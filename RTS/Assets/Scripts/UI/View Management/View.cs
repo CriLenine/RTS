@@ -10,9 +10,10 @@ public abstract class View : MonoBehaviour
     [SerializeField] private Sprite _viewIcon;
     public Sprite ViewIcon => _viewIcon;
 
+    protected bool _blockClick = false;
+    public bool Blocklick => _blockClick;
 
-
-    public abstract void Initialize<T>(T parentManager) where T: ViewManager;
+    public abstract void Initialize<T>(T parentManager) where T : ViewManager;
 
     public virtual void Hide()
     {
@@ -22,5 +23,5 @@ public abstract class View : MonoBehaviour
     {
         gameObject.SetActive(true);
     }
-    
+
 }
