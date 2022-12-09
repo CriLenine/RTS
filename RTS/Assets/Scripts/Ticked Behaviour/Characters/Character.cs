@@ -26,8 +26,6 @@ public abstract class Character : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
-    [SerializeField]
-    private UtilsView[] _views;
 
     public int CurrentHealth => _currentHealth;
 
