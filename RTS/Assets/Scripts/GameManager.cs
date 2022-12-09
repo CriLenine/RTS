@@ -435,6 +435,17 @@ public class GameManager : MonoBehaviour
 
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
             CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(1f, 0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(1f, 1f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(2f, 1f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(2f, 2f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-1f, 2f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-1f, -1f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-2f, -2f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-3f, -2f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-3f, -3f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-4f, -3f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-4f, 1f));
             CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.5f, -0.5f));
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
 
