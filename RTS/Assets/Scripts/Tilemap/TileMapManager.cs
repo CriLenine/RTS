@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Diagnostics;
-using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
+//using UnityEngine.UIElements;
+//using static UnityEditor.PlayerSettings;
 using UnityEngine;
 using System;
 
@@ -261,7 +261,6 @@ public class TileMapManager : MonoBehaviour
         List<Vector2Int> wayPoints = new List<Vector2Int>();
         HashSet<Vector2Int> open = new HashSet<Vector2Int>();
         HashSet<Vector2Int> closed = new HashSet<Vector2Int>();
-
 
         if (!_instance._tiles.TryGetValue(startCoords, out LogicalTile currentTile) || !_instance._tiles.ContainsKey(endCoords))
             return wayPoints;

@@ -68,7 +68,7 @@ public class CharacterManager : MonoBehaviour
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
         if (characters.Count == 1 &&
-            (GameManager.RessourcesManager.HasRock(rallyPointCoords) || GameManager.RessourcesManager.HasTree(rallyPointCoords)))
+            (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
         {
             NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
             return;
@@ -83,11 +83,6 @@ public class CharacterManager : MonoBehaviour
             IDs[i] = characters[i].ID;
 
         NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
-    }
-
-    public static void ChangeView<T>(T owner) where T : TickedBehaviour
-    {
-        UIManager.ShowTickedBehaviourUI(owner);
     }
 
     public static List<Character> SelectedCharacters()
@@ -141,8 +136,6 @@ public class CharacterManager : MonoBehaviour
     }
     public static void DeselectAll()
     {
-        UIManager.HideCurrentUI();
-
         _instance._buildingSelected = null;
 
         foreach (Character characterToRemove in _instance._charactersSelected)

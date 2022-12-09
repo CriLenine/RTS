@@ -4,6 +4,7 @@ public abstract class Action
 {
     protected readonly Character _character;
     private bool _isRunningUpdate = false;
+    public Action SpecificAction => _current == null ? this : _current.SpecificAction;
     public Action(Character character)
     {
         _character = character;
@@ -18,7 +19,7 @@ public abstract class Action
         if (_current is null || _isRunningUpdate)
         {
             _isRunningUpdate = true;
-            if(Update())
+            if (Update())
             {
                 _isRunningUpdate = false;
                 return _queue.Count == 0;
@@ -55,4 +56,3 @@ public abstract class Action
         AddAction(action);
     }
 }
-

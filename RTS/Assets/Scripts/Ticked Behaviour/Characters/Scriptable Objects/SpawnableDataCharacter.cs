@@ -19,7 +19,7 @@ public class SpawnableDataCharacter : ScriptableObject
     private float _initialSpawningTime;
 
     [SerializeField]
-    private GameManager.RessourceCost[] _cost;
+    private Resource.Amount[] _cost;
 
     [Header("UI")]
     [SerializeField]

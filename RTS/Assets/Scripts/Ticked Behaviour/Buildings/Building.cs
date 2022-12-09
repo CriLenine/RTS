@@ -6,7 +6,8 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         Farm,
         Barracks,
-        Ressourcesoutpost
+        PlutoniumOutpost,
+        GoldOutpost
     }
 
     [SerializeField]
@@ -27,15 +28,15 @@ public abstract class Building : TickedBehaviour, IDamageable
     private Type _type;
     public Type BuildingType => _type;
 
-    /*Ici on aura les options disponibles en cliquant sur un bâtiment
-     * (ex créer une certaine unité dans une caserne)*/
+    /*Ici on aura les options disponibles en cliquant sur un bï¿½timent
+     * (ex crï¿½er une certaine unitï¿½ dans une caserne)*/
     //[SerializeField]
     //private List<Option> _options;
 
-    public BuildingData Data => _buildingData;
+    public BuildingData Data => _data;
 
-    protected int MaxHealth => _buildingData.MaxHealth;
-    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
+    protected int MaxHealth => _data.MaxHealth;
+    public float CurrentWorkforceRatio => _currentWorkforce / _data.TotalWorkforce;
 
     private LineRenderer _pathRenderer;
     public LineRenderer PathRenderer => _pathRenderer;
@@ -89,14 +90,14 @@ public abstract class Building : TickedBehaviour, IDamageable
         //Change sprite 
         int spriteIndex=0;
         
-        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
+        for (int i = 0; i < _data.ConstructionSteps.Length; i++)
         {
             spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
         }
 
         if(spriteIndex != _actualSpriteIndex)
         {
-            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
+            _buildingRenderer.sprite = _data.ConstructionSteps[spriteIndex];
             _actualSpriteIndex = spriteIndex;
         }
 
@@ -104,7 +105,7 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (CurrentWorkforceRatio >= 1f)
         {
-            _currentWorkforce = _buildingData.TotalWorkforce;
+            _currentWorkforce = _data.TotalWorkforce;
             _isBuilt = true;
         }
         return _isBuilt;

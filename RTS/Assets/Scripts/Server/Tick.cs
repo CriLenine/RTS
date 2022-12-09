@@ -48,7 +48,6 @@ public partial class NetworkManager
                     case InputType.Build:
                         {
                             int prefab = message.GetInt(i++);
-
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
                             int[] ids = Extract<int>(message, i, out i);

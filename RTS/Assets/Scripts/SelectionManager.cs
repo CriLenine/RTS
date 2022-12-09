@@ -11,7 +11,7 @@ public class SelectionManager : MonoBehaviour
     public bool _shifting;
     private bool _clicking;
 
-   [SerializeField]
+    [SerializeField]
     private LayerMask _clickable, _environment;
 
     private float _minimumSelectionArea;
@@ -83,7 +83,7 @@ public class SelectionManager : MonoBehaviour
 
             if (hit.collider != null) // if we hit a clickable object
             {
-                
+
                 if (hit.collider.gameObject.TryGetComponent(out Character selectedCharacter)) // Collider = character
                 {
                     if (GameManager.MyEntities.Contains(selectedCharacter)) //Test if I is character owner
@@ -92,39 +92,31 @@ public class SelectionManager : MonoBehaviour
                         {
                             CharacterManager.DeselectAll();
 
-
                             CharacterManager.SelectedCharacters().Add(selectedCharacter);
                             selectedCharacter.SelectionMarker.SetActive(true);
 
-                            CharacterManager.ChangeView(selectedCharacter);
+                            //CharacterManager.ChangeView(selectedCharacter);
                             if (_debug)
                                 selectedCharacter.DebugCoordinates();
                         }
                         else    // Shift click
-                        {
                             if (!CharacterManager.SelectedCharacters().Contains(selectedCharacter)) // If the character is not already selected
-                            {
                                 CharacterManager.AddCharacterToSelection(selectedCharacter);
-                            }
                             else
-                            {
                                 CharacterManager.RemoveCharacterFromSelection(selectedCharacter);
-                            }
-                        }
                     }
-                    else if(CharacterManager.SelectedCharacters().Count > 0)// Ennemy => ATTACK 
+                    else if (CharacterManager.SelectedCharacters().Count > 0)// Ennemy => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
                         NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
-                else if(hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
+                else if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
                 {
                     if (GameManager.MyEntities.Contains(selectedBuilding)) //Test if building owner
                     {
                         CharacterManager.DeselectAll();
                         CharacterManager.AddBuildingToSelected(selectedBuilding);
-                        CharacterManager.ChangeView(selectedBuilding);
                     }
                     else if (CharacterManager.SelectedCharacters().Count > 0)// EnnemyBuilding => ATTACK 
                     {
@@ -132,14 +124,13 @@ public class SelectionManager : MonoBehaviour
                         NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
-                else if(!_shifting) // If we didn't hit anything and shift is not being held
+                else if (!_shifting) // If we didn't hit anything and shift is not being held
                     CharacterManager.DeselectAll();
-
 
             }
             else
                 if (!_shifting) // If we didn't hit anything and shift is not being held
-                    CharacterManager.DeselectAll();
+                CharacterManager.DeselectAll();
         }
         else    // Drag Select
         {
@@ -147,18 +138,9 @@ public class SelectionManager : MonoBehaviour
                 CharacterManager.DeselectAll();
 
             foreach (Character character in GameManager.MyCharacters)
-            {
                 if (_selectionBox.Contains(_camera.WorldToScreenPoint(character.transform.position)))
-                {
                     if (!(_shifting && CharacterManager.SelectedCharacters().Contains(character)))
-                    {
                         CharacterManager.AddCharacterToSelection(character);
-                    }
-                }
-            }
-
-            if (CharacterManager.SelectedCharacters().Count > 0)
-                CharacterManager.ChangeView(CharacterManager.SelectedCharacters()[0]);
         }
 
         _startpos = Vector2.zero;
@@ -167,6 +149,8 @@ public class SelectionManager : MonoBehaviour
         _boxVisual.sizeDelta = new Vector2(0, 0);
 
         _clicking = false;
+
+        HUDManager.UpdateHUD(CharacterManager.SelectedCharacters());
     }
 
     /// <summary>

@@ -1,16 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Peon : Character
 {
     private Building _workedOnBuilding;
 
-    private Ressource _recoltedRessource;
+    private Resource _harvestedResource;
 
     private PeonData _specificData;
 
     public new PeonData Data => _specificData;
+    public override bool Idle => _workedOnBuilding == null && _harvestedResource == null;
 
-    public override bool Idle => _workedOnBuilding == null && _recoltedRessource == null;
+    public Resource.Amount CarriedResource;
 
     protected override void Start()
     {
@@ -29,5 +31,10 @@ public class Peon : Character
     public void SetBuild(Building building)
     {
         _workedOnBuilding = building;
+    }
+
+    public void SetResource(Resource harvestedResource)
+    {
+        _harvestedResource = harvestedResource;
     }
 }

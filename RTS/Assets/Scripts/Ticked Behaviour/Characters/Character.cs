@@ -26,6 +26,8 @@ public abstract class Character : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
+    public int CurrentHealth => _currentHealth;
+
     public abstract bool Idle { get; }
     public CharacterData Data => _data;
 
@@ -50,8 +52,7 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     protected virtual void Update()
     {
-        //Debug.Log(CurrentAction+"-"+ID);
-        if (CurrentAction is Move move)
+        if (CurrentAction?.SpecificAction is Move move)
         {
             _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
 

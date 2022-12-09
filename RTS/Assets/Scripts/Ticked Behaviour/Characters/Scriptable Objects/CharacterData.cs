@@ -4,15 +4,29 @@ using UnityEngine;
 
 public abstract class CharacterData : ScriptableObject
 {
-    [SerializeField]
-    [Min(1)]
-    private int _maxHealth;
-    public int MaxHealth => _maxHealth;
+    [Header("Name")]
+    [Space]
 
     [SerializeField]
-    [Min(0.1f)]
-    private int _attackDamage;
+    private string _unitName;
+    public string UnitName => _unitName;
+
+    [Space]
+    [Space]
+
+    [Header("Fighting Stats")]
+    [Space]
+
+    [SerializeField]
+    [Min(0)]
+    private int _maxHealth;
+    [SerializeField]
+    [Min(0)]
+    private int _attackDamage, _meleeArmor, _rangeArmor;
+    public int MaxHealth => _maxHealth;
     public int AttackDamage => _attackDamage;
+    public int MeleeArmor => _meleeArmor;
+    public int RangeArmor => _rangeArmor;
 
     [SerializeField]
     [Min(0.1f)]
@@ -24,7 +38,13 @@ public abstract class CharacterData : ScriptableObject
     private float _attackSpeed;
     public float AttackSpeed => _attackSpeed;
 
+    [Space]
+    [Space]
+
+    [Header("Weapon")]
+    [Space]
+
     [SerializeField]
-    private UtilsView[] _views;
-    public UtilsView[] Views => _views;
+    private Sprite _weapon;
+    public Sprite Weapon => _weapon;
 }

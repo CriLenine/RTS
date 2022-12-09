@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Move : Action
 {
-    public int Index { get; private set; }
+    public int Index { get; protected set; }
 
     public readonly List<Vector2> Positions;
 
@@ -27,7 +27,7 @@ public class Move : Action
 
     public Move(Character character, Vector2 position) : base(character)
     {
-        Positions = Positions = new List<Vector2>();
+        Positions = new List<Vector2>();
         Positions.Add(position);
     }
 
