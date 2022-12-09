@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfdd97d8846322740b3a68c65abc39b5, type: 3}
   m_Name: Farm
   m_EditorClassIdentifier: 
+  _type: 0
+  _buildingBlueprint: {fileID: 7296661523523168018, guid: 7b71f153d02245944aa360e6d382da22, type: 3}
+  _building: {fileID: 7277766087222600918, guid: 50a9146c97ad7424d9d3fcbbfda1557a, type: 3}
+  _outline: 1
+  _neededPlayerLevel: 0
+  _cost: []
+  _buildingUiIcon: {fileID: -150912834, guid: 9ac4e9c8ca93605499ac85671e8b562c, type: 3}
   _totalWorkforce: 100
   _maxHealth: 100
   _constructionSteps:
@@ -20,3 +27,4 @@ MonoBehaviour:
   - {fileID: -150912834, guid: 9ac4e9c8ca93605499ac85671e8b562c, type: 3}
   - {fileID: -383927644, guid: 9ac4e9c8ca93605499ac85671e8b562c, type: 3}
   _views: 0200000003000000
+  _spawnable: 

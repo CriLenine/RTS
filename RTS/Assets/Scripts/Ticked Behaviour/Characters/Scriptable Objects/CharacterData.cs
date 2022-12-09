@@ -4,6 +4,38 @@ using UnityEngine;
 
 public abstract class CharacterData : ScriptableObject
 {
+    [Header("Spawn Data")]
+    [Space]
+
+    [SerializeField]
+    private Character.Type _type;
+
+    [SerializeField]
+    private Character _character;
+
+    [SerializeField]
+    private int _neededBuildingLevel;
+
+    [SerializeField]
+    [Min(1)]
+    private float _initialSpawningTime;
+
+    [SerializeField]
+    private Resource.Amount[] _cost;
+
+    [Header("UI")]
+    [SerializeField]
+    private Sprite _charaUiIcon;
+    public Character.Type Type => _type;
+    public Character Character => _character;
+    public Sprite CharaUiIcon => _charaUiIcon;
+
+    public float InitialSpawningTime => _initialSpawningTime;
+
+
+    [Header("GameSpecs")]
+    [Space]
+
     [Header("Name")]
     [Space]
 

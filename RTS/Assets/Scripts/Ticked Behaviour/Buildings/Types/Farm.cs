@@ -6,8 +6,8 @@ public class Farm : Building, ISpawner
 {
     private Vector2 _rallyPoint;
 
-    private Queue<(Character.Type,SpawnableDataCharacter)> _spawningCharas = new();
-    private (Character.Type type, SpawnableDataCharacter data) _currentSpawningChara;
+    private Queue<(Character.Type, CharacterData)> _spawningCharas = new();
+    private (Character.Type type, CharacterData data) _currentSpawningChara;
     private float _spawningTimer = 0;
 
     float ISpawner.SpawningTime { get => _spawningTimer>0 ? _spawningTimer / _currentSpawningChara.data.InitialSpawningTime : 0;}

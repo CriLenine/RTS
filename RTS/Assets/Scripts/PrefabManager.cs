@@ -7,16 +7,16 @@ public class PrefabManager : MonoBehaviour
     private static PrefabManager _instance;
 
     [SerializeField]
-    private List<SpawnableDataCharacter> _dataCharacters;
+    private List<CharacterData> _dataCharacters;
 
     [SerializeField]
-    private List<SpawnableDataBuilding> _dataBuildings;
+    private List<BuildingData> _dataBuildings;
 
-    public static List<SpawnableDataBuilding> DataBuildings => _instance._dataBuildings;
-    public static List<SpawnableDataCharacter> DataCharacters => _instance._dataCharacters;
+    public static List<BuildingData> DataBuildings => _instance._dataBuildings;
+    public static List<CharacterData> DataCharacters => _instance._dataCharacters;
 
-    private Dictionary<Building.Type, SpawnableDataBuilding> _buildingsPrefabs;
-    private Dictionary<Character.Type, SpawnableDataCharacter> _charactersPrefabs;
+    private Dictionary<Building.Type, BuildingData> _buildingsPrefabs;
+    private Dictionary<Character.Type, CharacterData> _charactersPrefabs;
 
     private void Awake()
     {
@@ -26,8 +26,8 @@ public class PrefabManager : MonoBehaviour
     }
     private void Start()
     {
-        _buildingsPrefabs = new Dictionary<Building.Type, SpawnableDataBuilding>();
-        _charactersPrefabs = new Dictionary<Character.Type, SpawnableDataCharacter>();
+        _buildingsPrefabs = new Dictionary<Building.Type, BuildingData>();
+        _charactersPrefabs = new Dictionary<Character.Type, CharacterData>();
 
         foreach (var elem in _dataBuildings)
         {
@@ -40,12 +40,12 @@ public class PrefabManager : MonoBehaviour
         }
     }
 
-    public static SpawnableDataBuilding GetBuildingData(Building.Type peonBuilds)
+    public static BuildingData GetBuildingData(Building.Type peonBuilds)
     {
         return _instance._buildingsPrefabs[peonBuilds];
     }
 
-    public static SpawnableDataCharacter GetCharacterData(Character.Type characterType)
+    public static CharacterData GetCharacterData(Character.Type characterType)
     {
         return _instance._charactersPrefabs[characterType];
     }

@@ -90,11 +90,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9ce0f5fdecf1ab44b3344c48b048691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viewSqrtRadius: 5
+  _viewRadius: 5
   HealthBar: {fileID: 3603240131747965804}
   _data: {fileID: 11400000, guid: 560ca869988fc3046845155149cf6267, type: 2}
   _currentHealth: 0
-  _views: 
   SelectionMarker: {fileID: 4955897978504309409}
 --- !u!114 &3603240131747965804 stripped
 MonoBehaviour:

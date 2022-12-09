@@ -36,13 +36,33 @@ public abstract class TickedBehaviour : MonoBehaviour
     public Vector2Int Coords { get; protected set; }
 
     [SerializeField]
-    private int _viewSqrtRadius = 10;
+    private int _viewRadius = 10;
 
-    public int ViewSqrtMagnitude
+    [SerializeField]
+    private SpriteMask _fogRepeller;
+
+    public int ViewRadius
     {
-        get => _viewSqrtRadius;
+        get => _viewRadius;
         
-        protected set => _viewSqrtRadius = value;
+        protected set
+        {
+            _viewRadius = value;
+
+            ApplyViewRadius();
+        }
+    }
+
+    protected virtual void Awake()
+    {
+        _fogRepeller = GetComponentInChildren<SpriteMask>();
+
+        ApplyViewRadius();
+    }
+
+    private void ApplyViewRadius()
+    {
+        _fogRepeller.transform.localScale = Vector3.one * ViewRadius;
     }
 
     public void SetPosition(Vector3 position)
@@ -63,5 +83,4 @@ public abstract class TickedBehaviour : MonoBehaviour
 
         return hash;
     }
-
 }

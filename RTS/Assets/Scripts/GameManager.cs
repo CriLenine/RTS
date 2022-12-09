@@ -168,9 +168,9 @@ public class GameManager : MonoBehaviour
         Vector2Int offset = Vector2Int.zero;
 
         foreach (TickedBehaviour entity in Entities)
-            for (offset.x = -10; offset.x <= 10; ++offset.x)
-                for (offset.y = -10; offset.y <= 10; ++offset.y)
-                    if (offset.x * offset.x + offset.y * offset.y < entity.ViewSqrtMagnitude)
+            for (offset.x = -entity.ViewRadius; offset.x <= entity.ViewRadius; ++offset.x)
+                for (offset.y = -entity.ViewRadius; offset.y <= entity.ViewRadius; ++offset.y)
+                    if (offset.x * offset.x + offset.y * offset.y <= entity.ViewRadius * entity.ViewRadius)
                         TileMapManager.UpdateView(entity.Performer, entity.Coords + offset);
 
         #endregion
@@ -225,7 +225,7 @@ public class GameManager : MonoBehaviour
 
     private static Character CreateCharacter(int performer, ISpawner spawner , Character.Type type, Vector2 position)
     {
-        SpawnableDataCharacter data = PrefabManager.GetCharacterData(type);
+        CharacterData data = PrefabManager.GetCharacterData(type);
 
         Character character = TickedBehaviour.Create(performer, data.Character);
 
@@ -249,7 +249,7 @@ public class GameManager : MonoBehaviour
     }
     private static Character CreateCharacter(int performer, Character.Type type, Vector2 position)
     {
-        SpawnableDataCharacter data = PrefabManager.GetCharacterData(type);
+        CharacterData data = PrefabManager.GetCharacterData(type);
 
         Character character = TickedBehaviour.Create(performer, data.Character);
 
@@ -344,7 +344,7 @@ public class GameManager : MonoBehaviour
     }
     private static Building CreateBuilding(int performer, Building.Type type, Vector2 position, int[] targets)
     {
-        SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);
+        BuildingData data = PrefabManager.GetBuildingData(type);
 
         Building building = TickedBehaviour.Create(performer, data.Building, position);
 
@@ -375,7 +375,7 @@ public class GameManager : MonoBehaviour
 
     private static Building CreateBuilding(int performer, Building.Type type, Vector2 position) //CreateBuildingWithoutPeon
     {
-        SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);
+        BuildingData data = PrefabManager.GetBuildingData(type);
 
         Building building = TickedBehaviour.Create(performer, data.Building, position);
 

@@ -7,7 +7,7 @@ public class ConstructionView : View
     [SerializeField] private ItemUI _buildingUI;
     [SerializeField] private Transform _buildingsParent;
 
-    private Dictionary<SpawnableDataBuilding, ItemUI> _buildingsUi;
+    private Dictionary<BuildingData, ItemUI> _buildingsUi;
     private CharaUI _manager;
     public override void Initialize<T>(T parentManager) 
     {

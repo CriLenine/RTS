@@ -12,7 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da9832bd4ec40714c978f92b2f305751, type: 3}
   m_Name: Naked
   m_EditorClassIdentifier: 
-  _maxHealth: 100
-  _attackDamage: 10
-  _autoAttackDistance: 0.5
+  _type: 2
+  _character: {fileID: -3724668761118074979, guid: ea78c6a1672922740a5582c16600174d, type: 3}
+  _neededBuildingLevel: 0
+  _initialSpawningTime: 5
+  _cost: []
+  _charaUiIcon: {fileID: 421678573, guid: d7814ef2a39d44448b058b1508661bb3, type: 3}
+  _unitName: Naked
   _views: 01000000
+  _maxHealth: 100
+  _attackDamage: 1000
+  _meleeArmor: 0
+  _rangeArmor: 0
+  _attackRange: 0
+  _attackSpeed: 1
+  _weapon: {fileID: 21300000, guid: d4acf8d4e79148c47ad4f8f0c8c2bc3e, type: 3}

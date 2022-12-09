@@ -17,7 +17,7 @@ public class Blueprint : MonoBehaviour
 
     internal static Blueprint InstantiateWorldPos(Building.Type buildType)
     {
-        SpawnableDataBuilding building = PrefabManager.GetBuildingData(buildType);
+        BuildingData building = PrefabManager.GetBuildingData(buildType);
 
         _buildType = buildType;
         _outline = building.Outline;

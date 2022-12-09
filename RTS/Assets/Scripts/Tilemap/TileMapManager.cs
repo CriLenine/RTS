@@ -204,7 +204,7 @@ public class TileMapManager : MonoBehaviour
     public static void RemoveBuilding(Building building)
     {
         Vector2Int centerCoords = WorldToTilemapCoords(building.transform.position);
-        SpawnableDataBuilding data = PrefabManager.GetBuildingData(building.BuildingType);
+        BuildingData data = PrefabManager.GetBuildingData(building.BuildingType);
         int outlineCount = data.Outline;
         //Set building tiles
         Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlineCount, centerCoords.y - outlineCount);

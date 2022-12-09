@@ -171,11 +171,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb0c414f5b20535419ecde38e9e54dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viewSqrtRadius: 100
+  _viewSqrtRadius: 10
   HealthBar: {fileID: 6855402245890419204}
   _data: {fileID: 11400000, guid: 6af51e8e1fe6a34439a5104355b7f6c1, type: 2}
   _currentHealth: 0
   SelectionMarker: {fileID: 1605752978157292089}
+  CarriedResource:
+    _type: 0
+    _value: 0
 --- !u!114 &7484360325549253758 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2869153955104383923, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}

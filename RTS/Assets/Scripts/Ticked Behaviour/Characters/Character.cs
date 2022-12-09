@@ -41,8 +41,10 @@ public abstract class Character : TickedBehaviour, IDamageable
     private LineRenderer _pathRenderer;
     private bool _isAgressed = false;
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         _pathRenderer = GetComponentInChildren<LineRenderer>(true);
     }
 

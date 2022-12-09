@@ -47,8 +47,10 @@ public abstract class Building : TickedBehaviour, IDamageable
     private float _ratioStep;
     //
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         _buildingRenderer = GetComponent<SpriteRenderer>();
         _pathRenderer = GetComponentInChildren<LineRenderer>(true);
 

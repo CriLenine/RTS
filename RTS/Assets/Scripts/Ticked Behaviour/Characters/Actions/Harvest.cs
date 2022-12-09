@@ -38,8 +38,6 @@ public class Harvest : Action
             Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(nextCoordsToGo);
             Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo);
 
-            Debug.Log("Harvested");
-
             Action nextAction;
             if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
             {
@@ -54,7 +52,7 @@ public class Harvest : Action
             }
             else
                 nextAction = new Move(_character, harvestingPosition);
-            Debug.Log(nextAction);
+
             AddAction(nextAction);
             AddAction(new Harvest(_character, nextCoordsToHarvest, _resource));
 
