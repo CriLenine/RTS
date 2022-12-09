@@ -10,7 +10,7 @@ public class ResourcesOutpost : Building, IResourceStorer
     private void Start()
     {
         SetType(Type.PlutoniumOutpost);
-        _specificData = (ResourcesOutpostData)_data;
+        _specificData = (ResourcesOutpostData)_buildingData;
     }
     public override Hash128 GetHash128()
     {

@@ -14,7 +14,7 @@ public abstract class Building : TickedBehaviour, IDamageable
     private bool _isBuilt = false;
 
     [SerializeField]
-    private BuildingData _buildingData;
+    protected BuildingData _buildingData;
 
     [SerializeField]
     private int _currentWorkforce;
@@ -33,10 +33,10 @@ public abstract class Building : TickedBehaviour, IDamageable
     //[SerializeField]
     //private List<Option> _options;
 
-    public BuildingData Data => _data;
+    public BuildingData Data => _buildingData;
 
-    protected int MaxHealth => _data.MaxHealth;
-    public float CurrentWorkforceRatio => _currentWorkforce / _data.TotalWorkforce;
+    protected int MaxHealth => _buildingData.MaxHealth;
+    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
 
     private LineRenderer _pathRenderer;
     public LineRenderer PathRenderer => _pathRenderer;
@@ -90,14 +90,14 @@ public abstract class Building : TickedBehaviour, IDamageable
         //Change sprite 
         int spriteIndex=0;
         
-        for (int i = 0; i < _data.ConstructionSteps.Length; i++)
+        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
         {
             spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
         }
 
         if(spriteIndex != _actualSpriteIndex)
         {
-            _buildingRenderer.sprite = _data.ConstructionSteps[spriteIndex];
+            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
             _actualSpriteIndex = spriteIndex;
         }
 
@@ -105,7 +105,7 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (CurrentWorkforceRatio >= 1f)
         {
-            _currentWorkforce = _data.TotalWorkforce;
+            _currentWorkforce = _buildingData.TotalWorkforce;
             _isBuilt = true;
         }
         return _isBuilt;

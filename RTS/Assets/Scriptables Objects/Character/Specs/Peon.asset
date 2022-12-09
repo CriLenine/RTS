@@ -12,16 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e308f00de90bb45897f4bb87f43712, type: 3}
   m_Name: Peon
   m_EditorClassIdentifier: 
-
+  _unitName: Peon
+  _views: 01000000
   _maxHealth: 50
   _attackDamage: 2
+  _meleeArmor: 0
+  _rangeArmor: 0
   _attackRange: 1
   _attackSpeed: 0.5
-  _views: 01000000
+  _weapon: {fileID: 21300000, guid: a0a5a4c0833176e4195e90ca217a9965, type: 3}
   _workPower: 1
   _buildable: 00000000
-  _unitName: Peon
-  _meleeArmor: 10
-  _rangeArmor: 10
-  _weapon: {fileID: 21300000, guid: a0a5a4c0833176e4195e90ca217a9965, type: 3}
-  _nMaxCarriedResources: 3
+  _nMaxCarriedResources: 0

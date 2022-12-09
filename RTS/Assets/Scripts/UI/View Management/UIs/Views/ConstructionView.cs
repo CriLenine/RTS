@@ -7,7 +7,7 @@ public class ConstructionView : View
     [SerializeField] private ItemUI _buildingUI;
     [SerializeField] private Transform _buildingsParent;
 
-    private Dictionary<Building.Type, ItemUI> _buildingsUi;
+    private Dictionary<SpawnableDataBuilding, ItemUI> _buildingsUi;
     private CharaUI _manager;
     public override void Initialize<T>(T parentManager) 
     {
@@ -23,7 +23,7 @@ public class ConstructionView : View
 
             bUI.gameObject.SetActive(false);
 
-            _buildingsUi.Add(building.Type,bUI);
+            _buildingsUi.Add(building,bUI);
         }
     }
 
@@ -33,7 +33,7 @@ public class ConstructionView : View
 
         foreach (var buildingUi in _buildingsUi)
         {
-            if (data.Buildable.Contains(buildingUi.Key))
+            if (data.Buildable.Contains(buildingUi.Key.Type))
                 buildingUi.Value.gameObject.SetActive(true);
         }
 

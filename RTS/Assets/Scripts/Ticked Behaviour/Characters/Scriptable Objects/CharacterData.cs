@@ -11,6 +11,11 @@ public abstract class CharacterData : ScriptableObject
     private string _unitName;
     public string UnitName => _unitName;
 
+    [SerializeField]
+    private UtilsView[] _views;
+
+    public UtilsView[] Views => _views;
+
     [Space]
     [Space]
 

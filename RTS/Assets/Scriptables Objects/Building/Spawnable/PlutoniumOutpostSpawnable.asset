@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _buildingBlueprint: {fileID: -6925009843122130497, guid: ca22e2da0cd8ae547919a780683ba60e, type: 3}
-  _building: {fileID: 1231768139523129188, guid: 149f2697ce2b08340ae2edec3f176813, type: 3}
+  _building: {fileID: 8121990741871843947, guid: c4e204bbf7355c44b9462e0f30197819, type: 3}
   _outline: 1
   _neededPlayerLevel: 0
   _cost: []
