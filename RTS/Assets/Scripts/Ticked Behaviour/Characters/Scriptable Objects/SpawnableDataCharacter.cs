@@ -15,7 +15,7 @@ public class SpawnableDataCharacter : ScriptableObject
     private int _neededBuildingLevel;
 
     [SerializeField]
-    private GameManager.RessourceCost[] _cost;
+    private Resource.Amount[] _cost;
 
     [Header("UI")]
     [SerializeField]

@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Camp : Ressource
+public class Camp : Resource
 {
     [SerializeField]
     private List<CampEntity> _entities;
 
     public void AddEntity(CampEntity entity) => _entities.Add(entity);
 
-    public override void Clear() => _entities?.Clear();
+    public new void Clear() => _entities?.Clear();
 
     /// <summary>
     /// Called when an entity is killed.
@@ -37,8 +37,8 @@ public class Camp : Ressource
         return _entities[index];
     }
 
-    public override Vector2Int GetTileToHarvest(Vector2Int coords)
+    public override void HarvestedTile(Vector2Int coords)
     {
-        return coords;
+        throw new NotImplementedException();
     }
 }

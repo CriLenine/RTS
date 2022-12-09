@@ -6,14 +6,15 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         Farm,
         Barracks,
-        Ressourcesoutpost
+        PlutoniumOutpost,
+        GoldOutpost
     }
 
     [SerializeField]
     private bool _isBuilt = false;
 
     [SerializeField]
-    private BuildingData _buildingData; //USE ?
+    protected BuildingData _data; //USE ?
 
     [SerializeField]
     private int _currentWorkforce;
@@ -29,10 +30,10 @@ public abstract class Building : TickedBehaviour, IDamageable
     //[SerializeField]
     //private List<Option> _options;
 
-    public BuildingData Data => _buildingData;
+    public BuildingData Data => _data;
 
-    protected int MaxHealth => _buildingData.MaxHealth;
-    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
+    protected int MaxHealth => _data.MaxHealth;
+    public float CurrentWorkforceRatio => _currentWorkforce / _data.TotalWorkforce;
 
 
     //SpriteManagement
@@ -46,7 +47,7 @@ public abstract class Building : TickedBehaviour, IDamageable
         _buildingRenderer = GetComponent<SpriteRenderer>();
 
         _currentHealth = MaxHealth;
-        _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
+        _ratioStep = _data.TotalWorkforce / (_data.ConstructionSteps.Length);
         _actualSpriteIndex = 0;
     }
 
@@ -62,14 +63,14 @@ public abstract class Building : TickedBehaviour, IDamageable
         //Change sprite 
         int spriteIndex=0;
         
-        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
+        for (int i = 0; i < _data.ConstructionSteps.Length; i++)
         {
             spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
         }
 
         if(spriteIndex != _actualSpriteIndex)
         {
-            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
+            _buildingRenderer.sprite = _data.ConstructionSteps[spriteIndex];
             _actualSpriteIndex = spriteIndex;
         }
 
@@ -77,7 +78,7 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (CurrentWorkforceRatio >= 1f)
         {
-            _currentWorkforce = _buildingData.TotalWorkforce;
+            _currentWorkforce = _data.TotalWorkforce;
             _isBuilt = true;
         }
         return _isBuilt;

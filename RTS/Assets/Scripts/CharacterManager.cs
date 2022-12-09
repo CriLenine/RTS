@@ -68,7 +68,7 @@ public class CharacterManager : MonoBehaviour
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
         if (characters.Count == 1 &&
-            (GameManager.RessourcesManager.HasRock(rallyPointCoords) || GameManager.RessourcesManager.HasTree(rallyPointCoords)))
+            (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
         {
             NetworkManager.Input(TickInput.Harvest(rallyPointCoords, characters[0].ID));
             return;
