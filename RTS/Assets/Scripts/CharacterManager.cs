@@ -234,7 +234,7 @@ public class CharacterManager : MonoBehaviour
             }
         }
 
-        _onCharacterSelectionUpdated();
+        _onCharacterSelectionUpdated?.Invoke();
     }
 
     #endregion
@@ -253,7 +253,7 @@ public class CharacterManager : MonoBehaviour
     {
         if (entitie is Character character)
         {
-            if (_instance._selectedCharacters.Contains(character))
+            if (SelectedCharacters.Contains(character))
                 RemoveCharacterFromSelection(character);
         }
         else if (entitie is Building building && _instance._buildingSelected)
