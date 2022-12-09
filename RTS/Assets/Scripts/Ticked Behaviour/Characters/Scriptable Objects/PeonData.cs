@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Peon", menuName = "Characters/Peon", order = 1)]
@@ -13,7 +14,12 @@ public class PeonData : CharacterData
     private int _workPower;
 
     [SerializeField]
+    private List<Building.Type> _buildable;
+
+    [SerializeField]
     private int _nMaxCarriedResources;
+
+    public List<Building.Type> Buildable => _buildable;
 
     public int WorkPower => _workPower;
 

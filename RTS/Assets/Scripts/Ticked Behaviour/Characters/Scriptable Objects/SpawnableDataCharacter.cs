@@ -15,6 +15,10 @@ public class SpawnableDataCharacter : ScriptableObject
     private int _neededBuildingLevel;
 
     [SerializeField]
+    [Min(1)]
+    private float _initialSpawningTime;
+
+    [SerializeField]
     private Resource.Amount[] _cost;
 
     [Header("UI")]
@@ -23,4 +27,6 @@ public class SpawnableDataCharacter : ScriptableObject
     public Character.Type Type => _type;
     public Character Character => _character;
     public Sprite CharaUiIcon => _charaUiIcon;
+
+    public float InitialSpawningTime => _initialSpawningTime;
 }

@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     private Dictionary<Type,ViewManager> _viewManagers;
 
     private ViewManager _currentViewManager;
+
     public static ViewManager CurrentManager => _instance._currentViewManager;
     protected void Awake()
     {
@@ -57,6 +58,7 @@ public class UIManager : MonoBehaviour
         if (_instance._currentViewManager != null)
         {
             _instance._currentViewManager.HideUI();
+            _instance._currentViewManager = null;
         }
     }
 }

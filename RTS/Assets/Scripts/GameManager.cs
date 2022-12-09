@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine.VFX;
 using UnityEngine;
 using System;
+using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UIElements;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.Windows;
+using TMPro;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -91,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        _simulateWrongHash = Input.GetKey(KeyCode.H);
+        _simulateWrongHash = UnityEngine.Input.GetKey(KeyCode.H);
     }
 
     public static int Tick(TickInput[] inputs)
@@ -101,29 +106,31 @@ public class GameManager : MonoBehaviour
             //test of entity existances
             if(!_instance._entities.Contains(input.ID)) continue;
 
-            List<int> targets = new();
-
-            for (int i = 0; i < input.Targets.Length; i++)
+            if (input.Targets is not null)
             {
-                if (_instance._entities.Contains(input.Targets[i]))
-                    targets.Add(input.Targets[i]);
+                List<int> targets = new();
+
+                for (int i = 0; i < input.Targets.Length; i++)
+                {
+                    if (_instance._entities.Contains(input.Targets[i]))
+                        targets.Add(input.Targets[i]);
+                }
+
+                if (targets.Count == 0) continue;
+
+                input.Targets = targets.ToArray();
             }
-
-            if (targets.Count == 0) continue;
-
-            input.Targets = targets.ToArray();
 
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    CreateCharacter(input.Performer, input.Prefab, input.Position);
+                    CreateCharacter(input.Performer,input.ID, input.Prefab, input.Position);
 
                     break;
 
                 case InputType.Build:
                     MoveCharacters(input.Performer, input.Position, input.Targets);
-                    CreateBuilding(input.Performer, input.Prefab, input.Position, input.Targets);
-
+                    CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
                     break;
 
                 case InputType.Move:
@@ -150,27 +157,7 @@ public class GameManager : MonoBehaviour
                     
                 case InputType.Attack:
                     TickedBehaviour target = _instance._entities[input.ID];
-
-                    if(target is Building building)
-                    {
-                        List<Vector2> positions = TileMapManager.GetRandomFreePosAroundBuilding(building,1);
-                        if (positions.Count == 0)
-                            break;
-                        MoveCharacters(input.Performer,positions[0], input.Targets); // Destination point fixe
-                    }
-                    else
-                        MoveCharacters(input.Performer, target.transform.position, input.Targets, target, true); // Destination point qui bouge
-
-
-                    foreach (int ID in input.Targets)
-                    {
-                        Character attacker = (Character)_instance._entities[ID];
-
-                        if (!attacker)
-                            continue;
-
-                        attacker.AddAction(new Attack(attacker, target));
-                    }
+                    MoveAndAttack(input.Performer, target.transform.position, input.Targets, target);
                     break;
             }
         }
@@ -207,6 +194,30 @@ public class GameManager : MonoBehaviour
 
     #region Create & Destroy TickedBehaviours
 
+    private static Character CreateCharacter(int performer, ISpawner spawner , Character.Type type, Vector2 position)
+    {
+        SpawnableDataCharacter data = PrefabManager.GetCharacterData(type);
+
+        Character character = TickedBehaviour.Create(performer, data.Character);
+
+        _instance._entities.Add(character);
+        _instance._characters.Add(character);
+
+        if (performer == NetworkManager.Me)
+        {
+            _instance._myEntities.Add(character);
+            _instance._myCharacters.Add(character);
+        }
+
+        character.SetPosition(position);
+
+        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
+
+        Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
+        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint).ToArray()));
+
+        return character;
+    }
     private static Character CreateCharacter(int performer, Character.Type type, Vector2 position)
     {
         SpawnableDataCharacter data = PrefabManager.GetCharacterData(type);
@@ -229,12 +240,15 @@ public class GameManager : MonoBehaviour
         return character;
     }
 
-    private static Character CreateCharacter(int performer, int id, Vector2 position)
+    private static Character CreateCharacter(int performer,int spawnerID, int prefabID, Vector2 position)
     {
-        return CreateCharacter(performer, (Character.Type)id, position);
+        if (_instance._entities[spawnerID].TryGetComponent(out ISpawner spawner))
+            return CreateCharacter(performer, spawner, (Character.Type)prefabID, position);
+        else
+            throw new Exception("Not a spawner trying to spawn");
     }
 
-    private static void MoveCharacters(int performer, Vector2 position, int[] targets, TickedBehaviour target = null,bool isAttacking = false)
+    private static void MoveCharacters(int performer, Vector2 position, int[] targets) ///TO REMOVE
     {
         List<Character> characters = new List<Character>();
 
@@ -253,7 +267,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray(),target,isAttacking));
+                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
                 }
 
             }
@@ -261,7 +275,47 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Path not found!");
         }
     }
+    private static Dictionary<List<Character>,List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector2 position, int[] targets)
+    {
+        Dictionary<List<Character>, List<Vector2>> output = new();
+        List<Character> characters = new();
 
+        for (int i = 0; i < targets.Length; i++)
+            characters.Add((Character)_instance._entities[targets[i]]);
+
+        List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
+
+        foreach (List<Character> group in groups)
+        {
+            output.Add(group, LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position)));
+        }
+        return output;
+    }
+
+    private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
+    {
+        if (target is Building building)
+            position = TileMapManager.GetClosestPosAroundBuilding(building, _instance._entities[attackers[0]] as Character);
+
+        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer,position,attackers);
+        foreach (List<Character> group in groupsAndPathfindings.Keys)
+        {
+            if (groupsAndPathfindings[group] != null)
+            {
+                groupsAndPathfindings[group][^1] = position;
+
+                for (int i = 0; i < group.Count; ++i)
+                {
+                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group].ToArray(),target));
+                    group[i].AddAction(new Attack(group[i],target,position));
+                }
+
+            }
+            else
+                Debug.Log("Path not found!");
+        }
+
+    }
     private static Building CreateBuilding(int performer, Building.Type type, Vector2 position, int[] targets)
     {
         SpawnableDataBuilding data = PrefabManager.GetBuildingData(type);

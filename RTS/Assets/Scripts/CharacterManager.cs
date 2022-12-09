@@ -12,7 +12,7 @@ public class CharacterManager : MonoBehaviour
     private Mouse _mouse;
 
     private SelectionManager _selectionManager;
-    public LocomotionManager _locomotionManager;
+    private LocomotionManager _locomotionManager;
 
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;

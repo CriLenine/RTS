@@ -194,6 +194,7 @@ public partial class NetworkManager : MonoBehaviour
 
     public static float TickPeriod => _instance._tickPeriod;
 
+    public static float NormalTickPeriod => BaseTickPeriod;
     public static int Me => _instance._id;
     public static int RoomSize => _instance._roomSize;
     public static int CurrentTick => _instance._tick;
@@ -312,7 +313,7 @@ public partial class NetworkManager : MonoBehaviour
         switch (input.Type)
         {
             case InputType.Spawn:
-                message.Add(input.Prefab, input.Position.x, input.Position.y);
+                message.Add(input.ID,input.Prefab, input.Position.x, input.Position.y);
 
                 break;
 

@@ -11,6 +11,11 @@ public abstract class CharacterData : ScriptableObject
     private string _unitName;
     public string UnitName => _unitName;
 
+    [SerializeField]
+    private UtilsView[] _views;
+
+    public UtilsView[] Views => _views;
+
     [Space]
     [Space]
 
@@ -29,9 +34,14 @@ public abstract class CharacterData : ScriptableObject
     public int RangeArmor => _rangeArmor;
 
     [SerializeField]
-    [Min(0)]
-    private float _autoAttackDistance;
-    public float AutoAttackDistance => _autoAttackDistance;
+    [Min(0.1f)]
+    private float _attackRange;
+    public float AttackRange => _attackRange;
+
+    [SerializeField]
+    [Min(0.1f)]
+    private float _attackSpeed;
+    public float AttackSpeed => _attackSpeed;
 
     [Space]
     [Space]

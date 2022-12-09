@@ -217,32 +217,20 @@ public class TileMapManager : MonoBehaviour
         UpdateTilesState(_buildingMin, _buildingMax, TileState.Free);
     }
 
-    public static List<Vector2> GetRandomFreePosAroundBuilding(Building building,int number)
+    public static Vector2 GetClosestPosAroundBuilding(Building building,Character character)
     {
         Vector2Int pos = WorldToTilemapCoords(building.transform.position);
-        SpawnableDataBuilding data = PrefabManager.GetBuildingData(building.BuildingType);
-        int outlineCount = data.Outline;
+        Vector2Int direction = (character.Coords - pos);
+
         Dictionary<Vector2Int, LogicalTile> tiles = _instance._tiles;
 
-        Vector2Int _buildingMin = new(pos.x - outlineCount, pos.y - outlineCount);
-        Vector2Int _buildingMax = new(pos.x + outlineCount, pos.y + outlineCount);
+        while(!tiles[pos].IsFree(building.Performer))
+        {
+            pos.x += direction.x ==0 ? 0 : (int) Mathf.Sign(direction.x);
+            pos.y += direction.y == 0 ? 0 : (int) Mathf.Sign(direction.y);
+        }
 
-        List<Vector2> positions = new();
-
-        for (int x = _buildingMin.x - 1; x <= _buildingMax.x+1; ++x)
-            for (int y = _buildingMin.y - 1; y <= _buildingMax.y+1; ++y)
-            {
-                Vector2Int posTotest = new(x, y);
-                if (!tiles.ContainsKey(posTotest)) continue;
-
-                if (tiles[posTotest].IsFree(building.Performer))
-                    positions.Add(TilemapCoordsToWorld(posTotest));
-
-                if (positions.Count == number)
-                    return positions;
-            }
-
-        return positions;
+        return TilemapCoordsToWorld(pos);
     }
 
     #endregion

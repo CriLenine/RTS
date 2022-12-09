@@ -14,7 +14,7 @@ public abstract class Building : TickedBehaviour, IDamageable
     private bool _isBuilt = false;
 
     [SerializeField]
-    protected BuildingData _data; //USE ?
+    protected BuildingData _buildingData;
 
     [SerializeField]
     private int _currentWorkforce;
@@ -22,19 +22,24 @@ public abstract class Building : TickedBehaviour, IDamageable
     [SerializeField]
     private int _currentHealth;
 
+    [SerializeField]
+    protected HealthBar HealthBar;
+
     private Type _type;
     public Type BuildingType => _type;
 
-    /*Ici on aura les options disponibles en cliquant sur un bâtiment
-     * (ex créer une certaine unité dans une caserne)*/
+    /*Ici on aura les options disponibles en cliquant sur un bï¿½timent
+     * (ex crï¿½er une certaine unitï¿½ dans une caserne)*/
     //[SerializeField]
     //private List<Option> _options;
 
-    public BuildingData Data => _data;
+    public BuildingData Data => _buildingData;
 
-    protected int MaxHealth => _data.MaxHealth;
-    public float CurrentWorkforceRatio => _currentWorkforce / _data.TotalWorkforce;
+    protected int MaxHealth => _buildingData.MaxHealth;
+    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
 
+    private LineRenderer _pathRenderer;
+    public LineRenderer PathRenderer => _pathRenderer;
 
     //SpriteManagement
     private SpriteRenderer _buildingRenderer;
@@ -45,12 +50,34 @@ public abstract class Building : TickedBehaviour, IDamageable
     private void Awake()
     {
         _buildingRenderer = GetComponent<SpriteRenderer>();
+        _pathRenderer = GetComponentInChildren<LineRenderer>(true);
 
         _currentHealth = MaxHealth;
-        _ratioStep = _data.TotalWorkforce / (_data.ConstructionSteps.Length);
+        HealthBar.SetMaxHealth(MaxHealth);
+        _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
         _actualSpriteIndex = 0;
     }
 
+    private void Update()
+    {
+        if (UIManager.CurrentManager is BuildingUI buildingUI)
+        {
+            if (!buildingUI.Building.TryGetComponent(out ISpawner spawner)) return;
+
+            Vector2 rallypoint = spawner.GetRallyPoint();
+            _pathRenderer.SetPosition(0, transform.position);
+            _pathRenderer.SetPosition(1, rallypoint);
+
+            _pathRenderer.transform.position = rallypoint;
+
+            _pathRenderer.startColor = Color.cyan;
+            _pathRenderer.endColor = Color.cyan;
+
+            _pathRenderer.gameObject.SetActive(true);
+        }
+        else
+            _pathRenderer.gameObject.SetActive(false);
+    }
     /// <returns><see langword="true"/> if it finishes the building's construction,
     /// <see langword="false"/> otherwise </returns>
     public bool AddWorkforce(int amount)
@@ -63,14 +90,14 @@ public abstract class Building : TickedBehaviour, IDamageable
         //Change sprite 
         int spriteIndex=0;
         
-        for (int i = 0; i < _data.ConstructionSteps.Length; i++)
+        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
         {
             spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
         }
 
         if(spriteIndex != _actualSpriteIndex)
         {
-            _buildingRenderer.sprite = _data.ConstructionSteps[spriteIndex];
+            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
             _actualSpriteIndex = spriteIndex;
         }
 
@@ -78,7 +105,7 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (CurrentWorkforceRatio >= 1f)
         {
-            _currentWorkforce = _data.TotalWorkforce;
+            _currentWorkforce = _buildingData.TotalWorkforce;
             _isBuilt = true;
         }
         return _isBuilt;
@@ -86,12 +113,25 @@ public abstract class Building : TickedBehaviour, IDamageable
 
     public bool TakeDamage(int damage)
     {
-        return (_currentHealth -= damage) <= 0;
+        if (_currentHealth == MaxHealth)
+            HealthBar.gameObject.SetActive(true);
+
+        _currentHealth -= damage;
+        HealthBar.SetHealth(_currentHealth);
+        return _currentHealth <= 0;
     }
 
     public void GainHealth(int amount)
     {
-        if ((_currentHealth += amount) > MaxHealth)
+        _currentHealth += amount;
+
+
+        HealthBar.SetHealth(_currentHealth);
+
+        if (_currentHealth >= MaxHealth)
+            HealthBar.gameObject.SetActive(false);
+
+        if (_currentHealth > MaxHealth)
             _currentHealth = MaxHealth;
     }
 

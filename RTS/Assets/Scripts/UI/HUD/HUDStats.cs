@@ -35,7 +35,7 @@ public class HUDStats : HUD
 
         _name.text = character.Data.UnitName;
         _attackDamage.text = $"{data.AttackDamage}";
-        _attackRange.text = $"{data.AutoAttackDistance}";
+        _attackRange.text = $"{data.AttackRange}";
         _meleeArmor.text = $"{data.MeleeArmor}";
         _rangeArmor.text = $"{data.RangeArmor}";
 

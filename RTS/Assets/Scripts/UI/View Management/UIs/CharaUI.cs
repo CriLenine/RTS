@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CharaUI : ViewManager
 {
+    private Character _character;
+    public Character Character => _character;
     public override void Initialize()
     {
         for (int i = 0; i < _views.Length; i++)
@@ -16,10 +18,10 @@ public class CharaUI : ViewManager
 
     public override void ShowUI<T>(T uiOwner)
     {
-        Character chara = uiOwner as Character;
+        _character = uiOwner as Character;
 
-        _title.text = chara.Data.name.ToString();
-        //UtilViews = chara.Data.Views;
+        _title.text = _character.Data.name.ToString();
+        UtilViews = _character.Data.Views;
         base.ShowUI(uiOwner);
     }
 }

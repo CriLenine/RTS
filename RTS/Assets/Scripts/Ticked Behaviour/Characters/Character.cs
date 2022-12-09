@@ -18,10 +18,16 @@ public abstract class Character : TickedBehaviour, IDamageable
     public Type CharaType => _type;
 
     [SerializeField]
+    protected HealthBar HealthBar;
+
+    [SerializeField]
     protected CharacterData _data;
 
     [SerializeField]
     private int _currentHealth;
+
+    [SerializeField]
+    private UtilsView[] _views;
 
     public int CurrentHealth => _currentHealth;
 
@@ -34,6 +40,7 @@ public abstract class Character : TickedBehaviour, IDamageable
     public GameObject SelectionMarker;
 
     private LineRenderer _pathRenderer;
+    private bool _isAgressed = false;
 
     protected virtual void Awake()
     {
@@ -43,6 +50,7 @@ public abstract class Character : TickedBehaviour, IDamageable
     protected virtual void Start()
     {
         _currentHealth = MaxHealth;
+        HealthBar.SetMaxHealth(MaxHealth);
     }
 
     protected virtual void Update()
@@ -72,7 +80,8 @@ public abstract class Character : TickedBehaviour, IDamageable
     public sealed override void Tick()
     {
         if (CurrentAction is null)
-            CheckSurrounding();
+            _isAgressed = _isAgressed && CheckSurrounding();
+
         else if (CurrentAction.Perform())
         {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
@@ -114,10 +123,10 @@ public abstract class Character : TickedBehaviour, IDamageable
         AddAction(action);
     }
 
-    private void CheckSurrounding()
+    private bool CheckSurrounding()
     {
         List<Character> charas = GameManager.Characters.ToList();
-        float attackRange = Data.AutoAttackDistance;
+        float attackRange = Data.AttackRange;
 
         for (int i = 0; i < charas.Count; i++) //On regarde tous les charas du jeux
         {
@@ -126,8 +135,10 @@ public abstract class Character : TickedBehaviour, IDamageable
 
             //Sinon on renvois l'action d'attaque
             SetAction(new Attack(this, chara, false));
-            return;
+            return false;
         }
+
+        return false;
     }
     public void DebugCoordinates()
     {
@@ -146,12 +157,27 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public bool TakeDamage(int damage)
     {
-        return (_currentHealth -= damage) <= 0;
+        if (_currentHealth == MaxHealth)
+            HealthBar.gameObject.SetActive(true);
+
+        _isAgressed = true;
+
+        _currentHealth -= damage;
+        HealthBar.SetHealth(_currentHealth);
+        return _currentHealth <= 0;
     }
 
     public void GainHealth(int amount)
     {
-        if ((_currentHealth += amount) > MaxHealth)
+        _currentHealth += amount;
+
+
+        HealthBar.SetHealth(_currentHealth);
+
+        if (_currentHealth >= MaxHealth)
+            HealthBar.gameObject.SetActive(false);
+
+        if (_currentHealth > MaxHealth)
             _currentHealth = MaxHealth;
     }
 

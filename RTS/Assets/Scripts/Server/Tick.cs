@@ -25,11 +25,12 @@ public partial class NetworkManager
                 {
                     case InputType.Spawn:
                         {
+                            int spawnerID = message.GetInt(i++);
                             int prefab = message.GetInt(i++);
 
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
-                            inputs.Add(TickInput.Spawn(prefab, position, performer));
+                            inputs.Add(TickInput.Spawn(prefab,spawnerID, position, performer));
 
                             break;
                         }

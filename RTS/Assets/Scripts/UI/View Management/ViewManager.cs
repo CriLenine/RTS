@@ -14,6 +14,7 @@ public enum UtilsView
     Default,
     Construction,
     Spawn,
+    SetRallyPoint
 }
 public abstract class ViewManager : MonoBehaviour
 {
@@ -36,6 +37,8 @@ public abstract class ViewManager : MonoBehaviour
     public View[] Views => _views;
 
     private View _currentView=null;
+
+    public View CurrentView => _currentView;
 
     private readonly Stack<View> _history = new();
 
@@ -119,7 +122,5 @@ public abstract class ViewManager : MonoBehaviour
         }
 
         Show<DefaultView>();
-
     }
-
 }

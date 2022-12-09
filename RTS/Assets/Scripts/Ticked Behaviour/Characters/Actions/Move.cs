@@ -18,62 +18,23 @@ public class Move : Action
 
     public Vector2 Position => Positions[Index];
 
-    private float _finalDistanceToDest;
 
-    private TickedBehaviour _target;
-    private Vector2Int _lastPos;
-    private bool _isAttacking;
-    public Move(Character character, Vector2[] positions, TickedBehaviour target=null, bool isAttacking = false) : base(character)
+    public Move(Character character, Vector2[] positions) : base(character)
     {
-        _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance : .2f;
         Positions = new List<Vector2>(positions);
 
-        if(isAttacking)
-        {
-            _target = target;
-            _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
-            _isAttacking = isAttacking;
-        }
     }
 
-    public Move(Character character, Vector2 position, TickedBehaviour target =null, bool isAttacking=false) : base(character)
+    public Move(Character character, Vector2 position) : base(character)
     {
-        _finalDistanceToDest = isAttacking ? character.Data.AutoAttackDistance: .2f;
         Positions = new List<Vector2>();
         Positions.Add(position);
-
-        if (isAttacking)
-        {
-            _target = target;
-            _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
-            _isAttacking = isAttacking;
-        }
     }
 
     protected override bool Update()
     {
         if (CharacterManager.Move(_character, Position))
             ++Index;
-        
-        if(_isAttacking)
-        {
-            if ((Position - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest)
-                return true;
-
-            Vector2Int postToTest = TileMapManager.WorldToTilemapCoords(_target.transform.position);
-            if (postToTest != _lastPos)
-            {
-                if(TileMapManager.LineOfSight(_character.Performer,_character.Coords, postToTest))
-                {
-                    Positions.Clear();
-                    Positions.Add(postToTest);
-                }    
-                else
-                    Positions.Add(postToTest);
-
-                _lastPos = postToTest;
-            }
-        }
 
         return Index == Positions.Count;
     }
