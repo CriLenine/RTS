@@ -1,13 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 [RequireComponent(typeof(SelectionManager))]
 [RequireComponent(typeof(LocomotionManager))]
 public class CharacterManager : MonoBehaviour
 {
     private static CharacterManager _instance;
+
+    #region Variables
 
     private Camera _camera;
     private Mouse _mouse;
@@ -18,20 +22,34 @@ public class CharacterManager : MonoBehaviour
     private CharacterSelection _characterSelectionInputActions;
     private Locomotion _locomotionInputActions;
 
+    //* Character Selection *//
+
     private Character.Type _selectedType = Character.Type.None;
     private HashSet<Character.Type> _selectedTypes = new HashSet<Character.Type>();
 
     private List<Character> _selectedCharacters = new List<Character>();
-    private List<Character> _allSelectedCharacters = new List<Character>();
+    private HashSet<Character> _allSelectedCharacters = new HashSet<Character>();
 
     public static Character.Type SelectedType => _instance._selectedType;
     public static HashSet<Character.Type> SelectedTypes => _instance._selectedTypes;
 
     public static List<Character> SelectedCharacters => _instance._selectedCharacters;
 
+    public delegate void OnCharacterSelectionUpdatedHandler();
+
+    private event OnCharacterSelectionUpdatedHandler _onCharacterSelectionUpdated;
+
+    public static event OnCharacterSelectionUpdatedHandler OnCharacterSelectionUpdated
+    {
+        add => _instance._onCharacterSelectionUpdated += value;
+        remove => _instance._onCharacterSelectionUpdated -= value;
+    }
+
+    //* Building Selection *//
+
     private Building _buildingSelected = null;
 
-    private bool _debug = false;
+    #endregion
 
     private void Awake()
     {
@@ -73,6 +91,8 @@ public class CharacterManager : MonoBehaviour
 
     #region Debug
 
+    private bool _debug = true;
+
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || !Application.isEditor)
@@ -92,9 +112,7 @@ public class CharacterManager : MonoBehaviour
 
         const int lineHeight = 15;
 
-        List<Character.Type> types = GetSelectedCharacterTypes();
-
-        int lineCount = types.Count + 1;
+        int lineCount = SelectedTypes.Count + 1;
 
         if (lineCount < 1)
             return;
@@ -117,7 +135,7 @@ public class CharacterManager : MonoBehaviour
 
         AddButton(Character.Type.None);
 
-        foreach (Character.Type type in types)
+        foreach (Character.Type type in SelectedTypes)
             AddButton(type);
 
         GUILayout.EndArea();
@@ -165,16 +183,13 @@ public class CharacterManager : MonoBehaviour
         UIManager.ShowTickedBehaviourUI(owner);
     }
 
+    #region Character Selection
+
     public static void SpecializesSelection(Character.Type type)
     {
         _instance._selectedType = type;
 
         _instance.UpdateCharacterSelection();
-    }
-
-    public static List<Character.Type> GetSelectedCharacterTypes()
-    {
-        return _instance._allSelectedCharacters.Select(character => character.CharaType).Distinct().ToList();
     }
 
     public static void AddCharacterToSelection(Character character)
@@ -186,7 +201,8 @@ public class CharacterManager : MonoBehaviour
 
     public static void AddCharactersToSelection(List<Character> characters)
     {
-        _instance._selectedCharacters.AddRange(characters);
+        for (int i = 0; i < characters.Count; ++i)
+            _instance._allSelectedCharacters.Add(characters[i]);
 
         SpecializesSelection(Character.Type.None);
     }
@@ -217,7 +233,11 @@ public class CharacterManager : MonoBehaviour
                 character.SelectionMarker.SetActive(true);
             }
         }
+
+        _onCharacterSelectionUpdated();
     }
+
+    #endregion
 
     public static void AddBuildingToSelected(Building building)
     {
