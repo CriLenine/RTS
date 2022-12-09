@@ -460,6 +460,8 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.75f, -0.75f));
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, -0.75f));
 
+            CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, -2f), true);
+            //CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f), true);
             CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
 
             if (i == NetworkManager.Me)

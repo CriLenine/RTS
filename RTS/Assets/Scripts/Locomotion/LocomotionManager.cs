@@ -103,18 +103,18 @@ public class LocomotionManager : MonoBehaviour
         Vector2 characterPos = (Vector2)character.transform.position;
 
         // Récupérer voisins KDTree
-
-        //neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
+        GizmosManager.Clear();
+        neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
 
         List<Vector2> trajectoryAdjustments = new();
 
-        //foreach (int ID in neighborsID)
-        foreach (Character neighbor in GameManager.Characters)
+        foreach (int ID in neighborsID)
+        //foreach (Character neighbor in GameManager.Characters)
         {
+            Character neighbor = (Character)GameManager.Entities[ID];
+
             if (neighbor == character)
                 continue;
-
-            //Character neighbor = (Character)GameManager.Entities[ID];
 
             Vector2 deltaPos = (Vector2)neighbor.transform.position - characterPos;
 
