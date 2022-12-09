@@ -10,7 +10,6 @@ public class Peon : Character
     private PeonData _specificData;
 
     public new PeonData Data => _specificData;
-
     public override bool Idle => _workedOnBuilding == null && _harvestedResource == null;
 
     public Resource.Amount CarriedResource;

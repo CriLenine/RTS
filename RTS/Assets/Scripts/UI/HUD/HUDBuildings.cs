@@ -1,0 +1,4 @@
+public class HUDBuildings : HUD
+{
+    
+}

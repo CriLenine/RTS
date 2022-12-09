@@ -20,7 +20,7 @@ public abstract class Resource : MonoBehaviour
             _value = value;
         }
 
-        [SerializeField]
+    [SerializeField]
         private ResourceType _type;
 
         [SerializeField]
