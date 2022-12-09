@@ -17,44 +17,46 @@ public class Harvest : Action
     {
         if (--_duration < 0f)
         {
-            Vector2Int? newNullableCoords = _resource.GetNext(_coords);
-            if (newNullableCoords == null)
-            {
-                Debug.Log("No available tile found to continue harvest.");
-                return true;
-            }
-
-            Building building = GetNearestResourceStorer(_resource.Data.Type);
-            if (building == null)
-            {
-                Debug.Log("No suitable resource storer found");
-                return true;
-            }
-
-            Vector2Int newCoords = (Vector2Int)newNullableCoords;
-
-            Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(_resource.GetHarvestingPosition(newCoords, _character.Coords));
-
-            Debug.Log(harvestingPosition);
             Peon peon = _character as Peon;
 
-            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type)
+            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
             {
                 peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
             }
 
             peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
 
+            Vector2Int? newInputCoords = _resource.GetNext(_coords);
+            if (newInputCoords == null)
+            {
+                Debug.Log("No available tile found to continue harvest.");
+                return true;
+            }
+
+            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords);
+
+            Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(nextCoordsToGo);
+            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo);
+
             Debug.Log("Harvested");
 
             Action nextAction;
             if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
+            {
+                Building building = GetNearestResourceStorer(_resource.Data.Type);
+                if (building == null)
+                {
+                    Debug.Log("No suitable resource storer found");
+                    return true;
+                }
+
                 nextAction = new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building);
+            }
             else
                 nextAction = new Move(_character, harvestingPosition);
             Debug.Log(nextAction);
             AddAction(nextAction);
-            AddAction(new Harvest(_character, newCoords, _resource));
+            AddAction(new Harvest(_character, nextCoordsToHarvest, _resource));
 
             return true;
         }

@@ -7,6 +7,7 @@ public class Forest : Resource
     public override void HarvestedTile(Vector2Int coords)
     {
         GameManager.ResourcesManager.RemoveTree(coords);
+        TileMapManager.GetLogicalTile(coords).State = TileState.Free;
         CurrentAmount = CurrentAmount.RemoveQuantity(1);
     }
 }

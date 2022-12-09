@@ -80,8 +80,8 @@ public abstract class Resource : MonoBehaviour
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         foreach (Vector2Int harvestableTile in GetHarvestableTiles(lastHarvested))
         {
-            /*if (TileMapManager.FindPath(NetworkManager.Me, lastTree, tileCoords).Count > 0)*/
-            availableTiles.Add(harvestableTile);
+            /*if (TileMapManager.FindPath(NetworkManager.Me, lastHarvested, harvestableTile).Count > 0)*/
+                availableTiles.Add(harvestableTile);
         }
         //If we found at least one candidate
         if (availableTiles.Count > 0)
@@ -99,12 +99,19 @@ public abstract class Resource : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Get a tile from this resource that can be harvested directly next to <paramref name="coords"/>.
+    /// </summary>
+    /// <param name="coords"></param>
+    /// <returns>The harvestable coords.</returns>
     public Vector2Int GetTileToHarvest(Vector2Int coords)
     {
-        for (int i = -1; i < 2; ++i)
+        for (int i = -1; i <= 1; ++i)
         {
-            for (int j = -1; j < 2; ++j)
+            for (int j = -1; j <= 1; ++j)
             {
+                if (i == 0 && j == 0)
+                    continue;
                 Vector2Int tileCoords = coords + new Vector2Int(i, j);
                 if (_items.TryGetValue(tileCoords, out int nHarvested))
                     if (nHarvested < Data.NMaxHarvestPerTile)
@@ -114,7 +121,11 @@ public abstract class Resource : MonoBehaviour
         Debug.LogError("No tile found to harvest");
         return coords;
     }
-
+    /// <summary>
+    /// Get all the tiles in this resource in a small radius around <paramref name="coords"/>.
+    /// </summary>
+    /// <param name="coords"></param>
+    /// <returns>A <see cref="List{Vector2Int}"/> containing the appropriate coords.</returns>
     public List<Vector2Int> GetHarvestableTiles(Vector2Int coords)
     {
         List<Vector2Int> harvestableTiles = new List<Vector2Int>();
@@ -152,6 +163,7 @@ public abstract class Resource : MonoBehaviour
                         availableTiles.Add(tilePosition);
                 }
             }
+
             //If we found at least one candidate
             if (availableTiles.Count > 0)
             {
