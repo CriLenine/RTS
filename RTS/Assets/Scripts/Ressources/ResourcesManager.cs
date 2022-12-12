@@ -13,8 +13,6 @@ public class ResourcesManager : MonoBehaviour
     private Aggregate[] _aggregates;
     private Camp[] _camps;
 
-    public GameObject prefab;
-    public Forest forest;
     private void Start()
     {
         Bake();

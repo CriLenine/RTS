@@ -4,7 +4,12 @@ using System;
 
 public class Forest : Resource
 {
-    public override void HarvestedTile(Vector2Int coords)
+    public override void Bake()
+    {
+        
+    }
+
+    public override void OnHarvestedTile(Vector2Int coords)
     {
         GameManager.ResourcesManager.RemoveTree(coords);
         TileMapManager.GetLogicalTile(coords).State = TileState.Free;

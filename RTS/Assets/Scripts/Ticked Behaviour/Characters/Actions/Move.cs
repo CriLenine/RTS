@@ -19,20 +19,23 @@ public class Move : Action
     public Vector2 Position => Positions[Index];
 
 
-    public Move(Character character, Vector2[] positions) : base(character)
+    public Move(Character character, List<Vector2> positions) : base(character)
     {
-        Positions = new List<Vector2>(positions);
-
+        Positions = positions;
     }
 
     public Move(Character character, Vector2 position) : base(character)
     {
-        Positions = new List<Vector2>();
-        Positions.Add(position);
+        Positions = new List<Vector2>
+        {
+            position
+        };
     }
 
     protected override bool Update()
     {
+        if (Positions.Count == 0)
+            return true;
         if (CharacterManager.Move(_character, Position))
             ++Index;
 

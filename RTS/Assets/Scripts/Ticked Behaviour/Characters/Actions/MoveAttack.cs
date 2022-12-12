@@ -10,7 +10,7 @@ public class MoveAttack : Move
 
     private TickedBehaviour _target;
     private Vector2Int _lastPos;
-    public MoveAttack(Character character, Vector2[] positions, TickedBehaviour target) : base(character, positions) // Move and attack target
+    public MoveAttack(Character character, List<Vector2> positions, TickedBehaviour target) : base(character, positions)
     {
         _finalDistanceToDest = character.Data.AttackRange;
 

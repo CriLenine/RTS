@@ -1,16 +1,23 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Debug = UnityEngine.Debug;
 
 public class Harvest : Action
 {
-    private Vector2Int _coords;
-    private Resource _resource;
+    private readonly Vector2Int _coords;
+    private readonly Vector2Int _attractionPoint;
+    private readonly Resource _resource;
     private float _duration;
-    public Harvest(Character character, Vector2 unroundedCoords, Resource resource) : base(character)
+    private readonly int _performer;
+    public Harvest(Character character, Vector2Int coords, Vector2Int attractionPoint, Resource resource, int performer) : base(character)
     {
-        _coords = new Vector2Int((int)unroundedCoords.x, (int)unroundedCoords.y);
+        _coords = coords;
+        _attractionPoint = attractionPoint;
         _resource = resource;
         _duration = resource.Data.HarvestingTime / 0.025f;
+        _performer = performer;
     }
 
     protected override bool Update()
@@ -26,19 +33,26 @@ public class Harvest : Action
 
             peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
 
-            Vector2Int? newInputCoords = _resource.GetNext(_coords);
+            Stopwatch sw = Stopwatch.StartNew();
+            Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _performer);
+            sw.Stop();
+            Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
             if (newInputCoords == null)
             {
                 Debug.Log("No available tile found to continue harvest.");
                 return true;
             }
+            sw = Stopwatch.StartNew();
+            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _performer);
+            sw.Stop();
+            Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
 
-            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords);
-
-            Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(nextCoordsToGo);
-            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo);
+            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo, _attractionPoint);
 
             Action nextAction;
+
+            List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo);
+
             if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
             {
                 Building building = GetNearestResourceStorer(_resource.Data.Type);
@@ -47,14 +61,15 @@ public class Harvest : Action
                     Debug.Log("No suitable resource storer found");
                     return true;
                 }
+                List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, TileMapManager.WorldToTilemapCoords(building.transform.position));
 
-                nextAction = new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building);
+                nextAction = new MoveHarvest(_character, wayPointsToDeposit, nextCoordsToGo, (IResourceStorer)building, _performer);
             }
             else
-                nextAction = new Move(_character, harvestingPosition);
+                nextAction = new Move(_character, wayPointsToGo);
 
             AddAction(nextAction);
-            AddAction(new Harvest(_character, nextCoordsToHarvest, _resource));
+            AddAction(new Harvest(_character, nextCoordsToHarvest, _attractionPoint, _resource, _performer));
 
             return true;
         }

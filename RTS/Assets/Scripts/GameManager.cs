@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     public static ResourcesManager ResourcesManager => _instance._resourcesManager;
 
+    public GameObject prefab;
+
     #region Init & Variables
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
@@ -161,9 +163,11 @@ public class GameManager : MonoBehaviour
                     {
                         resource = _instance._resourcesManager.GetNearestAggregate(inputCoords);
                     }
-                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords);
-                    harvester.SetAction(new Move(harvester, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
-                    harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords), resource));
+                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, input.Performer);
+                    Debug.Log(TileMapManager.TilemapCoordsToWorld(harvestingCoords));
+                    Spawn(harvestingCoords);
+                    MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), input.Targets);
+                    harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
                     break;
                     
                 case InputType.Attack:
@@ -260,7 +264,8 @@ public class GameManager : MonoBehaviour
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
 
         Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
-        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint).ToArray()));
+        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint)));
+
     }
 
     private static void CreateCharacter(int performer, Character.Type type, Vector2 position)
@@ -309,7 +314,7 @@ public class GameManager : MonoBehaviour
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
+                    group[i].SetAction(new Move(group[i], wayPoints));
             }
             else
                 Debug.Log("Path not found!");
@@ -347,7 +352,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group].ToArray(),target));
+                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group],target));
                     group[i].AddAction(new Attack(group[i],target,position));
                 }
             }
@@ -517,6 +522,11 @@ public class GameManager : MonoBehaviour
         Gizmos.color = Color.red;
 
         Gizmos.DrawLine(TileMapManager.TilemapCoordsToWorld(PStart), TileMapManager.TilemapCoordsToWorld(PEnd));*/
+    }
+
+    public static void Spawn(Vector2Int coords)
+    {
+        Instantiate(_instance.prefab, TileMapManager.TilemapCoordsToWorld(coords), Quaternion.identity);
     }
 
     #endregion

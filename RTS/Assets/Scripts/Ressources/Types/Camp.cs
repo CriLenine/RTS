@@ -10,6 +10,11 @@ public class Camp : Resource
 
     public void AddEntity(CampEntity entity) => _entities.Add(entity);
 
+    public override void Bake()
+    {
+        throw new NotImplementedException();
+    }
+
     public new void Clear() => _entities?.Clear();
 
     /// <summary>
@@ -37,7 +42,7 @@ public class Camp : Resource
         return _entities[index];
     }
 
-    public override void HarvestedTile(Vector2Int coords)
+    public override void OnHarvestedTile(Vector2Int coords)
     {
         throw new NotImplementedException();
     }
