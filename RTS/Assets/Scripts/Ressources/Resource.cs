@@ -77,7 +77,7 @@ public abstract class Resource : MonoBehaviour
     /// Called when a tile is harvested.
     /// </summary>
     /// <returns>The position of the next tile to harvest, or <see langword="null"/> if no available tile has been found.</returns>
-    public Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
+    public virtual Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
     {
         OnHarvestedTile(lastHarvested);
 
@@ -106,7 +106,7 @@ public abstract class Resource : MonoBehaviour
     /// <param name="coords">The coords around which search a harvestable tile</param>
     /// <param name="attractionPoint">The point used to orient the choice</param>
     /// <returns>The harvestable coordinate which is closest to <paramref name="attractionPoint"/>.</returns>
-    public Vector2Int GetTileToHarvest(Vector2Int coords, Vector2Int attractionPoint)
+    public virtual Vector2Int GetTileToHarvest(Vector2Int coords, Vector2Int attractionPoint)
     {
         List<Vector2Int> dirs = new List<Vector2Int>
         {
@@ -156,7 +156,7 @@ public abstract class Resource : MonoBehaviour
     ///<summary>Called when a new resource tile is selected to be harvested.</summary>
     /// <returns>The destination for the worker to harvest the resource at <paramref name="resourceCoords"/>.
     /// If no suitable tile is found, returns <paramref name="resourceCoords"/>.</returns>
-    public Vector2Int GetHarvestingPosition(Vector2Int resourceCoords, int performer)
+    public virtual Vector2Int GetHarvestingPosition(Vector2Int resourceCoords, int performer)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         //Check all the outlines around the tree
