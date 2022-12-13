@@ -12,7 +12,7 @@ public class SelectionManager : MonoBehaviour
     private bool _clicking;
 
     [SerializeField]
-    private LayerMask _clickable, _environment;
+    private LayerMask _clickable, _environment, _HUD;
 
     private float _minimumSelectionArea;
 
@@ -61,12 +61,60 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
-    public void InitSelection()
+    public void GiveOrder()
     {
-        if (EventSystem.current.IsPointerOverGameObject() || UIManager.CurrentManager?.CurrentView?.Blocklick == true)
+        if (CharacterManager.SelectedCharacters.Count == 0)
             return;
 
+        Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
+
+        RaycastHit2D hit = Physics2D.Raycast(worldMousePos, Vector2.zero, Mathf.Infinity, _clickable);
+
+        if (hit.collider != null)
+            if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))
+                if (GameManager.MyBuildings.Contains(selectedBuilding) && selectedBuilding.BuildCompletionRatio < 1)
+                {
+                    int[] builderIDs = new int[CharacterManager.SelectedCharacters.Count];
+
+                    for (int i = 0; i < CharacterManager.SelectedCharacters.Count; ++i)
+                        builderIDs[i] = CharacterManager.SelectedCharacters[i].ID;
+
+                    NetworkManager.Input(TickInput.Build(selectedBuilding.ID, builderIDs));
+
+                    return;
+                }
+        
+        Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
+
+        LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
+
+        if (CharacterManager.SelectedCharacters.Count == 1 &&
+            (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
+        {
+            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, CharacterManager.SelectedCharacters[0].ID));
+            return;
+        }
+
+        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
+            return;
+
+        int[] IDs = new int[CharacterManager.SelectedCharacters.Count];
+
+        for (int i = 0; i < CharacterManager.SelectedCharacters.Count; ++i)
+            IDs[i] = CharacterManager.SelectedCharacters[i].ID;
+
+        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
+    }
+
+    public void InitSelection()
+    {
         _startpos = _mouse.position.ReadValue();
+
+        RaycastHit2D hit = Physics2D.Raycast(_startpos, Vector2.zero, Mathf.Infinity, _HUD);
+
+        if (hit.collider != null)
+            return;
+        
         _clicking = true;
         _selectionBox = new Rect();
     }
@@ -83,7 +131,6 @@ public class SelectionManager : MonoBehaviour
 
             if (hit.collider != null) // if we hit a clickable object
             {
-
                 if (hit.collider.gameObject.TryGetComponent(out Character selectedCharacter)) // Collider = character
                 {
                     if (GameManager.MyEntities.Contains(selectedCharacter)) //Test if I is character owner
@@ -91,8 +138,6 @@ public class SelectionManager : MonoBehaviour
                         if (!_shifting) // Normal click
                         {
                             CharacterManager.DeselectAll();
-
-
                             CharacterManager.AddCharacterToSelection(selectedCharacter);
                             selectedCharacter.SelectionMarker.SetActive(true);
 
@@ -116,10 +161,10 @@ public class SelectionManager : MonoBehaviour
                 }
                 else if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
                 {
-                    if (GameManager.MyEntities.Contains(selectedBuilding)) //Test if building owner
+                    if (GameManager.MyEntities.Contains(selectedBuilding) && CharacterManager.SelectedBuilding != selectedBuilding) //Test if building owner
                     {
                         CharacterManager.DeselectAll();
-                        CharacterManager.AddBuildingToSelected(selectedBuilding);
+                        CharacterManager.SetSelectedBuilding(selectedBuilding);
                     }
                     else if (CharacterManager.SelectedCharacters.Count > 0)// EnnemyBuilding => ATTACK 
                     {
@@ -153,7 +198,7 @@ public class SelectionManager : MonoBehaviour
 
         _clicking = false;
 
-        HUDManager.UpdateHUD(CharacterManager.SelectedCharacters);
+        HUDManager.UpdateHUD();
     }
 
     /// <summary>

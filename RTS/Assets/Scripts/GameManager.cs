@@ -52,6 +52,13 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
 
+    [SerializeField]
+    private List<Sprite> _resourcesSprites;
+    public static List<Sprite> ResourcesSprites => _instance._resourcesSprites;
+
+    private int _housing;
+    public static int Housing => _instance._housing;
+
     private void Awake()
     {
         _instance = this;
@@ -125,9 +132,15 @@ public class GameManager : MonoBehaviour
 
                     break;
 
-                case InputType.Build:
+                case InputType.NewBuild:
                     MoveCharacters(input.Performer, input.Position, input.Targets);
-                    CreateBuilding(input.Performer, input.ID, input.Position, input.Targets);
+                    int newBuildingID = CreateBuilding(input.Performer, (Building.Type)input.Prefab, input.Position);
+                    AssignBuild(newBuildingID, input.Targets);
+                    break;
+
+                case InputType.Build:
+                    MoveCharacters(input.Performer, Buildings[input.ID].gameObject.transform.position, input.Targets);
+                    AssignBuild(input.ID, input.Targets);
                     break;
 
                 case InputType.Move:
@@ -221,7 +234,7 @@ public class GameManager : MonoBehaviour
 
     #region Create & Destroy TickedBehaviours
 
-    private static Character CreateCharacter(int performer, ISpawner spawner , Character.Type type, Vector2 position)
+    private static void CreateCharacter(int performer, ISpawner spawner , Character.Type type, Vector2 position)
     {
         CharacterData data = PrefabManager.GetCharacterData(type);
 
@@ -242,10 +255,9 @@ public class GameManager : MonoBehaviour
 
         Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
         character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint).ToArray()));
-
-        return character;
     }
-    private static Character CreateCharacter(int performer, Character.Type type, Vector2 position)
+
+    private static void CreateCharacter(int performer, Character.Type type, Vector2 position)
     {
         CharacterData data = PrefabManager.GetCharacterData(type);
 
@@ -263,14 +275,12 @@ public class GameManager : MonoBehaviour
         character.SetPosition(position);
 
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
-
-        return character;
     }
 
-    private static Character CreateCharacter(int performer,int spawnerID, int prefabID, Vector2 position)
+    private static void CreateCharacter(int performer,int spawnerID, int prefabID, Vector2 position)
     {
         if (_instance._entities[spawnerID].TryGetComponent(out ISpawner spawner))
-            return CreateCharacter(performer, spawner, (Character.Type)prefabID, position);
+            CreateCharacter(performer, spawner, (Character.Type)prefabID, position);
         else
             throw new Exception("Not a spawner trying to spawn");
     }
@@ -288,7 +298,7 @@ public class GameManager : MonoBehaviour
         {
             List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position));
 
-            if (wayPoints is not null)
+            if (wayPoints != null && wayPoints.Count != 0)
             {
                 wayPoints[^1] = position;
 
@@ -340,7 +350,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
-    private static Building CreateBuilding(int performer, Building.Type type, Vector2 position, int[] targets)
+    private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = PrefabManager.GetBuildingData(type);
 
@@ -355,8 +365,18 @@ public class GameManager : MonoBehaviour
             _instance._myBuildings.Add(building);
         }
 
-        TileMapManager.AddBuilding(data.Outline, position);
+        TileMapManager.AddBuildingBlueprint(data.Outline, position);
 
+        building.SetPosition(position);
+
+        if(autoComplete)
+            building.CompleteBuild(building.Data.RequiredBuildTicks);
+
+        return building.ID;
+    }
+
+    private static void AssignBuild(int buildingID, int[] targets)
+    {
         foreach (int ID in targets)
         {
             Peon builder = (Peon)_instance._entities[ID];
@@ -364,37 +384,8 @@ public class GameManager : MonoBehaviour
             if (!builder)
                 continue;
 
-            builder.AddAction(new Build(builder, building));
+            builder.AddAction(new Build(builder, Buildings[buildingID]));
         }
-
-
-        return building;
-    }
-
-    private static Building CreateBuilding(int performer, Building.Type type, Vector2 position) //CreateBuildingWithoutPeon
-    {
-        BuildingData data = PrefabManager.GetBuildingData(type);
-
-        Building building = TickedBehaviour.Create(performer, data.Building, position);
-
-        _instance._entities.Add(building);
-        _instance._buildings.Add(building);
-
-        if (performer == NetworkManager.Me)
-        {
-            _instance._myEntities.Add(building);
-            _instance._myBuildings.Add(building);
-        }
-
-        TileMapManager.AddBuilding(data.Outline, position);
-
-        building.AddWorkforce(building.Data.TotalWorkforce);
-
-        return building;
-    }
-    private static Building CreateBuilding(int performer, int type, Vector2 position, int[] targets)
-    {
-        return CreateBuilding(performer, (Building.Type)type, position, targets);
     }
 
     public static void DestroyEntity(int id)
@@ -435,18 +426,22 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, 0.5f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.5f, 0.5f));
-            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.5f, -0.5f));
-            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.5f, -0.5f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, 0.75f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.75f, 0.75f));
+            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.75f, -0.75f));
+            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, -0.75f));
 
-            CreateBuilding(i+1, Building.Type.Farm, spawnPoint + new Vector2(0f, -2f));
-            CreateBuilding(i, Building.Type.PlutoniumOutpost, spawnPoint + new Vector2(-4f, -2f));
-            CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f));
+            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
         }
+    }
+
+    public static void UpdateHousing(int delta)
+    {
+        _instance._housing += delta;
+        HUDManager.UpdateHousing();
     }
 
     #region Debug

@@ -15,28 +15,28 @@ public class ConstructionView : View
 
         _buildingsUi = new();
 
-        foreach (var building in PrefabManager.DataBuildings)
-        {
-            var bUI = Instantiate(_buildingUI);
-            bUI.transform.SetParent(_buildingsParent);
-            bUI.InitUI(BuildingBlueprintsManager.SpawnBlueprint, building.BuildingUiIcon, building.name, building.Type);
+        //foreach (var building in PrefabManager.DataBuildings)
+        //{
+        //    var bUI = Instantiate(_buildingUI);
+        //    bUI.transform.SetParent(_buildingsParent);
+        //    //bUI.InitUI(BuildingBlueprintsManager.SpawnBlueprint, building.BuildingUiIcon, building.name, building.Type);
 
-            bUI.gameObject.SetActive(false);
+        //    bUI.gameObject.SetActive(false);
 
-            _buildingsUi.Add(building,bUI);
-        }
+        //    _buildingsUi.Add(building,bUI);
+        //}
     }
 
-    public override void Show()
-    {
-        var data = _manager.Character.Data as PeonData; //AIE AIE AIE
+    //public override void Show()
+    //{
+    //    var data = _manager.Character.Data as PeonData; //AIE AIE AIE
 
-        foreach (var buildingUi in _buildingsUi)
-        {
-            if (data.Buildable.Contains(buildingUi.Key.Type))
-                buildingUi.Value.gameObject.SetActive(true);
-        }
+    //    foreach (var buildingUi in _buildingsUi)
+    //    {
+    //        if (data.Buildable.Contains(buildingUi.Key.Type))
+    //            buildingUi.Value.gameObject.SetActive(true);
+    //    }
 
-        base.Show();
-    }
+    //    base.Show();
+    //}
 }

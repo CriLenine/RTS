@@ -21,7 +21,7 @@ public class CharaUI : ViewManager
         _character = uiOwner as Character;
 
         _title.text = _character.Data.name.ToString();
-        UtilViews = _character.Data.Views;
+        //UtilViews = _character.Data.Views;
         base.ShowUI(uiOwner);
     }
 }

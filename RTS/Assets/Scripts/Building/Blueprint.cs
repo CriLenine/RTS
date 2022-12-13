@@ -3,57 +3,52 @@ using UnityEngine.InputSystem;
 
 public class Blueprint : MonoBehaviour
 {
-    private static Building.Type _buildType;
-    private SpriteRenderer _blueprintRenderer;
+    private Mouse _mouse;
 
-    [SerializeField] 
-    private Color _availableColor;
+    private Building.Type _buildType;
 
     [SerializeField]
-    private Color _notAvailableColor;
+    private SpriteRenderer _blueprintSprite, _iconSprite;
 
-    private static int _outline;
+    [SerializeField] 
+    private Color _buildableColor, _notBuildableColor;
 
+    private int _outline;
 
-    internal static Blueprint InstantiateWorldPos(Building.Type buildType)
+    private void Awake()
     {
-        BuildingData building = PrefabManager.GetBuildingData(buildType);
-
-        _buildType = buildType;
-        _outline = building.Outline;
-
-        return Instantiate(building.BuildingBlueprint, Vector2.zero, Quaternion.identity);
+        _mouse = Mouse.current;
     }
 
-    private void Start()
+    public void SetActiveBlueprint(BuildingData data)
     {
-        _blueprintRenderer = GetComponent<SpriteRenderer>();
+        gameObject.SetActive(true);
 
-        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        _buildType = data.Type;
+        _outline = data.Outline;
 
-        if(Physics2D.OverlapPoint(worldPos))
-        {
-            transform.position = worldPos;
-        }
+        float scale = TileMapManager.TileSize * (2 * _outline + 1);
+        transform.localScale = new Vector3(scale, scale, 1);
+
+        _iconSprite.sprite = data.HUDIcon;
     }
 
     private void Update()
     {
+        if(_mouse.rightButton.wasPressedThisFrame)
+            gameObject.SetActive(false);
+
         (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
 
-        if (Physics2D.OverlapPoint(position))
+        _blueprintSprite.color = available ? _buildableColor : _notBuildableColor;
+
+        transform.position = position;
+
+        if (_mouse.leftButton.wasPressedThisFrame && available)
         {
-            transform.position = position;
-        }
+            NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
 
-        _blueprintRenderer.color = available ? _availableColor : _notAvailableColor;
-
-
-        if (Mouse.current.leftButton.wasPressedThisFrame && available)
-        {
-            NetworkManager.Input(TickInput.Build((int)_buildType, transform.position, CharacterManager.GetSelectedIds()));
-
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

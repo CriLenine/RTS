@@ -5,57 +5,71 @@ public abstract class BuildingData : ScriptableObject
 {
 
     [Header("Spawn Data")]
-    [Space]
 
     [SerializeField]
     private Building.Type _type;
+    public Building.Type Type => _type;
+
+    [Space]
+    [Space]
+
+    [Header("HUD")]
+    [SerializeField]
+    private Resource.Amount[] _cost;
+    public Resource.Amount[] Cost => _cost;
+
+    [Space]
+    [Space]
 
     [Header("Building")]
-    [SerializeField]
-    private Blueprint _buildingBlueprint;
 
     [SerializeField]
     private Building _building;
+    public Building Building => _building;
 
     [SerializeField]
     [Min(0)]
     private int _outline;
+    public int Outline => _outline;
 
-    [Header("Data")]
-    [SerializeField]
-    private int _neededPlayerLevel;
-
-    [SerializeField]
-    private Resource.Amount[] _cost;
+    [Space]
+    [Space]
 
     [Header("UI")]
+
     [SerializeField]
-    private Sprite _buildingUiIcon;
+    private Sprite _HUDIcon;
+    public Sprite HUDIcon => _HUDIcon;
 
-    public Building.Type Type => _type;
-    public Blueprint BuildingBlueprint => _buildingBlueprint;
-    public Building Building => _building;
-    public int Outline => _outline;
-    public Sprite BuildingUiIcon => _buildingUiIcon;
-
+    [Space]
+    [Space]
 
     [Header("Game Specs")]
-    [Space]
 
     [SerializeField]
     [Min(0)]
-    private int _totalWorkforce;
+    private int _requiredBuildTicks;
+    public int RequiredBuildTicks => _requiredBuildTicks;
 
     [SerializeField]
     [Min(0)]
     private int _maxHealth;
+    public int MaxHealth => _maxHealth;
 
     [SerializeField]
-    private Sprite[] _constructionSteps;
+    [Min(0)]
+    private int _housingProvided;
+    public int HousingProvided => _housingProvided;
 
-    public int TotalWorkforce => _totalWorkforce;
-    public int MaxHealth => _maxHealth;
-    public Sprite[] ConstructionSteps => _constructionSteps;
+    [SerializeField]
+    [Min(0)]
+    private int _meleeArmor, _rangeArmor;
+    public int MeleeArmor => _meleeArmor;
+    public int RangeArmor => _rangeArmor;
+
+    [SerializeField]
+    private Sprite[] _buildingProgressSprites;
+    public Sprite[] BuildingProgressSprites => _buildingProgressSprites;
 
     [SerializeField]
     private UtilsView[] _views;

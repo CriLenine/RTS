@@ -45,14 +45,25 @@ public partial class NetworkManager
                             break;
                         }
 
-                    case InputType.Build:
+                    case InputType.NewBuild:
                         {
                             int prefab = message.GetInt(i++);
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
                             int[] ids = Extract<int>(message, i, out i);
 
-                            inputs.Add(TickInput.Build(prefab, position, ids, performer));
+                            inputs.Add(TickInput.NewBuild(prefab, position, ids, performer));
+
+                            break;
+                        }
+
+                    case InputType.Build:
+                        {
+                            int ID = message.GetInt(i++);
+
+                            int[] ids = Extract<int>(message, i, out i);
+
+                            inputs.Add(TickInput.Build(ID, ids, performer));
 
                             break;
                         }
