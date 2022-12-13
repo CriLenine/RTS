@@ -14,14 +14,14 @@ public class Forest : Resource
         _items.Add(coords, 0);
 
         RBuildTree(Node<Vector2Int>.RootNode, ^1, ySorted: new List<Vector2Int>(_items.Keys));
-        //RPrintNode(_holyNode);
     }
 
-    public override Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
+    /*public override Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
     {
+        OnHarvestedTile(lastHarvested);
         Node<Vector2Int> lastNode = Node<Vector2Int>.RDisable(lastHarvested);
-        return lastNode.RGetClosest().Value;
-    }
+        return lastNode.RGetClosest()?.Value;
+    }*/
 
     private void RBuildTree(Node<Vector2Int> parent, Index index, List<Vector2Int> xSorted = null, List<Vector2Int> ySorted = null)
     {

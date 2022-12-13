@@ -17,6 +17,7 @@ public abstract class TickedBehaviour : MonoBehaviour
 
         tickedBehaviour.ID = NextID;
         tickedBehaviour.Performer = performer;
+        tickedBehaviour.Coords = TileMapManager.WorldToTilemapCoords(position);
 
         return tickedBehaviour;
     }

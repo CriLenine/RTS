@@ -20,7 +20,8 @@ public class ResourcesManager : MonoBehaviour
 
     public bool Harvestable(Vector2Int coords)
     {
-        return HasTree(coords) || HasRock(coords);
+        return HasTree(coords) && GetNearestForest(coords).IsHarvestable(coords) 
+            || HasRock(coords) && GetNearestAggregate(coords).IsHarvestable(coords);
     }
     public bool HasTree(Vector2Int coords)
     {

@@ -16,7 +16,6 @@ public class LocomotionManager : MonoBehaviour
         List<Vector2Int> wayPoints = TileMapManager.FindPath(performer, leader.Coords, rallyPoint);
         if (wayPoints is null)
             return null;
-        Debug.Log("find path result" + wayPoints.Count);
 
         List<Vector2> positionWayPoints = new();
 

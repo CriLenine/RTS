@@ -163,8 +163,7 @@ public class GameManager : MonoBehaviour
                     {
                         resource = _instance._resourcesManager.GetNearestAggregate(inputCoords);
                     }
-                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, input.Performer);
-                    Debug.Log(TileMapManager.TilemapCoordsToWorld(harvestingCoords));
+                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
                     Spawn(harvestingCoords);
                     MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), input.Targets);
                     harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));

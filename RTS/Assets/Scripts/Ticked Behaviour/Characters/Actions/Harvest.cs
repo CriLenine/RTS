@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
 
 public class Harvest : Action
@@ -43,7 +42,7 @@ public class Harvest : Action
                 return true;
             }
             sw = Stopwatch.StartNew();
-            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _performer);
+            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords, _performer);
             sw.Stop();
             Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
 
@@ -53,6 +52,9 @@ public class Harvest : Action
 
             List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo);
 
+            if(wayPointsToGo == null)
+                Debug.Log("fdp go");
+
             if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
             {
                 Building building = GetNearestResourceStorer(_resource.Data.Type);
@@ -61,8 +63,10 @@ public class Harvest : Action
                     Debug.Log("No suitable resource storer found");
                     return true;
                 }
-                List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, TileMapManager.WorldToTilemapCoords(building.transform.position));
+                List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, GetDepositPosition(building));
 
+                if (wayPointsToDeposit == null)
+                    Debug.Log("fdp deposit");
                 nextAction = new MoveHarvest(_character, wayPointsToDeposit, nextCoordsToGo, (IResourceStorer)building, _performer);
             }
             else
@@ -98,5 +102,32 @@ public class Harvest : Action
             }
         }
         return closestBuilding;
+    }
+
+    private Vector2Int GetDepositPosition(Building building)
+    {
+        List<Vector2Int> availableTiles = new List<Vector2Int>();
+        for (int outline = 1; outline <= building.Data.Outline + 1; ++outline)
+        {
+            for (int i = -outline; i <= outline; ++i)
+            {
+                for (int j = -outline; j <= outline; ++j)
+                {
+                    if (i != -outline && i != outline && j != -outline && j != outline)
+                        continue;
+                    Vector2Int tileCoords = building.Coords + new Vector2Int(i, j);
+                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(_performer) == true
+                        && TileMapManager.FindPath(_performer, _character.Coords, tileCoords)?.Count > 0)
+                        availableTiles.Add(tileCoords);
+                }
+            }
+
+            //If we found at least one candidate
+            if (availableTiles.Count > 0)
+                return Resource.FindClosestCoords(availableTiles, _character.Coords);
+        }
+
+        Debug.LogError("Cannot deposit to the building");
+        return Vector2Int.zero;
     }
 }

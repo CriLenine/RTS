@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public enum ResourceType
 {
@@ -43,10 +45,19 @@ public abstract class Resource : MonoBehaviour
         }
     }
 
-    [SerializeField]
     protected Dictionary<Vector2Int, int> _items = new Dictionary<Vector2Int, int>();
 
+    private readonly List<Vector2Int> _dirs = new List<Vector2Int>
+        {
+            Vector2Int.up,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.right
+        };
+
     public void AddItem(Vector2Int newItem) => _items.Add(newItem, 0);
+
+    public bool IsHarvestable(Vector2Int coords) => _items.ContainsKey(coords) && _items[coords] < Data.NMaxHarvestPerTile;
 
     [SerializeField]
     private ResourceData _data;
@@ -71,6 +82,7 @@ public abstract class Resource : MonoBehaviour
     public void Init()
     {
         CurrentAmount = new Amount(Data.Type, _items.Count);
+        Bake();
     }
 
     /// <summary>
@@ -89,8 +101,12 @@ public abstract class Resource : MonoBehaviour
 
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         foreach (Vector2Int harvestableTile in GetHarvestableTiles(lastHarvested))
-            /*if (IsPath(lastHarvested, harvestableTile, performer))*/
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            if (IsPath(lastHarvested, harvestableTile, performer))
                 availableTiles.Add(harvestableTile);
+            Debug.Log($"IsPath took {sw.ElapsedMilliseconds} ms.");
+        }
 
         //If we found at least one candidate
         if (availableTiles.Count > 0)
@@ -108,16 +124,9 @@ public abstract class Resource : MonoBehaviour
     /// <returns>The harvestable coordinate which is closest to <paramref name="attractionPoint"/>.</returns>
     public virtual Vector2Int GetTileToHarvest(Vector2Int coords, Vector2Int attractionPoint)
     {
-        List<Vector2Int> dirs = new List<Vector2Int>
-        {
-            Vector2Int.up,
-            Vector2Int.down,
-            Vector2Int.left,
-            Vector2Int.right
-        };
         List<Vector2Int> availableTiles = new List<Vector2Int>();
 
-        foreach (Vector2Int dir in dirs)
+        foreach (Vector2Int dir in _dirs)
         {
             Vector2Int tileCoords = coords + dir;
             if (_items.TryGetValue(tileCoords, out int nHarvested))
@@ -156,7 +165,7 @@ public abstract class Resource : MonoBehaviour
     ///<summary>Called when a new resource tile is selected to be harvested.</summary>
     /// <returns>The destination for the worker to harvest the resource at <paramref name="resourceCoords"/>.
     /// If no suitable tile is found, returns <paramref name="resourceCoords"/>.</returns>
-    public virtual Vector2Int GetHarvestingPosition(Vector2Int resourceCoords, int performer)
+    public virtual Vector2Int GetHarvestingPosition(Vector2Int resourceCoords, Vector2Int harvesterCoords, int performer)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         //Check all the outlines around the tree
@@ -170,7 +179,8 @@ public abstract class Resource : MonoBehaviour
                         continue;
                     Vector2Int tileCoords = resourceCoords + new Vector2Int(i, j);
                     if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(performer) == true
-                        /*&& TileMapManager.FindPath(performer, harvesterCoords, tileCoords)?.Count > 0*/)
+                        && TileMapManager.FindPath(performer, harvesterCoords, tileCoords)?.Count > 0
+                        && IsValidHarvestPosition(tileCoords))
                         availableTiles.Add(tileCoords);
                 }
             }
@@ -184,7 +194,7 @@ public abstract class Resource : MonoBehaviour
         return resourceCoords;
     }
 
-    private Vector2Int FindClosestCoords(List<Vector2Int> availableTiles, Vector2Int attractionPoint)
+    public static Vector2Int FindClosestCoords(List<Vector2Int> availableTiles, Vector2Int attractionPoint)
     {
         (int minMagnitude, int index) = ((availableTiles[0] - attractionPoint).sqrMagnitude, 0);
         for (int i = 1; i < availableTiles.Count; i++)
@@ -196,17 +206,17 @@ public abstract class Resource : MonoBehaviour
         return availableTiles[index];
     }
 
+    private bool IsValidHarvestPosition(Vector2Int coords)
+    {
+        foreach (Vector2Int dir in _dirs)
+            if (IsHarvestable(coords + dir))
+                return true;
+        return false;
+    }
+
     private bool IsPath(Vector2Int startCoords, Vector2Int endCoords, int performer)
     {
-        List<Vector2Int> dirs = new List<Vector2Int>
-        {
-            Vector2Int.up,
-            Vector2Int.down,
-            Vector2Int.left,
-            Vector2Int.right
-        };
-
-        foreach (Vector2Int dir in dirs)
+        foreach (Vector2Int dir in _dirs)
             if (TileMapManager.FindPath(performer, startCoords, endCoords + dir) != null)
                 return true;
 
