@@ -1,24 +1,34 @@
 using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
+using System.Diagnostics;
+using UnityEngine;
+using System;
+
 using Debug = UnityEngine.Debug;
 
 public class TileMapManager : MonoBehaviour
 {
     private static TileMapManager _instance;
 
+    [Serializable]
+    public class TilemapReference
+    {
+        public Tilemap Tilemap;
+        public TileTag Tag;
+    }
+
     private Mouse _mouse;
     private Camera _camera;
 
-    [Header("Tilemaps")]
-    [SerializeField]
+    [SerializeField, Header("Tilemaps")]
     private Grid _parentGrid;
+
     [SerializeField]
     private Tilemap _playableTileMap;
+
     [SerializeField]
-    private List<Tilemap> _obstacleTilemaps;
+    private List<TilemapReference> _obstacleTilemaps;
 
     public static float TileSize { get; private set; }
 
@@ -56,10 +66,10 @@ public class TileMapManager : MonoBehaviour
 
         TileSize = _parentGrid.cellSize.x;
 
-        InitLogicalTiles(_playableTileMap, TileState.Free);
+        InitLogicalTiles(_playableTileMap, TileState.Free, TileTag.None);
 
         for (int i = 0; i < _obstacleTilemaps.Count; ++i)
-            InitLogicalTiles(_obstacleTilemaps[i], TileState.Obstacle);
+            InitLogicalTiles(_obstacleTilemaps[i].Tilemap, TileState.Obstacle, _obstacleTilemaps[i].Tag);
     }
 
     private void Update()
@@ -86,19 +96,20 @@ public class TileMapManager : MonoBehaviour
 
     #region Initialization
 
-    private void InitLogicalTiles(Tilemap tilemap, TileState state)
+    private void InitLogicalTiles(Tilemap tilemap, TileState state, TileTag tag)
     {
         foreach (Vector3Int position in tilemap.cellBounds.allPositionsWithin)
-            if (!tilemap.HasTile(position))
-                continue;
-            else
+            if (tilemap.HasTile(position))
             {
                 Vector2Int tileCoordinates = new Vector2Int(position.x, position.y);
 
                 if (_tiles.ContainsKey(tileCoordinates))
+                {
                     _tiles[tileCoordinates].State = state;
+                    _tiles[tileCoordinates].Tag = tag;
+                }
                 else
-                    _tiles.Add(tileCoordinates, new LogicalTile(tileCoordinates, state));
+                    _tiles.Add(tileCoordinates, new LogicalTile(tileCoordinates, state, tag));
             }
     }
 
@@ -266,10 +277,126 @@ public class TileMapManager : MonoBehaviour
     [SerializeField]
     private List<Vector2Int> _wayPointsLissed;
 
-    /*public static List<Vector2Int> FindRessourcePath(int performer, Vector2Int startCoords, Vector2Int endCoords, TileState state, int additionnalWeight = 0)
+    public static List<Vector2Int> FindPathWithTag(int performer, Vector2Int startCoords, Vector2Int endCoords, TileTag tag, int additionnalWeight = 0)
     {
-        
-    }*/
+        if (_instance._debug)
+            _instance._stopwatch = Stopwatch.StartNew();
+
+        LogicalTile startTile = GetLogicalTile(startCoords);
+        LogicalTile endTile = GetLogicalTile(endCoords);
+
+        if (startTile is null || endTile is null)
+        {
+            if (_instance._debug)
+                Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
+
+            return null;
+        }
+
+        List<LogicalTile> openTiles = new List<LogicalTile>();
+        HashSet<LogicalTile> closedTiles = new HashSet<LogicalTile>();
+
+        startTile.Parent = null;
+        startTile.G = startTile.H = 0;
+
+        openTiles.Add(startTile);
+
+        LogicalTile currentTile = startTile, lastTile;
+
+        while (openTiles.Count > 0)
+        {
+            int closestTileIndex = 0;
+
+            for (int i = 1; i < openTiles.Count; ++i)
+                if (openTiles[i].F < openTiles[closestTileIndex].F)
+                    closestTileIndex = i;
+
+            lastTile = currentTile;
+
+            currentTile = openTiles[closestTileIndex];
+            openTiles.RemoveAt(closestTileIndex);
+
+            if (currentTile == endTile || currentTile.Tag == tag)
+            {
+                currentTile = lastTile;
+
+                List<Vector2Int> path = new List<Vector2Int>();
+                _instance._wayPoints = new List<Vector2Int>();
+
+                Vector2Int lastDirection = Vector2Int.zero;
+
+                while (currentTile != startTile)
+                {
+                    Vector2Int direction = currentTile.Parent.Coords - currentTile.Coords;
+
+                    _instance._wayPoints.Add(currentTile.Coords);
+
+                    if (direction != lastDirection)
+                        path.Add(currentTile.Coords);
+
+                    lastDirection = direction;
+                    currentTile = currentTile.Parent;
+                }
+
+                _instance._wayPoints.Add(startTile.Coords);
+                path.Add(startTile.Coords);
+
+                _instance._wayPointsLissed = path;
+
+                if (_instance._debug)
+                {
+                    _instance._stopwatch.Stop();
+
+                    Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+                }
+
+                return path;
+            }
+
+            for (int moveIndex = 0; moveIndex < _instance._unitDisplacements.Length; ++moveIndex)
+            {
+                LogicalTile neighborTile = GetLogicalTile(currentTile.Coords + _instance._unitDisplacements[moveIndex]);
+
+                if (neighborTile is null || closedTiles.Contains(neighborTile))
+                    continue;
+
+                if (neighborTile.IsObstacle(performer) && neighborTile.Tag != tag)
+                    continue;
+
+                float moveWeight = moveIndex < 4 ? 1f : 1.4f;
+
+                if (neighborTile.Tag == tag)
+                    moveWeight += additionnalWeight;
+
+                float g = currentTile.G + moveWeight;
+
+                bool isNew = !openTiles.Contains(neighborTile);
+
+                if (g < neighborTile.G || isNew)
+                {
+                    neighborTile.G = g;
+
+                    neighborTile.H = (endTile.Coords - neighborTile.Coords).sqrMagnitude;
+
+                    neighborTile.Parent = currentTile;
+                }
+
+                if (isNew)
+                    openTiles.Add(neighborTile);
+            }
+
+            closedTiles.Add(currentTile);
+        }
+
+        if (_instance._debug)
+        {
+            _instance._stopwatch.Stop();
+
+            Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+        }
+
+        return null;
+    }
 
     public static List<Vector2Int> FindPath(int performer, Vector2Int startCoords, Vector2Int endCoords)
     {
@@ -283,6 +410,7 @@ public class TileMapManager : MonoBehaviour
         {
             if (_instance._debug)
                 Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
+
             return null;
         }
 
@@ -299,7 +427,7 @@ public class TileMapManager : MonoBehaviour
             int closestTileIndex = 0;
 
             for (int i = 1; i < openTiles.Count; ++i)
-                if (openTiles[i].H < openTiles[closestTileIndex].H)
+                if (openTiles[i].F < openTiles[closestTileIndex].F)
                     closestTileIndex = i;
 
             LogicalTile currentTile = openTiles[closestTileIndex];
