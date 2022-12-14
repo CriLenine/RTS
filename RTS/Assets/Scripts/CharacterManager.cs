@@ -73,7 +73,7 @@ public class CharacterManager : MonoBehaviour
         _characterInputActions.Selection.Shift.canceled += _ => _selectionManager._shifting = false;
 
         _locomotionInputActions = new Locomotion();
-        _locomotionInputActions.Displacement.RightClick.performed += _ => GiveOrder();
+        _locomotionInputActions.Displacement.RightClick.performed += _ => _selectionManager.GiveOrder();
 
         EnableInputs();
     }
