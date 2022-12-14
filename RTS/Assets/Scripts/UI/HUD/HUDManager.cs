@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class HUDManager : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class HUDManager : MonoBehaviour
     [SerializeField]
     private HUDBuildings _buildings;
 
+    private UIInputs _uiInputs;
+
     protected void Awake()
     {
         if (_instance == null)
@@ -27,6 +30,9 @@ public class HUDManager : MonoBehaviour
 
         _instance._resources.Show();
         _instance._population.Show();
+
+        _uiInputs = new UIInputs();
+        _uiInputs.Enable();
     }
 
     public static void DisplayStats(Character character)
@@ -77,6 +83,8 @@ public class HUDManager : MonoBehaviour
             }
     }
 
+    public static UIInputs GetUIInputs() => _instance._uiInputs;
+    
     public static void UpdateHousing()
     {
         _instance._population.UpdateHousing();

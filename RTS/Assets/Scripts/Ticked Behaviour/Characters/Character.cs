@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public abstract class Character : TickedBehaviour, IDamageable
 {
@@ -39,7 +40,9 @@ public abstract class Character : TickedBehaviour, IDamageable
     public GameObject SelectionMarker;
 
     private LineRenderer _pathRenderer;
+
     private bool _isAgressed = false;
+    private bool _isWatching = false;
 
     protected override void Awake()
     {
@@ -81,7 +84,12 @@ public abstract class Character : TickedBehaviour, IDamageable
     public sealed override void Tick()
     {
         if (CurrentAction is null)
-            _isAgressed = _isAgressed && CheckSurrounding();
+        {
+            if (_isWatching)
+                CheckSurrounding();
+            else
+                _isAgressed = _isAgressed && CheckSurrounding();
+        }
 
         else if (CurrentAction.Perform())
         {
@@ -110,6 +118,8 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public void AddAction(Action action)
     {
+        _isWatching = false; //stop watching if action added
+
         _actions.Enqueue(action);
 
         CurrentAction ??= _actions.Dequeue();
@@ -160,8 +170,9 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         if (_currentHealth == MaxHealth)
             HealthBar.gameObject.SetActive(true);
-
         _isAgressed = true;
+
+        GameEventsManager.PlayEvent("TakeDamage", transform.position);
 
         _currentHealth -= damage;
         HealthBar.SetHealth((float)_currentHealth/MaxHealth);
@@ -186,4 +197,6 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         _type = type;
     }
+
+    public void BeginWatch() => _isWatching = true;
 }

@@ -19,7 +19,7 @@ public class CharacterManager : MonoBehaviour
     private SelectionManager _selectionManager;
     private LocomotionManager _locomotionManager;
 
-    private CharacterSelection _characterSelectionInputActions;
+    private CharacterInputs _characterInputActions;
     private Locomotion _locomotionInputActions;
 
     //* Character Selection *//
@@ -66,16 +66,16 @@ public class CharacterManager : MonoBehaviour
         _selectionManager = GetComponent<SelectionManager>();
         _locomotionManager = GetComponent<LocomotionManager>();
 
-        _characterSelectionInputActions = new CharacterSelection();
-        _characterSelectionInputActions.Enable();
-        _characterSelectionInputActions.Selection.Click.started += _ => _selectionManager.InitSelection();
-        _characterSelectionInputActions.Selection.Click.canceled += _ => _selectionManager.ProceedSelection();
-        _characterSelectionInputActions.Selection.Shift.started += _ => _selectionManager._shifting = true;
-        _characterSelectionInputActions.Selection.Shift.canceled += _ => _selectionManager._shifting = false;
+        _characterInputActions = new CharacterInputs();
+        _characterInputActions.Selection.Click.started += _ => _selectionManager.InitSelection();
+        _characterInputActions.Selection.Click.canceled += _ => _selectionManager.ProceedSelection();
+        _characterInputActions.Selection.Shift.started += _ => _selectionManager._shifting = true;
+        _characterInputActions.Selection.Shift.canceled += _ => _selectionManager._shifting = false;
 
         _locomotionInputActions = new Locomotion();
-        _locomotionInputActions.Enable();
-        _locomotionInputActions.Displacement.RightClick.performed += _ => _selectionManager.GiveOrder(); ;
+        _locomotionInputActions.Displacement.RightClick.performed += _ => _selectionManager.GiveOrder();
+
+        EnableInputs();
     }
 
     private void Update()
@@ -142,6 +142,17 @@ public class CharacterManager : MonoBehaviour
 
     #endregion Debug
 
+    public static void EnableInputs()
+    {
+        _instance._characterInputActions.Enable();
+        _instance._locomotionInputActions.Enable();
+    }
+
+    public static void DisableInputs()
+    {
+        _instance._characterInputActions.Disable();
+        _instance._locomotionInputActions.Disable();
+    }
     public static bool Move(Character character, Vector2 position)
     {
         return _instance._locomotionManager.Move(character, position);

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a18cbf91f1dec4da30f7788aa777b9, type: 3}
+  m_Name: Click
+  m_EditorClassIdentifier: 
+  feedbacks:
+  - rid: 4846035129921699845
+  - rid: 4846035129921699843
+  references:
+    version: 2
+    RefIds:
+    - rid: 4846035129921699843
+      type: {class: PlaySound, ns: RTS.Feedback, asm: Assembly-CSharp}
+      data:
+        _IsAttached: 0
+        _Cue:
+          _Clips:
+          - {fileID: 8300000, guid: 8fff23651a4de6d43a42523413afe9ba, type: 3}
+          _Parameters: {fileID: 0}
+    - rid: 4846035129921699845
+      type: {class: PlayParticleEffect, ns: RTS.Feedback, asm: Assembly-CSharp}
+      data:
+        _particleSystemPrefab: {fileID: 7392750856892959049, guid: d206783717d16cd46a44e0c3c8d20469, type: 3}

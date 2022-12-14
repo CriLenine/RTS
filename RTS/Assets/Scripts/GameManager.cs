@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -108,7 +109,7 @@ public class GameManager : MonoBehaviour
         foreach (TickInput input in inputs)
         {
             //test of entity existances
-            if(!_instance._entities.Contains(input.ID)) continue;
+            if(!_instance._entities.Contains(input.ID) && input.ID != -1 ) continue; // InputID = -1 = special case
 
             if (input.Targets is not null)
             {
@@ -166,8 +167,13 @@ public class GameManager : MonoBehaviour
                     break;
                     
                 case InputType.Attack:
-                    TickedBehaviour target = _instance._entities[input.ID];
-                    MoveAndAttack(input.Performer, target.transform.position, input.Targets, target);
+                    if(input.ID == -1)
+                        MoveAndWatch(input.Performer, input.Position, input.Targets);
+                    else
+                    {
+                        TickedBehaviour target = _instance._entities[input.ID];
+                        MoveAndAttack(input.Performer, input.Position , input.Targets, target);
+                    }
                     break;
             }
         }
@@ -326,6 +332,7 @@ public class GameManager : MonoBehaviour
         return output;
     }
 
+    #region Attack methods
     private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
     {
         if (target is Building building)
@@ -343,13 +350,35 @@ public class GameManager : MonoBehaviour
                     group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group].ToArray(),target));
                     group[i].AddAction(new Attack(group[i],target,position));
                 }
-
             }
             else
                 Debug.Log("Path not found!");
         }
 
     }
+    private static void MoveAndWatch(int performer, Vector2 position, int[] supervisors)
+    {
+
+        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, position, supervisors);
+        foreach (List<Character> group in groupsAndPathfindings.Keys)
+        {
+            if (groupsAndPathfindings[group] != null)
+            {
+                groupsAndPathfindings[group][^1] = position;
+
+                for (int i = 0; i < group.Count; ++i)
+                {
+                    group[i].SetAction(new Move(group[i], groupsAndPathfindings[group].ToArray()));
+                    group[i].BeginWatch();
+                }
+            }
+            else
+                Debug.Log("Path not found!");
+        }
+
+    }
+    #endregion
+    
     private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = PrefabManager.GetBuildingData(type);
@@ -473,7 +502,7 @@ public class GameManager : MonoBehaviour
             Gizmos.color = Colors[i + 4];
 
             for (j = 0; j < groups[i].Count; ++j)
-                Gizmos.DrawWireSphere(groups[i][j].transform.position, TileMapManager.TileSize);
+                Gizmos.DrawWireSphere(groups[i][j].transform.position, groups[i][j].Data.AttackRange);
         }
 
         // Debug Line Of Sight

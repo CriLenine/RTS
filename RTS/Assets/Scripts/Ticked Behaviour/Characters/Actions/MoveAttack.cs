@@ -10,7 +10,7 @@ public class MoveAttack : Move
 
     private TickedBehaviour _target;
     private Vector2Int _lastPos;
-    public MoveAttack(Character character, Vector2[] positions, TickedBehaviour target) : base(character, positions)
+    public MoveAttack(Character character, Vector2[] positions, TickedBehaviour target) : base(character, positions) // Move and attack target
     {
         _finalDistanceToDest = character.Data.AttackRange;
 
@@ -18,7 +18,7 @@ public class MoveAttack : Move
         _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
     }
 
-    public MoveAttack(Character character, Vector2 position, TickedBehaviour target) : base(character, position)
+    public MoveAttack(Character character, Vector2 position, TickedBehaviour target) : base(character, position) // Move and attack target
     {
         _finalDistanceToDest =character.Data.AttackRange;
 
@@ -30,7 +30,7 @@ public class MoveAttack : Move
     {
         bool output = base.Update();
 
-        if ((Positions[^1] - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest)
+        if ((Positions[^1] - (Vector2)_character.transform.position).sqrMagnitude <= _finalDistanceToDest || _target == null)
         {
             return true;
         }
