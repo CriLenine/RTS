@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public enum ResourceType
 {
@@ -43,85 +45,115 @@ public abstract class Resource : MonoBehaviour
         }
     }
 
-    [SerializeField]
-    protected Dictionary<Vector2Int, int> _items = new Dictionary<Vector2Int, int>();
-
-    public void AddItem(Vector2Int newItem) => _items.Add(newItem, 0);
+    public Amount CurrentAmount;
 
     [SerializeField]
     private ResourceData _data;
 
+    protected Dictionary<Vector2Int, int> _itemsNHarvested = new Dictionary<Vector2Int, int>();
+    protected Dictionary<Vector2Int, bool> _itemsReservations = new Dictionary<Vector2Int, bool>();
+
+    private readonly List<Vector2Int> _dirs = new List<Vector2Int>
+        {
+            Vector2Int.up,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.right
+        };
+
     public ResourceData Data => _data;
 
-    public Amount CurrentAmount;
+    public bool IsHarvestable(Vector2Int coords) => _itemsNHarvested.ContainsKey(coords) && _itemsNHarvested[coords] < Data.NMaxHarvestPerTile;
+
+    /// <summary>
+    /// Called when a tile is harvested. Executes the needed operations on the tile.
+    /// </summary>
+    /// <param name="coords">The coords of the harvested tile</param>
+    public abstract void OnHarvestedTile(Vector2Int coords);
+    public abstract void Bake();
+
+    public void AddItem(Vector2Int newItem)
+    { 
+        _itemsNHarvested.Add(newItem, 0);
+        _itemsReservations.Add(newItem, false);
+    }
 
     public void Clear()
     {
-        _items?.Clear();
+        _itemsNHarvested?.Clear();
+        _itemsReservations?.Clear();
     }
 
     public void Init()
     {
-        CurrentAmount = new Amount(Data.Type, _items.Count);
+        CurrentAmount = new Amount(Data.Type, _itemsNHarvested.Count);
+        Bake();
     }
-
-    public abstract void HarvestedTile(Vector2Int coords);
 
     /// <summary>
     /// Called when a tile is harvested.
     /// </summary>
     /// <returns>The position of the next tile to harvest, or <see langword="null"/> if no available tile has been found.</returns>
-    public Vector2Int? GetNext(Vector2Int lastHarvested)
+    public virtual Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, Vector2Int characterCoords, int performer, bool harvested)
     {
-        HarvestedTile(lastHarvested);
-        if (++_items[lastHarvested] >= Data.NMaxHarvestPerTile)
-            _items.Remove(lastHarvested);
-        if (CurrentAmount.Value < 1)
-            return null;
+        if (harvested && _itemsNHarvested.ContainsKey(lastHarvested))
+        {
+            OnHarvestedTile(lastHarvested);
+            _itemsReservations[lastHarvested] = false;
+            if (++_itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile)
+                _itemsNHarvested.Remove(lastHarvested);
+
+            if (CurrentAmount.Value < 1)
+                return null;
+        }
+
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         foreach (Vector2Int harvestableTile in GetHarvestableTiles(lastHarvested))
         {
-            /*if (TileMapManager.FindPath(NetworkManager.Me, lastHarvested, harvestableTile).Count > 0)*/
+            Stopwatch sw = Stopwatch.StartNew();
+            if (!_itemsReservations[harvestableTile] && !IsSurrounded(harvestableTile, performer) && IsPath(characterCoords, harvestableTile, performer))
                 availableTiles.Add(harvestableTile);
+            //Debug.Log($"IsPath took {sw.ElapsedMilliseconds} ms.");
         }
+
         //If we found at least one candidate
         if (availableTiles.Count > 0)
         {
-            //Find the nearest candidate in magnitude
-            (int minMagnitude, int index) = ((availableTiles[0] - lastHarvested).sqrMagnitude, 0);
-            for (int i = 1; i < availableTiles.Count; i++)
-            {
-                int currentMagnitude = (availableTiles[i] - lastHarvested).sqrMagnitude;
-                if (currentMagnitude < minMagnitude)
-                    (minMagnitude, index) = (currentMagnitude, i);
-            }
-            return availableTiles[index];
+            Vector2Int chosenCoords = FindClosestCoords(availableTiles, attractionPoint);
+            _itemsReservations[chosenCoords] = true;
+            return chosenCoords;
         }
+
+        Debug.Log("No next suitable tile found.");
         return null;
     }
 
     /// <summary>
     /// Get a tile from this resource that can be harvested directly next to <paramref name="coords"/>.
     /// </summary>
-    /// <param name="coords"></param>
-    /// <returns>The harvestable coords.</returns>
-    public Vector2Int GetTileToHarvest(Vector2Int coords)
+    /// <param name="coords">The coords around which search a harvestable tile</param>
+    /// <param name="attractionPoint">The point used to orient the choice</param>
+    /// <returns>The harvestable coordinate which is closest to <paramref name="attractionPoint"/>.</returns>
+    public virtual Vector2Int GetTileToHarvest(Vector2Int coords, Vector2Int attractionPoint)
     {
-        for (int i = -1; i <= 1; ++i)
+        List<Vector2Int> availableTiles = new List<Vector2Int>();
+
+        foreach (Vector2Int dir in _dirs)
         {
-            for (int j = -1; j <= 1; ++j)
-            {
-                if (i == 0 && j == 0)
-                    continue;
-                Vector2Int tileCoords = coords + new Vector2Int(i, j);
-                if (_items.TryGetValue(tileCoords, out int nHarvested))
-                    if (nHarvested < Data.NMaxHarvestPerTile)
-                        return coords + new Vector2Int(i, j);
-            }
+            Vector2Int tileCoords = coords + dir;
+            if (_itemsNHarvested.TryGetValue(tileCoords, out int nHarvested))
+                if (nHarvested < Data.NMaxHarvestPerTile && !_itemsReservations[tileCoords])
+                    availableTiles.Add(tileCoords);
         }
+
+        //If we found at least one candidate
+        if (availableTiles.Count > 0)
+            return FindClosestCoords(availableTiles, attractionPoint);
+
         Debug.LogError("No tile found to harvest");
         return coords;
     }
+
     /// <summary>
     /// Get all the tiles in this resource in a small radius around <paramref name="coords"/>.
     /// </summary>
@@ -135,7 +167,7 @@ public abstract class Resource : MonoBehaviour
             for (int j = -3; j < 3; ++j)
             {
                 Vector2Int tileCoords = coords + new Vector2Int(i, j);
-                if (_items.ContainsKey(tileCoords))
+                if (_itemsNHarvested.ContainsKey(tileCoords))
                     harvestableTiles.Add(tileCoords);
             }
         }
@@ -143,43 +175,73 @@ public abstract class Resource : MonoBehaviour
     }
 
     ///<summary>Called when a new resource tile is selected to be harvested.</summary>
-    /// <returns>The destination for the worker to harvest the resource at <paramref name="resourcePosition"/>.
-    /// If no suitable tile is found, returns <paramref name="resourcePosition"/>.</returns>
-    public Vector2Int GetHarvestingPosition(Vector2Int resourcePosition, Vector2Int harvesterPosition)
+    /// <returns>The destination for the worker to harvest the resource at <paramref name="resourceCoords"/>.
+    /// If no suitable tile is found, returns <paramref name="resourceCoords"/>.</returns>
+    public virtual Vector2Int GetHarvestingPosition(Vector2Int resourceCoords, Vector2Int harvesterCoords, int performer)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         //Check all the outlines around the tree
         for (int outline = 1; outline <= 5; ++outline)
         {
-            //Run through each tile of the current outline
-            for (int i = -outline; i <= outline; i += 2 * outline)
+            for (int i = -outline; i <= outline; ++i)
             {
                 for (int j = -outline; j <= outline; ++j)
                 {
-                    if (i != -outline && i != outline && j != outline && j != outline)
+                    if (i != -outline && i != outline && j != -outline && j != outline)
                         continue;
-                    Vector2Int tilePosition = resourcePosition + new Vector2Int(i, j);
-                    if (TileMapManager.GetLogicalTile(tilePosition).IsFree(NetworkManager.Me) 
-                        /*&& TileMapManager.FindPath(NetworkManager.Me, harvesterPosition, resourcePosition).Count > 0*/)
-                        availableTiles.Add(tilePosition);
+                    Vector2Int tileCoords = resourceCoords + new Vector2Int(i, j);
+                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(performer) == true
+                        && TileMapManager.FindPath(performer, harvesterCoords, tileCoords)?.Count > 0
+                        && IsValidHarvestPosition(tileCoords))
+                        availableTiles.Add(tileCoords);
                 }
             }
 
             //If we found at least one candidate
             if (availableTiles.Count > 0)
-            {
-                //Find the nearest candidate to the harvester in magnitude
-                (int minMagnitude, int index) = ((availableTiles[0] - harvesterPosition).sqrMagnitude, 0);
-                for (int i = 1; i < availableTiles.Count; i++)
-                {
-                    int currentMagnitude = (availableTiles[i] - harvesterPosition).sqrMagnitude;
-                    if (currentMagnitude < minMagnitude)
-                        (minMagnitude, index) = (currentMagnitude, i);
-                }
-                return availableTiles[index];
-            }
+                return FindClosestCoords(availableTiles, resourceCoords);
         }
-        Debug.LogError("No free tile found !");
-        return resourcePosition;
+
+        Debug.Log("No free tile found !");
+        return resourceCoords;
     }
+
+    public static Vector2Int FindClosestCoords(List<Vector2Int> availableTiles, Vector2Int attractionPoint)
+    {
+        (int minMagnitude, int index) = ((availableTiles[0] - attractionPoint).sqrMagnitude, 0);
+        for (int i = 1; i < availableTiles.Count; i++)
+        {
+            int currentMagnitude = (availableTiles[i] - attractionPoint).sqrMagnitude;
+            if (currentMagnitude < minMagnitude)
+                (minMagnitude, index) = (currentMagnitude, i);
+        }
+        return availableTiles[index];
+    }
+
+    private bool IsValidHarvestPosition(Vector2Int coords)
+    {
+        foreach (Vector2Int dir in _dirs)
+            if (IsHarvestable(coords + dir))
+                return true;
+        return false;
+    }
+
+    private bool IsPath(Vector2Int startCoords, Vector2Int endCoords, int performer)
+    {
+        foreach (Vector2Int dir in _dirs)
+            if (TileMapManager.FindPath(performer, startCoords, endCoords + dir) != null)
+                return true;
+
+        return false;
+    }
+
+    private bool IsSurrounded(Vector2Int coords, int performer)
+    {
+        foreach (Vector2Int dir in _dirs)
+            if (TileMapManager.GetLogicalTile(coords + dir)?.IsFree(performer) == true)
+                return false;
+
+        return true;
+    }
+
 }

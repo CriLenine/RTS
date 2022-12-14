@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     public static ResourcesManager ResourcesManager => _instance._resourcesManager;
 
+    public GameObject prefab;
+
     #region Init & Variables
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
@@ -150,20 +152,26 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Harvest:
-                    Peon harvester = (Peon)_instance._myEntities[input.Targets[0]];
                     Resource resource = null;
                     Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
-                    if (_instance._resourcesManager.HasTree(input.Position))
+                    if (ResourcesManager.HasTree(input.Position))
                     {
-                        resource = _instance._resourcesManager.GetNearestForest(inputCoords);
+                        resource = ResourcesManager.GetNearestForest(inputCoords);
                     }
-                    else if (_instance._resourcesManager.HasRock(input.Position))
+                    else if (ResourcesManager.HasRock(input.Position))
                     {
-                        resource = _instance._resourcesManager.GetNearestAggregate(inputCoords);
+                        resource = ResourcesManager.GetNearestAggregate(inputCoords);
                     }
-                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords);
-                    harvester.SetAction(new Move(harvester, TileMapManager.TilemapCoordsToWorld(harvestingCoords)));
-                    harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords), resource));
+
+                    for (int i = 0; i < input.Targets.Length; ++i)
+                    {
+
+                        Peon harvester = (Peon)_instance._myEntities[input.Targets[i]];
+                        Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
+                        Spawn(harvestingCoords);
+                        MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), new int[] { input.Targets[i] });
+                        harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
+                    }
                     break;
                     
                 case InputType.Attack:
@@ -260,7 +268,8 @@ public class GameManager : MonoBehaviour
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
 
         Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
-        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint).ToArray()));
+        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint)));
+
     }
 
     private static void CreateCharacter(int performer, Character.Type type, Vector2 position)
@@ -309,7 +318,7 @@ public class GameManager : MonoBehaviour
                 wayPoints[^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
-                    group[i].SetAction(new Move(group[i], wayPoints.ToArray()));
+                    group[i].SetAction(new Move(group[i], wayPoints));
             }
             else
                 Debug.Log("Path not found!");
@@ -347,7 +356,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group].ToArray(),target));
+                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group],target));
                     group[i].AddAction(new Attack(group[i],target,position));
                 }
             }
@@ -460,6 +469,8 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.75f, -0.75f));
             CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, -0.75f));
 
+            CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, -2f), true);
+            //CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f), true);
             CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
 
             if (i == NetworkManager.Me)
@@ -515,6 +526,11 @@ public class GameManager : MonoBehaviour
         Gizmos.color = Color.red;
 
         Gizmos.DrawLine(TileMapManager.TilemapCoordsToWorld(PStart), TileMapManager.TilemapCoordsToWorld(PEnd));*/
+    }
+
+    public static void Spawn(Vector2Int coords)
+    {
+        Instantiate(_instance.prefab, TileMapManager.TilemapCoordsToWorld(coords), Quaternion.identity);
     }
 
     #endregion

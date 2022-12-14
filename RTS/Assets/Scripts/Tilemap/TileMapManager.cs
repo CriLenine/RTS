@@ -3,6 +3,7 @@ using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
+using Debug = UnityEngine.Debug;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -279,7 +280,11 @@ public class TileMapManager : MonoBehaviour
         LogicalTile endTile = GetLogicalTile(endCoords);
 
         if (startTile is null || endTile is null)
+        {
+            if (_instance._debug)
+                Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
             return null;
+        }
 
         List<LogicalTile> openTiles = new List<LogicalTile>();
         HashSet<LogicalTile> closedTiles = new HashSet<LogicalTile>();
@@ -329,7 +334,7 @@ public class TileMapManager : MonoBehaviour
                 {
                     _instance._stopwatch.Stop();
 
-                    UnityEngine.Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+                    Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
                 }
 
                 return path;
@@ -364,9 +369,12 @@ public class TileMapManager : MonoBehaviour
             closedTiles.Add(currentTile);
         }
 
-        //_instance._stopwatch.Stop();
+        if (_instance._debug)
+        {
+            _instance._stopwatch.Stop();
 
-        //UnityEngine.Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+            Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+        }
 
         return null;
     }

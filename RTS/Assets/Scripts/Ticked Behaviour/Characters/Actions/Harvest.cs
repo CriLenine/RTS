@@ -1,44 +1,63 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class Harvest : Action
 {
-    private Vector2Int _coords;
-    private Resource _resource;
+    private readonly Vector2Int _coords;
+    private readonly Vector2Int _attractionPoint;
+    private readonly Resource _resource;
     private float _duration;
-    public Harvest(Character character, Vector2 unroundedCoords, Resource resource) : base(character)
+    private readonly int _performer;
+    public Harvest(Character character, Vector2Int coords, Vector2Int attractionPoint, Resource resource, int performer) : base(character)
     {
-        _coords = new Vector2Int((int)unroundedCoords.x, (int)unroundedCoords.y);
+        _coords = coords;
+        _attractionPoint = attractionPoint;
         _resource = resource;
         _duration = resource.Data.HarvestingTime / 0.025f;
+        _performer = performer;
     }
 
     protected override bool Update()
     {
-        if (--_duration < 0f)
+        if (--_duration < 0f || !ResourcesManager.Harvestable(_coords))
         {
             Peon peon = _character as Peon;
 
-            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
+            if (_duration < 0f)
             {
-                peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
+                if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
+                {
+                    peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
+                }
+
+                peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
             }
 
-            peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
-
-            Vector2Int? newInputCoords = _resource.GetNext(_coords);
+            Stopwatch sw = Stopwatch.StartNew();
+            Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _character.Coords, _performer, _duration < 0f);
+            sw.Stop();
+            //Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
             if (newInputCoords == null)
             {
                 Debug.Log("No available tile found to continue harvest.");
                 return true;
             }
+            sw = Stopwatch.StartNew();
+            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords, _performer);
+            sw.Stop();
+            //Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
 
-            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords);
-
-            Vector2 harvestingPosition = TileMapManager.TilemapCoordsToWorld(nextCoordsToGo);
-            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo);
+            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo, _attractionPoint);
 
             Action nextAction;
+
+            List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo);
+
+            if(wayPointsToGo == null)
+                Debug.Log("fdp go");
+
             if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
             {
                 Building building = GetNearestResourceStorer(_resource.Data.Type);
@@ -47,19 +66,22 @@ public class Harvest : Action
                     Debug.Log("No suitable resource storer found");
                     return true;
                 }
+                List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, GetDepositPosition(building));
 
-                nextAction = new MoveHarvest(_character, building.transform.position, harvestingPosition, (IResourceStorer)building);
+                if (wayPointsToDeposit == null)
+                    Debug.Log("fdp deposit");
+                nextAction = new MoveHarvest(_character, wayPointsToDeposit, nextCoordsToGo, (IResourceStorer)building, _performer);
             }
             else
-                nextAction = new Move(_character, harvestingPosition);
+                nextAction = new Move(_character, wayPointsToGo);
 
             AddAction(nextAction);
-            AddAction(new Harvest(_character, nextCoordsToHarvest, _resource));
+            AddAction(new Harvest(_character, nextCoordsToHarvest, _attractionPoint, _resource, _performer));
 
             return true;
         }
 
-        return !GameManager.ResourcesManager.Harvestable(_coords);
+        return false;
     }
 
     private Building GetNearestResourceStorer(ResourceType type)
@@ -83,5 +105,32 @@ public class Harvest : Action
             }
         }
         return closestBuilding;
+    }
+
+    private Vector2Int GetDepositPosition(Building building)
+    {
+        List<Vector2Int> availableTiles = new List<Vector2Int>();
+        for (int outline = 1; outline <= building.Data.Outline + 1; ++outline)
+        {
+            for (int i = -outline; i <= outline; ++i)
+            {
+                for (int j = -outline; j <= outline; ++j)
+                {
+                    if (i != -outline && i != outline && j != -outline && j != outline)
+                        continue;
+                    Vector2Int tileCoords = building.Coords + new Vector2Int(i, j);
+                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(_performer) == true
+                        && TileMapManager.FindPath(_performer, _character.Coords, tileCoords)?.Count > 0)
+                        availableTiles.Add(tileCoords);
+                }
+            }
+
+            //If we found at least one candidate
+            if (availableTiles.Count > 0)
+                return Resource.FindClosestCoords(availableTiles, _character.Coords);
+        }
+
+        Debug.LogError("Cannot deposit to the building");
+        return Vector2Int.zero;
     }
 }

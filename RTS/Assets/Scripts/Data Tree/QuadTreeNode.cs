@@ -19,24 +19,25 @@ public class QuadTreeNode
 
     private bool _IsLeave => _leftChild == null;//Cannot have only 1 child so no need to check rightChild
 
+    public readonly string ID = "";
+
     #region Debug
     public static Dictionary<int, HashSet<QuadTreeNode>> d_Leaves => _leaves;
-    public readonly string d_name = "";
     public int d_NodesCount => 1 + (_IsLeave ? 0 : _leftChild.d_NodesCount + _rightChild.d_NodesCount);
     public int d_Depth => _IsLeave ? 0 : 1 + Mathf.Max(_leftChild.d_Depth, _rightChild.d_Depth);
+    #endregion
 
     private float XMAX = x0;
     private float XMIN = -x0;
     private float YMAX = y0;
     private float YMIN = -y0;
-    #endregion
 
-    private QuadTreeNode(string d_name, float xmax, float xmin, float ymax, float ymin, HashSet<int> value = null, QuadTreeNode leftChild = null, QuadTreeNode rightChild = null)
+    private QuadTreeNode(string ID, float xmax, float xmin, float ymax, float ymin, HashSet<int> value = null, QuadTreeNode leftChild = null, QuadTreeNode rightChild = null)
     {
         _characters = value ?? new HashSet<int>();
         _leftChild = leftChild;
         _rightChild = rightChild;
-        this.d_name = d_name;
+        this.ID = ID;
         XMAX = xmax;
         XMIN = xmin;
         YMAX = ymax;
@@ -58,6 +59,27 @@ public class QuadTreeNode
         _charactersHitBoxes = new Dictionary<int, (float width, float height)>();
         _charactersPositions = new Dictionary<int, Vector2>();
         QuadTreeRoot = new QuadTreeNode("r", x0, -x0, y0, -y0);
+    }
+
+    public void RPrintNode()
+    {
+        string s = ID + " characters : ";
+        foreach (int item in _characters)
+        {
+            s += item + " ";
+        }
+        Debug.Log(s);
+        _leftChild?.RPrintNode();
+        _rightChild?.RPrintNode();
+    }
+
+    public HashSet<int> RGetCharacters(string nodeName)
+    {
+        if (ID == nodeName)
+            return _characters;
+        else if (_IsLeave)
+            return null;
+        return _leftChild?.RGetCharacters(nodeName) ?? _rightChild?.RGetCharacters(nodeName);
     }
 
     /// <summary>
@@ -123,14 +145,37 @@ public class QuadTreeNode
     /// </summary>
     private void UpdateTree(int ID)
     {
-        HashSet<QuadTreeNode> newLeaves = RPlace(ID, x0, y0);
+        HashSet<QuadTreeNode> newLeaves = RPlace(ID, 0, 0);
         HashSet<QuadTreeNode> currentLeaves = new HashSet<QuadTreeNode>(_leaves[ID]);
         foreach (QuadTreeNode node in currentLeaves)
             if (!newLeaves.Contains(node))
             {
-                node._characters.Remove(ID);
                 _leaves[ID].Remove(node);
+                if (!node.IsAncestor(newLeaves))
+                    node._characters.Remove(ID);
             }
+    }
+
+    private bool IsAncestor(HashSet<QuadTreeNode> newLeaves)
+    {
+        foreach (QuadTreeNode node in newLeaves)
+        {
+            if (IsAncestor(node))
+                return true;
+        }
+        return false;
+    }
+
+    private bool IsAncestor(QuadTreeNode node)
+    {
+        if (node.ID.Length < ID.Length)
+            return false;
+        for (int i = 0; i < ID.Length; ++i)
+        {
+            if (node.ID[i] != ID[i])
+                return false;
+        }
+        return true;
     }
 
     /// <summary>
@@ -145,7 +190,7 @@ public class QuadTreeNode
 
         _characters.Add(ID);
 
-        if (_characters.Count <= _nCharactersThreshold) //Node isn't overfilled
+        if (_characters.Count <= _nCharactersThreshold || (XMAX - XMIN < 1f && YMAX - YMIN < 1f)) //Node isn't overfilled or is too small
         {
             _leaves[ID].Add(this);
             nodes.Add(this);
@@ -173,6 +218,8 @@ public class QuadTreeNode
                     if (xMax > x)
                         rightCharacters.Add(IDToSort);
                 }
+                _leftChild = new QuadTreeNode($"{this.ID}g", x, XMIN, YMAX, YMIN, leftCharacters);
+                _rightChild = new QuadTreeNode($"{this.ID}d", XMAX, x, YMAX, YMIN, rightCharacters);
             }
             else //Discriminate via y
             {
@@ -190,10 +237,9 @@ public class QuadTreeNode
                     if (yMax > y)
                         rightCharacters.Add(IDToSort);
                 }
+                _leftChild = new QuadTreeNode($"{this.ID}g", XMAX, XMIN, y, YMIN, leftCharacters);
+                _rightChild = new QuadTreeNode($"{this.ID}d", XMAX, XMIN, YMAX, y, rightCharacters);
             }
-
-            _leftChild = new QuadTreeNode($"{d_name}g", XMAX, XMIN, YMAX, YMIN, leftCharacters);
-            _rightChild = new QuadTreeNode($"{d_name}d", XMAX, XMIN, YMAX, YMIN, rightCharacters);
         }
 
         //Continue to run through the tree
@@ -201,31 +247,31 @@ public class QuadTreeNode
 
         if (depth % 2 == 0) //Discriminate via x
         {
-            GizmosManager.toDrawStart.Add(new Vector3(x - x0, YMAX));
-            GizmosManager.toDrawEnd.Add(new Vector3(x - x0, YMIN));
+            GizmosManager.toDrawStart.Add(new Vector3(x, YMAX));
+            GizmosManager.toDrawEnd.Add(new Vector3(x, YMIN));
 
             float xCurrent = _charactersPositions[ID].x;
             float width = _charactersHitBoxes[ID].width;
             float xMin = xCurrent - width / 2f;
             float xMax = xCurrent + width / 2f;
             if (xMin < x)
-                nodes.UnionWith(_leftChild.RPlace(ID, x - x0 * depthMultiplicator, y, depth + 1));
+                nodes.UnionWith(_leftChild.RPlace(ID, (XMIN + XMAX) / 2, y, depth + 1));
             if (xMax > x)
-                nodes.UnionWith(_rightChild.RPlace(ID, x + x0 * depthMultiplicator, y, depth + 1));
+                nodes.UnionWith(_rightChild.RPlace(ID, (XMIN + XMAX) / 2, y, depth + 1));
         }
         else //Discriminate via y
         {
-            GizmosManager.toDrawStart.Add(new Vector3(XMAX, y - y0));
-            GizmosManager.toDrawEnd.Add(new Vector3(XMIN, y - y0));
+            GizmosManager.toDrawStart.Add(new Vector3(XMAX, y));
+            GizmosManager.toDrawEnd.Add(new Vector3(XMIN, y));
 
             float yCurrent = _charactersPositions[ID].y;
             float height = _charactersHitBoxes[ID].height;
             float yMin = yCurrent - height / 2f;
             float yMax = yCurrent + height / 2f;
             if (yMin < y)
-                nodes.UnionWith(_leftChild.RPlace(ID, x, y - y0 * depthMultiplicator, depth + 1));
+                nodes.UnionWith(_leftChild.RPlace(ID, x, (YMIN + YMAX) / 2, depth + 1));
             if (yMax > y)
-                nodes.UnionWith(_rightChild.RPlace(ID, x, y + y0 * depthMultiplicator, depth + 1));
+                nodes.UnionWith(_rightChild.RPlace(ID, x, (YMIN + YMAX) / 2, depth + 1));
         }
         return nodes;
     }
