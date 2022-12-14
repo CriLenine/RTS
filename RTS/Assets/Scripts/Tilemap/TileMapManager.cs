@@ -255,6 +255,11 @@ public class TileMapManager : MonoBehaviour
     [SerializeField]
     private List<Vector2Int> _wayPointsLissed;
 
+    /*public static List<Vector2Int> FindRessourcePath(int performer, Vector2Int startCoords, Vector2Int endCoords, TileState state, int additionnalWeight = 0)
+    {
+        
+    }*/
+
     public static List<Vector2Int> FindPath(int performer, Vector2Int startCoords, Vector2Int endCoords)
     {
         if (_instance._debug)

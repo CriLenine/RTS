@@ -67,8 +67,6 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    private SpriteMask _fogRepeller;
-
     public static void AddResource(ResourceType type, int amount)
     {
         _instance._myResources[type] += amount;
@@ -84,7 +82,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        _fogRepeller = GetComponent<SpriteMask>();
+
     }
 
     private void Update()
@@ -425,6 +423,10 @@ public class GameManager : MonoBehaviour
 
         DestroyAllEntities();
 
+        FogOfWarManager.ResetFog();
+        FogOfWarManager.UpdateFog();
+        FogOfWarManager.SetFogActive(true);
+
         TileMapManager.ResetViews();
 
         QuadTreeNode.Init(3, 20, 13);
@@ -445,8 +447,6 @@ public class GameManager : MonoBehaviour
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
         }
-
-        _instance._fogRepeller.enabled = false;
     }
 
     #region Debug
