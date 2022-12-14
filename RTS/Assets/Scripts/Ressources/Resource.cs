@@ -113,7 +113,7 @@ public abstract class Resource : MonoBehaviour
             Stopwatch sw = Stopwatch.StartNew();
             if (!_itemsReservations[harvestableTile] && !IsSurrounded(harvestableTile, performer) && IsPath(characterCoords, harvestableTile, performer))
                 availableTiles.Add(harvestableTile);
-            Debug.Log($"IsPath took {sw.ElapsedMilliseconds} ms.");
+            //Debug.Log($"IsPath took {sw.ElapsedMilliseconds} ms.");
         }
 
         //If we found at least one candidate

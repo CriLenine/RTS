@@ -168,7 +168,6 @@ public class GameManager : MonoBehaviour
 
                         Peon harvester = (Peon)_instance._myEntities[input.Targets[i]];
                         Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
-                        Spawn(harvestingCoords);
                         MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), new int[] { input.Targets[i] });
                         harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
                     }
@@ -213,6 +212,7 @@ public class GameManager : MonoBehaviour
             {
                 _instance._characters.Remove(character);
                 _instance._myCharacters.Remove(character);
+                QuadTreeNode.RemoveCharacter(character.ID);
             }
 
             if (entity is Building building)
@@ -377,7 +377,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new Move(group[i], groupsAndPathfindings[group].ToArray()));
+                    group[i].SetAction(new Move(group[i], groupsAndPathfindings[group]));
                     group[i].BeginWatch();
                 }
             }

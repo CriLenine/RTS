@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/NIcolas.unity
+    path: Assets/Scenes/Nicolas.unity
     guid: bc166ce7c7de90640830fc1090aafdd6
   m_configObjects: {}
