@@ -19,10 +19,15 @@ public abstract class Action
         if (_current is null || _isRunningUpdate)
         {
             _isRunningUpdate = true;
+
             if (Update())
             {
                 _isRunningUpdate = false;
-                return _queue.Count == 0;
+
+                if (_queue.Count > 0 && _current == null)
+                    _current = _queue.Dequeue();
+
+                return _current == null;
             }
         }
         else if (_current.Perform())

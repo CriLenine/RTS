@@ -38,7 +38,7 @@ public class Harvest : Action
             Stopwatch sw = Stopwatch.StartNew();
             Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _character.Coords, _performer, _duration < 0f);
             sw.Stop();
-            Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
+            //Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
             if (newInputCoords == null)
             {
                 Debug.Log("No available tile found to continue harvest.");
@@ -47,7 +47,7 @@ public class Harvest : Action
             sw = Stopwatch.StartNew();
             Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords, _performer);
             sw.Stop();
-            Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
+            //Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
 
             Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo, _attractionPoint);
 
