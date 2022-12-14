@@ -173,12 +173,12 @@ public class TileMapManager : MonoBehaviour
         _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + outlinesCount, _instance._hoveredTileCoords.y + outlinesCount);
 
         // If the building steps outside of the map.
-        for (int x = _instance._previewMin.x; x < _instance._previewMax.x; ++x)
-            for (int y = _instance._previewMin.y; y < _instance._previewMax.y; ++y)
+        for (int x = _instance._previewMin.x; x <= _instance._previewMax.x; ++x)
+            for (int y = _instance._previewMin.y; y <= _instance._previewMax.y; ++y)
             {
                 LogicalTile tile;
 
-                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || !tile.IsFree(NetworkManager.Me))
+                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || /*!tile.IsFree(NetworkManager.Me)*/ !(tile.State == TileState.Free))
                     return (_instance._hoveredTilePos, _instance._previousAvailability);
             }
 
@@ -187,25 +187,35 @@ public class TileMapManager : MonoBehaviour
         return (_instance._hoveredTilePos, _instance._previousAvailability);
     }
 
-    public static void AddBuilding(int outlinesCount, Vector2 position)
+    public static void AddBuildingBlueprint(int outlinesCount, Vector2 position)
     {
         Vector2Int centerCoords = WorldToTilemapCoords(position);
 
-        //Set building tiles
         Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlinesCount, centerCoords.y - outlinesCount);
         Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlinesCount, centerCoords.y + outlinesCount);
 
         UpdateTilesState(_buildingMin, _buildingMax, TileState.BuildingOutline);
+    }
+
+    public static void AddBuilding(int outlinesCount, Vector2 position)
+    {
+        Vector2Int centerCoords = WorldToTilemapCoords(position);
+
+        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlinesCount, centerCoords.y - outlinesCount);
+        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlinesCount, centerCoords.y + outlinesCount);
 
         for (int x = _buildingMin.x + 1; x < _buildingMax.x; ++x)
             for (int y = _buildingMin.y + 1; y < _buildingMax.y; ++y)
                 UpdateTileState(new Vector2Int(x, y), TileState.Obstacle);
     }
+
     public static void RemoveBuilding(Building building)
     {
         Vector2Int centerCoords = WorldToTilemapCoords(building.transform.position);
         BuildingData data = PrefabManager.GetBuildingData(building.BuildingType);
+
         int outlineCount = data.Outline;
+
         //Set building tiles
         Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlineCount, centerCoords.y - outlineCount);
         Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlineCount, centerCoords.y + outlineCount);
@@ -354,9 +364,9 @@ public class TileMapManager : MonoBehaviour
             closedTiles.Add(currentTile);
         }
 
-        _instance._stopwatch.Stop();
+        //_instance._stopwatch.Stop();
 
-        UnityEngine.Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+        //UnityEngine.Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
 
         return null;
     }

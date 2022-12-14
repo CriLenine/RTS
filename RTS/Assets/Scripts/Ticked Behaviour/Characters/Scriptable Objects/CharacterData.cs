@@ -14,39 +14,21 @@ public abstract class CharacterData : ScriptableObject
     private Character _character;
 
     [SerializeField]
-    private int _neededBuildingLevel;
-
-    [SerializeField]
     [Min(1)]
-    private float _initialSpawningTime;
+    private int _spawnTicks;
 
     [SerializeField]
     private Resource.Amount[] _cost;
+    public Resource.Amount[] Cost => _cost;
 
     [Header("UI")]
     [SerializeField]
-    private Sprite _charaUiIcon;
+    private Sprite _HUDIcon;
     public Character.Type Type => _type;
     public Character Character => _character;
-    public Sprite CharaUiIcon => _charaUiIcon;
+    public Sprite HUDIcon => _HUDIcon;
 
-    public float InitialSpawningTime => _initialSpawningTime;
-
-
-    [Header("GameSpecs")]
-    [Space]
-
-    [Header("Name")]
-    [Space]
-
-    [SerializeField]
-    private string _unitName;
-    public string UnitName => _unitName;
-
-    [SerializeField]
-    private UtilsView[] _views;
-
-    public UtilsView[] Views => _views;
+    public float SpawnTicks => _spawnTicks;
 
     [Space]
     [Space]

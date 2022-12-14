@@ -9,11 +9,11 @@ public class BuildingUI : ViewManager
 
     public override void Initialize()
     {
-            for (int i = 0; i < _views.Length; i++)
-            {
-                _views[i].Initialize(this);
-                _views[i].Hide();
-            }
+        for (int i = 0; i < _views.Length; i++)
+        {
+            _views[i].Initialize(this);
+            _views[i].Hide();
+        }
     }
 
     public override void ShowUI<T>(T uiOwner)

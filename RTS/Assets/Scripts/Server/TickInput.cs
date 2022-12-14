@@ -4,6 +4,7 @@ public enum InputType
 {
     Spawn,
     Move,
+    NewBuild,
     Build,
     Harvest,
     Hunt,
@@ -50,17 +51,31 @@ public class TickInput
         };
     }
 
-    public static TickInput Build(int prefab, Vector2 position, int[] targets, int performer = 0)
+    public static TickInput NewBuild(int prefab, Vector2 position, int[] targets, int performer = 0)
     {
         return new TickInput()
         {
-            Type = InputType.Build,
+            Type = InputType.NewBuild,
 
             Targets = targets,
 
             Prefab = prefab,
 
             Position = position,
+            Performer = performer
+        };
+    }
+
+    public static TickInput Build(int buildingID, int[] targets, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Build,
+
+            ID = buildingID,
+
+            Targets = targets,
+
             Performer = performer
         };
     }

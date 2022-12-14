@@ -15,7 +15,7 @@ public abstract class Character : TickedBehaviour, IDamageable
         Naked
     }
 
-    private Type _type;
+    protected Type _type;
     public Type CharaType => _type;
 
     [SerializeField]
@@ -51,7 +51,7 @@ public abstract class Character : TickedBehaviour, IDamageable
     protected virtual void Start()
     {
         _currentHealth = MaxHealth;
-        HealthBar.SetMaxHealth(MaxHealth);
+        HealthBar.SetHealth(1);
     }
 
     protected virtual void Update()
@@ -164,7 +164,7 @@ public abstract class Character : TickedBehaviour, IDamageable
         _isAgressed = true;
 
         _currentHealth -= damage;
-        HealthBar.SetHealth(_currentHealth);
+        HealthBar.SetHealth((float)_currentHealth/MaxHealth);
         return _currentHealth <= 0;
     }
 

@@ -328,8 +328,14 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
-            case InputType.Build:
+            case InputType.NewBuild:
                 message.Add(input.Prefab, input.Position.x, input.Position.y);
+
+                Spread(message, input.Targets);
+
+                break;
+            case InputType.Build:
+                message.Add(input.ID);
 
                 Spread(message, input.Targets);
 

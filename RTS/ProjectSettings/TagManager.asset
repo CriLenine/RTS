@@ -15,12 +15,12 @@ TagManager:
   - Environment
   - Clickable
   - view
+  - Cursor
   - 
-  - FogOfWarMain
-  - FogOfWarSecondary
+  - FogOfWarPersistent
+  - FogOfWarCurrent
   - 
-  - 
-  - 
+  - HUD
   - 
   - 
   - 

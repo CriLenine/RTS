@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class Peon : Character
 {
-    private Building _workedOnBuilding;
+    private Building _buildingCurrentlyBuilt;
 
     private Resource _harvestedResource;
 
     private PeonData _specificData;
 
     public new PeonData Data => _specificData;
-    public override bool Idle => _workedOnBuilding == null && _harvestedResource == null;
+    public override bool Idle => _buildingCurrentlyBuilt == null && _harvestedResource == null;
 
     public Resource.Amount CarriedResource;
 
@@ -18,7 +18,7 @@ public class Peon : Character
     {
         base.Start();
 
-        SetType(Type.Peon);
+        _type = Type.Peon;
 
         _specificData = (PeonData)_data;
     }
@@ -30,7 +30,7 @@ public class Peon : Character
 
     public void SetBuild(Building building)
     {
-        _workedOnBuilding = building;
+        _buildingCurrentlyBuilt = building;
     }
 
     public void SetResource(Resource harvestedResource)

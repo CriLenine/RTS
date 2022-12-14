@@ -25,7 +25,7 @@ public class SpawningView : View
         {
             var bUI = Instantiate(_itemUI);
             bUI.transform.SetParent(_itemsParent);
-            bUI.InitUI(OnClick, chara.CharaUiIcon, chara.name,chara.Type);
+            bUI.InitUI(OnClick, chara.HUDIcon, chara.name,chara.Type);
         }
     }
     private void Update()
