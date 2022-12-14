@@ -67,6 +67,11 @@ public class Attack : Action
         if(_attackSpeedTimer == 0)
             if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
             {
+                if (_target is Building && _target.Performer == NetworkManager.Me) 
+                {
+                    Building building = (Building)_target;
+                    GameManager.UpdateHousing(-building.Data.HousingProvided);
+                }
                 GameManager.DestroyEntity(_target.ID);
                 return true;
             }

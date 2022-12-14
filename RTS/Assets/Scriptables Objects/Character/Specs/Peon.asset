@@ -14,12 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 1
   _character: {fileID: 1300237163801353399, guid: 84535e00d9cd9ef4ea82208c2ab37bab, type: 3}
-  _neededBuildingLevel: 0
-  _initialSpawningTime: 2
-  _cost: []
-  _charaUiIcon: {fileID: 1597179441, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}
-  _unitName: Peon
-  _views: 01000000
+  _spawnTicks: 1200
+  _cost:
+  - _type: 0
+    _value: 50
+  _HUDIcon: {fileID: 21300000, guid: 06fb776c4b7ed1e4cb878f5b09aaebde, type: 3}
   _maxHealth: 50
   _attackDamage: 2
   _meleeArmor: 0
@@ -27,6 +26,5 @@ MonoBehaviour:
   _attackRange: 1
   _attackSpeed: 0.5
   _weapon: {fileID: 21300000, guid: a0a5a4c0833176e4195e90ca217a9965, type: 3}
-  _workPower: 1
-  _buildable: 00000000
+  _buildEfficiencyMultiplier: 1
   _nMaxCarriedResources: 3

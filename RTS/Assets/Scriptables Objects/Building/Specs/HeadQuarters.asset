@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18cd2801bbbd8524f9b55610750b1df1, type: 3}
+  m_Name: HeadQuarters
+  m_EditorClassIdentifier: 
+  _type: 0
+  _timeCost: 115
+  _cost:
+  - _type: 0
+    _value: 150
+  - _type: 1
+    _value: 200
+  - _type: 2
+    _value: 200
+  _building: {fileID: 1201046603458702877, guid: b2d42f6fd20d2ac4e887508e9de0921a, type: 3}
+  _outline: 2
+  _HUDIcon: {fileID: 21300000, guid: 752150149e8db6847b3e40e8be92eb7a, type: 3}
+  _requiredBuildTicks: 1000
+  _maxHealth: 200
+  _housingProvided: 10
+  _meleeArmor: 10
+  _rangeArmor: 15
+  _buildingProgressSprites: []
+  _views: 
+  _spawnable: 

@@ -2,14 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 
-public enum ResourceType2
-{
-    crystal,
-    wood,
-    gold,
-    stone
-}
-
 public class HUDManager : MonoBehaviour
 {
     private static HUDManager _instance;
@@ -48,20 +40,32 @@ public class HUDManager : MonoBehaviour
         _instance._stats.DisplayStats(character);
     }
 
-    public static void UpdateHUD(List<Character> characters)
+    public static void UpdateHUD()
     {
+        List<Character> characters = CharacterManager.SelectedCharacters;
+        Building building = CharacterManager.SelectedBuilding;
+
         _instance._stats.Hide();
         _instance._actions.Hide();
         _instance._buildings.Hide();
 
-        int count = characters.Count;
+        int charactersCount = characters.Count;
 
-        if (count == 0)
+        if (charactersCount == 0 && building == null)
             return;
 
         _instance._actions.Show();
 
-        if(count == 1)
+        if (building != null)
+        {
+            _instance._stats.DisplayStats(building);
+            _instance._actions.UpdateActions(building.BuildingType);
+            return;
+        }
+
+        _instance._actions.UpdateActions();
+        
+        if (charactersCount == 1)
         {
             _instance._stats.DisplayStats(characters[0]);
             if (characters[0] is Peon)
@@ -71,7 +75,7 @@ public class HUDManager : MonoBehaviour
 
         _instance._buildings.Show();
 
-        for (int i = 0; i < count; ++i)
+        for (int i = 0; i < charactersCount; ++i)
             if(characters[i] is not Peon)
             {
                 _instance._buildings.Hide();
@@ -80,4 +84,9 @@ public class HUDManager : MonoBehaviour
     }
 
     public static UIInputs GetUIInputs() => _instance._uiInputs;
+    
+    public static void UpdateHousing()
+    {
+        _instance._population.UpdateHousing();
+    }
 }

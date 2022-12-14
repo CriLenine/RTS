@@ -1,32 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
     [SerializeField]
-    private Slider _slider;
+    private Transform _bar;
 
     [SerializeField]
-    private Gradient _gradient;
+    private SpriteRenderer _fill;
 
     [SerializeField]
-    private Image _fill;
+    private Color _fullHealthColor, _midHealthColor, _lowHealthColor;
 
-
-    public void SetMaxHealth(int maxHealth)
+    public void SetHealth(float normalizedValue)
     {
-        _slider.maxValue = maxHealth;
-        _slider.value = maxHealth;
+        _bar.localScale = new Vector3(normalizedValue, 1);
 
-        _fill.color = _gradient.Evaluate(1f);
-    }
+        _fill.color = normalizedValue > .5f ? Color.Lerp(_midHealthColor, _fullHealthColor, (normalizedValue - .5f) * 2) :
+            Color.Lerp(_lowHealthColor, _midHealthColor, normalizedValue * 2);
 
-    public void SetHealth(int health) 
-    {
-        _slider.value = health;
-
-        _fill.color = _gradient.Evaluate(_slider.normalizedValue);
+        gameObject.SetActive(normalizedValue != 1);
     }
 }

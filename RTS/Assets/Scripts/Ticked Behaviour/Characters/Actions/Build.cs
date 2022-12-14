@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Build : Action
 {
     private Peon _peon;
@@ -8,11 +6,19 @@ public class Build : Action
     public Build(Peon peon, Building building) : base(peon)
     {
         _peon = peon;
-        _building = building;   
+        _building = building;
+
+        _peon.SetBuild(building);
     }
 
     protected override bool Update()
     {
-        return _building.AddWorkforce(_peon.Data.WorkPower);
+        if(_building.CompleteBuild(_peon.Data.BuildEfficiencyMultiplier))
+        {
+            _peon.SetBuild(null);
+            return true;
+        }
+
+        return false;
     }
 }

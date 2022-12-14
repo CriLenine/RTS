@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class Naked : Character
 {
-    private Building _workedOnBuilding;
+    private Building _buildingCurrentlyBuilt;
 
-    private Resource _recoltedRessource;
+    private Resource _recoltedResource;
 
     private NakedData _specificData;
 
     public new NakedData Data => _specificData;
 
-    public override bool Idle => _workedOnBuilding == null && _recoltedRessource == null;
+    public override bool Idle => _buildingCurrentlyBuilt == null && _recoltedResource == null;
 
     protected override void Start()
     {
         base.Start();
 
-        SetType(Type.Naked);
+        _type = Type.Naked;
 
         _specificData = (NakedData)_data;
     }
@@ -28,6 +28,6 @@ public class Naked : Character
 
     public void SetBuild(Building building)
     {
-        _workedOnBuilding = building;
+        _buildingCurrentlyBuilt = building;
     }
 }

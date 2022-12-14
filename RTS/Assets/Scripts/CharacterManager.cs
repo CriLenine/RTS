@@ -30,10 +30,13 @@ public class CharacterManager : MonoBehaviour
     private List<Character> _selectedCharacters = new List<Character>();
     private HashSet<Character> _allSelectedCharacters = new HashSet<Character>();
 
+    private Building _selectedBuilding;
+
     public static Character.Type SelectedType => _instance._selectedType;
     public static HashSet<Character.Type> SelectedTypes => _instance._selectedTypes;
 
     public static List<Character> SelectedCharacters => _instance._selectedCharacters;
+    public static Building SelectedBuilding => _instance._selectedBuilding;
 
     public delegate void OnCharacterSelectionUpdatedHandler();
 
@@ -44,10 +47,6 @@ public class CharacterManager : MonoBehaviour
         add => _instance._onCharacterSelectionUpdated += value;
         remove => _instance._onCharacterSelectionUpdated -= value;
     }
-
-    //* Building Selection *//
-
-    private Building _buildingSelected = null;
 
     #endregion
 
@@ -159,40 +158,6 @@ public class CharacterManager : MonoBehaviour
         return _instance._locomotionManager.Move(character, position);
     }
 
-    private void GiveOrder()
-    {
-        if (SelectedCharacters.Count == 0)
-            return;
-
-        // Retrieve the rallypoint's coordinates according to the input.
-
-        Vector3 worldMousePos = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
-        Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
-
-        LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
-
-        if (SelectedCharacters.Count == 1 &&
-            (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
-        {
-            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, SelectedCharacters[0].ID));
-            return;
-        }
-
-        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
-            return;
-
-        int[] IDs = new int[SelectedCharacters.Count];
-
-        for (int i = 0; i < SelectedCharacters.Count; ++i)
-            IDs[i] = SelectedCharacters[i].ID;
-
-        NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
-    } 
-
-    private void Attack()
-    {
-
-    }
     public static void ChangeView<T>(T owner) where T : TickedBehaviour
     {
         UIManager.ShowTickedBehaviourUI(owner);
@@ -254,32 +219,32 @@ public class CharacterManager : MonoBehaviour
 
     #endregion
 
-    public static void AddBuildingToSelected(Building building)
+    public static void SetSelectedBuilding(Building building)
     {
-        _instance._buildingSelected = building;
+        DeselectAll();
+        _instance._selectedBuilding = building;
+        building.Select();
     }
 
-    public static Building SelectedBuilding()
+    public static void TestEntitieSelection(TickedBehaviour entity)
     {
-        return _instance._buildingSelected;
-    }
-
-    public static void TestEntitieSelection(TickedBehaviour entitie)
-    {
-        if (entitie is Character character)
+        if (entity is Character character)
         {
             if (SelectedCharacters.Contains(character))
                 RemoveCharacterFromSelection(character);
         }
-        else if (entitie is Building building && _instance._buildingSelected)
+        else if (entity is Building building && _instance._selectedBuilding != null)
         {
-            if (_instance._buildingSelected == building)
+            if (_instance._selectedBuilding == building)
                 DeselectAll();
         }
     }
     public static void DeselectAll()
     {
-        _instance._buildingSelected = null;
+        if(_instance._selectedBuilding != null)
+            _instance._selectedBuilding.Unselect();
+
+        _instance._selectedBuilding = null;
 
         _instance._allSelectedCharacters.Clear();
 

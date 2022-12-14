@@ -4,113 +4,168 @@ public abstract class Building : TickedBehaviour, IDamageable
 {
     public enum Type
     {
-        Farm,
-        Barracks,
-        PlutoniumOutpost,
-        GoldOutpost
+        HeadQuarters,
+        Housing,
+        Sawmill,
     }
 
-    [SerializeField]
-    private bool _isBuilt = false;
+
+    [Header("Base Data")]
+    [Space]
 
     [SerializeField]
     protected BuildingData _buildingData;
 
     [SerializeField]
-    private int _currentWorkforce;
-
-    [SerializeField]
     private int _currentHealth;
+    public int CurrentHealth => _currentHealth;
 
     [SerializeField]
     protected HealthBar HealthBar;
 
-    private Type _type;
-    public Type BuildingType => _type;
+    [Space]
+    [Space]
 
-    /*Ici on aura les options disponibles en cliquant sur un b�timent
-     * (ex cr�er une certaine unit� dans une caserne)*/
-    //[SerializeField]
-    //private List<Option> _options;
+    [Header("Utils")]
+    [Space]
 
-    public BuildingData Data => _buildingData;
+    [SerializeField]
+    private BoxCollider2D _boxCollider;
 
-    protected int MaxHealth => _buildingData.MaxHealth;
-    public float CurrentWorkforceRatio => _currentWorkforce / _buildingData.TotalWorkforce;
+    [Space]
+    [Space]
+
+    [Header("Construction Progression Art")]
+    [Space]
+
+    [Header("Transforms")]
+    [SerializeField]
+    private Transform _visualTransform;
+    [SerializeField]
+    private Transform _completionVisualTransform, _healthBarTransform;
+
+    [Header("SpriteRenderers")]
+    [SerializeField]
+    private SpriteRenderer _completionVisualSprite;
+    [SerializeField]
+    private SpriteRenderer _iconSprite, _visualBackgroundSprite;
+
+    [Header("Colors")]
+    [SerializeField]
+    private Color _completionVisualStartColor;
+    [SerializeField]
+    private Color _completionVisualEndColor, _iconSpriteStartColor, _iconSpriteEndColor, _selectedColor;
+    [SerializeField]
+    private Color _visualBackgroundStartColor, _visualBackgroundEndColor;
+
+
+    private bool _buildComplete;
+
+    private int _completedBuildTicks;
 
     private LineRenderer _pathRenderer;
     public LineRenderer PathRenderer => _pathRenderer;
 
-    //SpriteManagement
-    private SpriteRenderer _buildingRenderer;
-    private int _actualSpriteIndex;
-    private float _ratioStep;
-    //
+    protected Type _type;
+    public Type BuildingType => _type;
+    public BuildingData Data => _buildingData;
+    protected int MaxHealth => _buildingData.MaxHealth;
+    public float BuildCompletionRatio => (float)_completedBuildTicks / _buildingData.RequiredBuildTicks;
+
+    private bool _selected;
 
     protected override void Awake()
     {
         base.Awake();
 
-        _buildingRenderer = GetComponent<SpriteRenderer>();
         _pathRenderer = GetComponentInChildren<LineRenderer>(true);
 
+        float scale = .95f * (TileMapManager.TileSize * (1 + 2 * Data.Outline));
+        _visualTransform.localScale = new Vector3(scale, scale, 1);
+        _boxCollider.size = new Vector2(scale, scale);
+
+        _healthBarTransform.transform.position += new Vector3(0, .5f * scale);
+
         _currentHealth = MaxHealth;
-        HealthBar.SetMaxHealth(MaxHealth);
-        _ratioStep = _buildingData.TotalWorkforce / (_buildingData.ConstructionSteps.Length);
-        _actualSpriteIndex = 0;
+        HealthBar.SetHealth(1);
+
+        _completedBuildTicks = 0;
+        _buildComplete = false;
+
+        _completionVisualTransform.localScale = new Vector3(0, 0, 1);
+
+        _completionVisualSprite.color = _completionVisualStartColor;
+        _iconSprite.color = _iconSpriteStartColor;
+        _visualBackgroundSprite.color = _visualBackgroundStartColor;
     }
 
-    private void Update()
-    {
-        if (UIManager.CurrentManager is BuildingUI buildingUI)
-        {
-            if (!buildingUI.Building.TryGetComponent(out ISpawner spawner)) return;
+    //private void Update()
+    //{
+    //    if (UIManager.CurrentManager is BuildingUI buildingUI)
+    //    {
+    //        if (!buildingUI.Building.TryGetComponent(out ISpawner spawner)) return;
 
-            Vector2 rallypoint = spawner.GetRallyPoint();
-            _pathRenderer.SetPosition(0, transform.position);
-            _pathRenderer.SetPosition(1, rallypoint);
+    //        Vector2 rallypoint = spawner.GetRallyPoint();
+    //        _pathRenderer.SetPosition(0, transform.position);
+    //        _pathRenderer.SetPosition(1, rallypoint);
 
-            _pathRenderer.transform.position = rallypoint;
+    //        _pathRenderer.transform.position = rallypoint;
 
-            _pathRenderer.startColor = Color.cyan;
-            _pathRenderer.endColor = Color.cyan;
+    //        _pathRenderer.startColor = Color.cyan;
+    //        _pathRenderer.endColor = Color.cyan;
 
-            _pathRenderer.gameObject.SetActive(true);
-        }
-        else
-            _pathRenderer.gameObject.SetActive(false);
-    }
+    //        _pathRenderer.gameObject.SetActive(true);
+    //    }
+    //    else
+    //        _pathRenderer.gameObject.SetActive(false);
+    //}
+
     /// <returns><see langword="true"/> if it finishes the building's construction,
     /// <see langword="false"/> otherwise </returns>
-    public bool AddWorkforce(int amount)
+    public bool CompleteBuild(int completionAmount)
     {
-        if (_isBuilt)
+        if (_buildComplete)
             return true;
 
-        _currentWorkforce += amount;
+        _completedBuildTicks += completionAmount;
 
-        //Change sprite 
-        int spriteIndex=0;
-        
-        for (int i = 0; i < _buildingData.ConstructionSteps.Length; i++)
+        if (BuildCompletionRatio >= 1f)
         {
-            spriteIndex = _currentWorkforce > (i * (_ratioStep)) ? i:spriteIndex ;
+            // REQUIRES FIXING POSITION WHEN BUILD ORDER IS SENT !
+            // TileMapManager.AddBuilding(Data.Outline, transform.position);
+
+            _completedBuildTicks = _buildingData.RequiredBuildTicks;
+            _iconSprite.color = _iconSpriteEndColor;
+
+            if(!_selected)
+                _visualBackgroundSprite.color = _visualBackgroundEndColor;
+
+            if (GameManager.MyBuildings.Contains(ID))
+                GameManager.UpdateHousing(Data.HousingProvided);
+
+            _buildComplete = true;
         }
 
-        if(spriteIndex != _actualSpriteIndex)
-        {
-            _buildingRenderer.sprite = _buildingData.ConstructionSteps[spriteIndex];
-            _actualSpriteIndex = spriteIndex;
-        }
+        float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
+        _completionVisualTransform.localScale = new Vector3(completionValue, completionValue, 1);
 
-        //
+        _completionVisualSprite.color = Color.Lerp(_completionVisualStartColor, _completionVisualEndColor, BuildCompletionRatio);
 
-        if (CurrentWorkforceRatio >= 1f)
-        {
-            _currentWorkforce = _buildingData.TotalWorkforce;
-            _isBuilt = true;
-        }
-        return _isBuilt;
+        return _buildComplete;
+    }
+
+    public void Select()
+    {
+        _selected = true;
+
+        if (_buildComplete)
+            _visualBackgroundSprite.color = _selectedColor;
+    }
+
+    public void Unselect()
+    {
+        _selected = false;
+        _visualBackgroundSprite.color = _buildComplete ? _visualBackgroundEndColor : _visualBackgroundStartColor;
     }
 
     public bool TakeDamage(int damage)
@@ -119,7 +174,7 @@ public abstract class Building : TickedBehaviour, IDamageable
             HealthBar.gameObject.SetActive(true);
 
         _currentHealth -= damage;
-        HealthBar.SetHealth(_currentHealth);
+        HealthBar.SetHealth((float)_currentHealth / MaxHealth);
         return _currentHealth <= 0;
     }
 
@@ -127,18 +182,12 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         _currentHealth += amount;
 
-
-        HealthBar.SetHealth(_currentHealth);
+        HealthBar.SetHealth((float)_currentHealth / MaxHealth);
 
         if (_currentHealth >= MaxHealth)
             HealthBar.gameObject.SetActive(false);
 
         if (_currentHealth > MaxHealth)
             _currentHealth = MaxHealth;
-    }
-
-    protected void SetType(Type type)
-    {
-        _type = type;
     }
 }

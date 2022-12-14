@@ -11,17 +11,12 @@ public class PeonData : CharacterData
     [Space]
 
     [SerializeField]
-    private int _workPower;
-
-    [SerializeField]
-    private List<Building.Type> _buildable;
+    private int _buildEfficiencyMultiplier;
 
     [SerializeField]
     private int _nMaxCarriedResources;
 
-    public List<Building.Type> Buildable => _buildable;
-
-    public int WorkPower => _workPower;
+    public int BuildEfficiencyMultiplier => _buildEfficiencyMultiplier;
 
     public int NMaxCarriedResources => _nMaxCarriedResources;
 }

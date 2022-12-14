@@ -4,9 +4,10 @@ using UnityEngine;
 
 public enum ResourceType
 {
-    Coins,
-    Plutonium,
-    Meat
+    Crystal,
+    Wood,
+    Gold,
+    Stone
 }
 
 public abstract class Resource : MonoBehaviour

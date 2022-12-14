@@ -29,15 +29,11 @@ public class PrefabManager : MonoBehaviour
         _buildingsPrefabs = new Dictionary<Building.Type, BuildingData>();
         _charactersPrefabs = new Dictionary<Character.Type, CharacterData>();
 
-        foreach (var elem in _dataBuildings)
-        {
-            _buildingsPrefabs.Add(elem.Type, elem);
-        }
+        foreach (BuildingData data in _dataBuildings)
+            _buildingsPrefabs.Add(data.Type, data);
 
-        foreach (var elem in _dataCharacters)
-        {
-            _charactersPrefabs.Add(elem.Type, elem);
-        }
+        foreach (CharacterData data in _dataCharacters)
+            _charactersPrefabs.Add(data.Type, data);
     }
 
     public static BuildingData GetBuildingData(Building.Type peonBuilds)
