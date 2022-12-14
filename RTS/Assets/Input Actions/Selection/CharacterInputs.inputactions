@@ -1,0 +1,82 @@
+{
+    "name": "CharacterInputs",
+    "maps": [
+        {
+            "name": "Selection",
+            "id": "b19c5584-85f2-4cba-b85c-e4e24a4a8b90",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "bfcd5b73-bd5e-4f3f-9bac-cff64ccadca6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shift",
+                    "type": "Button",
+                    "id": "7ebd39ea-837a-4d73-a97e-0c7c6d7120b7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a9b47c8e-2b36-4dd5-ab32-666807c4ed17",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1601a41-c8dd-48ea-9219-fe4196e0f443",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Attack",
+            "id": "38f70ce4-8e57-42bb-b649-da5681ed197e",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "aa031dbf-b474-43d5-aa79-413f75dfbf74",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "514682de-6557-4772-9407-5edd9220250d",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

@@ -69,6 +69,7 @@ public class SelectionManager : MonoBehaviour
         _startpos = _mouse.position.ReadValue();
         _clicking = true;
         _selectionBox = new Rect();
+
     }
 
 
@@ -78,6 +79,8 @@ public class SelectionManager : MonoBehaviour
 
         if (_selectionBox.size.sqrMagnitude < _minimumSelectionArea) // Selection Box is too small : click select
         {
+            GameEventsManager.PlayEvent("Click", _camera.ScreenToWorldPoint(_mouse.position.ReadValue()));
+
             Vector2 worldPoint = _camera.ScreenToWorldPoint(_mouse.position.ReadValue());
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, _clickable);
 
@@ -111,7 +114,7 @@ public class SelectionManager : MonoBehaviour
                     else if(CharacterManager.SelectedCharacters.Count > 0)// Ennemy => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
-                        NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
+                        //NetworkManager.Input(TickInput.Attack(selectedCharacter.ID, selectedCharacter.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
                 else if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
@@ -124,7 +127,7 @@ public class SelectionManager : MonoBehaviour
                     else if (CharacterManager.SelectedCharacters.Count > 0)// EnnemyBuilding => ATTACK 
                     {
                         // TOREVIEW: test if target is damageable before or after networking, for now its after see in GameManager
-                        NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
+                        //NetworkManager.Input(TickInput.Attack(selectedBuilding.ID, selectedBuilding.transform.position, CharacterManager.GetSelectedIds()));
                     }
                 }
                 else if (!_shifting) // If we didn't hit anything and shift is not being held

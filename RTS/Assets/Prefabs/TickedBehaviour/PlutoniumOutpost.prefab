@@ -11,6 +11,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlutoniumOutpost
       objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 4.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2543660346750743713, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -79,6 +91,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9056454643823321994, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056454643823321994, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8817811001789827384, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
@@ -110,7 +130,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01ecc0bda47b6664b9f1ef43920d11f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viewSqrtRadius: 10
+  _viewRadius: 10
+  _fogRepeller: {fileID: 0}
   _isBuilt: 0
   _buildingData: {fileID: 11400000, guid: 7cfa7268ef99be240a83d639fb46fb55, type: 2}
   _currentWorkforce: 0

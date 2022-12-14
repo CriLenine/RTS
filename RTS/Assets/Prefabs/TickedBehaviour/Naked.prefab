@@ -71,6 +71,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5719273635459304380, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816396306792564142, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816396306792564142, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5e0892d9831cca46a9d11b3ec46df04, type: 3}
 --- !u!1 &919682063634932821 stripped
@@ -91,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _viewRadius: 5
+  _fogRepeller: {fileID: 0}
   HealthBar: {fileID: 3603240131747965804}
   _data: {fileID: 11400000, guid: 560ca869988fc3046845155149cf6267, type: 2}
   _currentHealth: 0

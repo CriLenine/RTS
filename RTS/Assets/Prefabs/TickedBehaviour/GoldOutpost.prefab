@@ -11,6 +11,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldOutpost
       objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374124352718371248, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2543660346750743713, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641900104719006387, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641900104719006387, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6271213867209807365, guid: f82aa10974fce074f9c1c2cd0e13b1a6, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -86,7 +110,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01ecc0bda47b6664b9f1ef43920d11f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viewSqrtRadius: 10
+  _viewRadius: 10
+  _fogRepeller: {fileID: 0}
   _isBuilt: 0
   _buildingData: {fileID: 11400000, guid: d431ec0daabd6334fab2a96de10b774c, type: 2}
   _currentWorkforce: 0

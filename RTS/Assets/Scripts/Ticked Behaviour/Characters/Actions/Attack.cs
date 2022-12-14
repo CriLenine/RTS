@@ -52,7 +52,7 @@ public class Attack : Action
 
     protected override bool Update()
     {
-        if (!_target) return true;//target already dead no point 
+        if (_target == null) return true;//target already dead no point 
 
         if ((_posToAttack - (Vector2)_charaTransform.position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
         {

@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a40b3bbf79eb44b4ea26eba8595af, type: 3}
   m_Name: Attack
   m_EditorClassIdentifier: 
+  _actionType: 1
   Sprite: {fileID: 21300000, guid: 38d483c27e3ec17429685ff8b5a6eebc, type: 3}
+  ToogledSprite: {fileID: 21300000, guid: 3fc95232fa1f34a4b815180436801931, type: 3}
   Color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
