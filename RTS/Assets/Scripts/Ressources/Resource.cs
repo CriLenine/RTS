@@ -45,7 +45,13 @@ public abstract class Resource : MonoBehaviour
         }
     }
 
-    protected Dictionary<Vector2Int, int> _items = new Dictionary<Vector2Int, int>();
+    public Amount CurrentAmount;
+
+    [SerializeField]
+    private ResourceData _data;
+
+    protected Dictionary<Vector2Int, int> _itemsNHarvested = new Dictionary<Vector2Int, int>();
+    protected Dictionary<Vector2Int, bool> _itemsReservations = new Dictionary<Vector2Int, bool>();
 
     private readonly List<Vector2Int> _dirs = new List<Vector2Int>
         {
@@ -55,17 +61,9 @@ public abstract class Resource : MonoBehaviour
             Vector2Int.right
         };
 
-    public void AddItem(Vector2Int newItem) => _items.Add(newItem, 0);
-
-    public bool IsHarvestable(Vector2Int coords) => _items.ContainsKey(coords) && _items[coords] < Data.NMaxHarvestPerTile;
-
-    [SerializeField]
-    private ResourceData _data;
-
     public ResourceData Data => _data;
 
-    public Amount CurrentAmount;
-
+    public bool IsHarvestable(Vector2Int coords) => _itemsNHarvested.ContainsKey(coords) && _itemsNHarvested[coords] < Data.NMaxHarvestPerTile;
 
     /// <summary>
     /// Called when a tile is harvested. Executes the needed operations on the tile.
@@ -74,14 +72,21 @@ public abstract class Resource : MonoBehaviour
     public abstract void OnHarvestedTile(Vector2Int coords);
     public abstract void Bake();
 
+    public void AddItem(Vector2Int newItem)
+    { 
+        _itemsNHarvested.Add(newItem, 0);
+        _itemsReservations.Add(newItem, false);
+    }
+
     public void Clear()
     {
-        _items?.Clear();
+        _itemsNHarvested?.Clear();
+        _itemsReservations?.Clear();
     }
 
     public void Init()
     {
-        CurrentAmount = new Amount(Data.Type, _items.Count);
+        CurrentAmount = new Amount(Data.Type, _itemsNHarvested.Count);
         Bake();
     }
 
@@ -89,28 +94,35 @@ public abstract class Resource : MonoBehaviour
     /// Called when a tile is harvested.
     /// </summary>
     /// <returns>The position of the next tile to harvest, or <see langword="null"/> if no available tile has been found.</returns>
-    public virtual Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
+    public virtual Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, Vector2Int characterCoords, int performer, bool harvested)
     {
-        OnHarvestedTile(lastHarvested);
+        if (harvested && _itemsNHarvested.ContainsKey(lastHarvested))
+        {
+            OnHarvestedTile(lastHarvested);
+            _itemsReservations[lastHarvested] = false;
+            if (++_itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile)
+                _itemsNHarvested.Remove(lastHarvested);
 
-        if (++_items[lastHarvested] >= Data.NMaxHarvestPerTile)
-            _items.Remove(lastHarvested);
-
-        if (CurrentAmount.Value < 1)
-            return null;
+            if (CurrentAmount.Value < 1)
+                return null;
+        }
 
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         foreach (Vector2Int harvestableTile in GetHarvestableTiles(lastHarvested))
         {
             Stopwatch sw = Stopwatch.StartNew();
-            if (IsPath(lastHarvested, harvestableTile, performer))
+            if (!_itemsReservations[harvestableTile] && !IsSurrounded(harvestableTile, performer) && IsPath(characterCoords, harvestableTile, performer))
                 availableTiles.Add(harvestableTile);
             Debug.Log($"IsPath took {sw.ElapsedMilliseconds} ms.");
         }
 
         //If we found at least one candidate
         if (availableTiles.Count > 0)
-            return FindClosestCoords(availableTiles, attractionPoint);
+        {
+            Vector2Int chosenCoords = FindClosestCoords(availableTiles, attractionPoint);
+            _itemsReservations[chosenCoords] = true;
+            return chosenCoords;
+        }
 
         Debug.Log("No next suitable tile found.");
         return null;
@@ -129,8 +141,8 @@ public abstract class Resource : MonoBehaviour
         foreach (Vector2Int dir in _dirs)
         {
             Vector2Int tileCoords = coords + dir;
-            if (_items.TryGetValue(tileCoords, out int nHarvested))
-                if (nHarvested < Data.NMaxHarvestPerTile)
+            if (_itemsNHarvested.TryGetValue(tileCoords, out int nHarvested))
+                if (nHarvested < Data.NMaxHarvestPerTile && !_itemsReservations[tileCoords])
                     availableTiles.Add(tileCoords);
         }
 
@@ -155,7 +167,7 @@ public abstract class Resource : MonoBehaviour
             for (int j = -3; j < 3; ++j)
             {
                 Vector2Int tileCoords = coords + new Vector2Int(i, j);
-                if (_items.ContainsKey(tileCoords))
+                if (_itemsNHarvested.ContainsKey(tileCoords))
                     harvestableTiles.Add(tileCoords);
             }
         }
@@ -222,4 +234,14 @@ public abstract class Resource : MonoBehaviour
 
         return false;
     }
+
+    private bool IsSurrounded(Vector2Int coords, int performer)
+    {
+        foreach (Vector2Int dir in _dirs)
+            if (TileMapManager.GetLogicalTile(coords + dir)?.IsFree(performer) == true)
+                return false;
+
+        return true;
+    }
+
 }

@@ -3,6 +3,8 @@ using UnityEngine.Tilemaps;
 
 public class ResourcesManager : MonoBehaviour
 {
+    private static ResourcesManager _instance;
+
     [SerializeField]
     private Tilemap _treesTilemap;
 
@@ -13,41 +15,46 @@ public class ResourcesManager : MonoBehaviour
     private Aggregate[] _aggregates;
     private Camp[] _camps;
 
+    private void Awake()
+    {
+        _instance ??= this;
+    }
+
     private void Start()
     {
         Bake();
     }
 
-    public bool Harvestable(Vector2Int coords)
+    public static bool Harvestable(Vector2Int coords)
     {
         return HasTree(coords) && GetNearestForest(coords).IsHarvestable(coords) 
             || HasRock(coords) && GetNearestAggregate(coords).IsHarvestable(coords);
     }
-    public bool HasTree(Vector2Int coords)
+    public static bool HasTree(Vector2Int coords)
     {
-        return _treesTilemap.HasTile(new Vector3Int(coords.x, coords.y));
+        return _instance._treesTilemap.HasTile(new Vector3Int(coords.x, coords.y));
     }
-    public bool HasTree(Vector2 position)
+    public static bool HasTree(Vector2 position)
     {
         return HasTree(new Vector2Int((int)position.x, (int)position.y));
     }
-    public bool HasRock(Vector2Int coords)
+    public static bool HasRock(Vector2Int coords)
     {
-        return _rocksTilemap.HasTile(new Vector3Int(coords.x, coords.y));
+        return _instance._rocksTilemap.HasTile(new Vector3Int(coords.x, coords.y));
     }
-    public bool HasRock(Vector2 position)
+    public static bool HasRock(Vector2 position)
     {
         return HasRock(new Vector2Int((int)position.x, (int)position.y));
     }
 
-    public void RemoveTree(Vector2Int coords)
+    public static void RemoveTree(Vector2Int coords)
     {
-        _treesTilemap.SetTile(new Vector3Int(coords.x, coords.y), null);
+        _instance._treesTilemap.SetTile(new Vector3Int(coords.x, coords.y), null);
     }
 
-    public void RemoveRock(Vector2Int coords)
+    public static void RemoveRock(Vector2Int coords)
     {
-        _rocksTilemap.SetTile(new Vector3Int(coords.x, coords.y), null);
+        _instance._rocksTilemap.SetTile(new Vector3Int(coords.x, coords.y), null);
     }
 
     /// <summary>
@@ -88,48 +95,48 @@ public class ResourcesManager : MonoBehaviour
             resource.Init();
     }
 
-    public Forest GetNearestForest(Vector2Int position)
+    public static Forest GetNearestForest(Vector2Int position)
     {
         (int minMagnitude, int index) = (int.MaxValue, 0);
 
-        for (int i = 0; i < _forests.Length; ++i)
+        for (int i = 0; i < _instance._forests.Length; ++i)
         {
-            int currentMagnitude = ((Vector2Int)_treesTilemap.WorldToCell(_forests[i].transform.position) - position).sqrMagnitude;
+            int currentMagnitude = ((Vector2Int)_instance._treesTilemap.WorldToCell(_instance._forests[i].transform.position) - position).sqrMagnitude;
 
             if (currentMagnitude < minMagnitude)
                 (minMagnitude, index) = (currentMagnitude, i);
         }
 
-        return _forests[index];
+        return _instance._forests[index];
     }
 
-    public Aggregate GetNearestAggregate(Vector2Int position)
+    public static Aggregate GetNearestAggregate(Vector2Int position)
     {
         (int minMagnitude, int index) = (int.MaxValue, 0);
 
-        for (int i = 0; i < _aggregates.Length; ++i)
+        for (int i = 0; i < _instance._aggregates.Length; ++i)
         {
-            int currentMagnitude = ((Vector2Int)_rocksTilemap.WorldToCell(_aggregates[i].transform.position) - position).sqrMagnitude;
+            int currentMagnitude = ((Vector2Int)_instance._rocksTilemap.WorldToCell(_instance._aggregates[i].transform.position) - position).sqrMagnitude;
 
             if (currentMagnitude < minMagnitude)
                 (minMagnitude, index) = (currentMagnitude, i);
         }
 
-        return _aggregates[index];
+        return _instance._aggregates[index];
     }
 
-    public Camp GetNearestCamp(CampEntity campEntity)
+    public static Camp GetNearestCamp(CampEntity campEntity)
     {
         (float minMagnitude, int index) = (float.MaxValue, 0);
 
-        for (int i = 0; i < _camps.Length; ++i)
+        for (int i = 0; i < _instance._camps.Length; ++i)
         {
-            float currentMagnitude = (_camps[i].transform.position - campEntity.Position).sqrMagnitude;
+            float currentMagnitude = (_instance._camps[i].transform.position - campEntity.Position).sqrMagnitude;
 
             if (currentMagnitude < minMagnitude)
                 (minMagnitude, index) = (currentMagnitude, i);
         }
 
-        return _camps[index];
+        return _instance._camps[index];
     }
 }

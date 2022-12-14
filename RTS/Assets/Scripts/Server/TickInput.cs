@@ -80,13 +80,13 @@ public class TickInput
         };
     }
 
-    public static TickInput Harvest(Vector2 position, int target, int performer = 0)
+    public static TickInput Harvest(Vector2 position, int[] targets, int performer = 0)
     {
         return new TickInput()
         {
             Type = InputType.Harvest,
 
-            Targets = new int[1] { target },
+            Targets = targets,
             Position = position,
             Performer = performer
         };

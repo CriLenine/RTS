@@ -11,9 +11,9 @@ public class Forest : Resource
         Vector2Int coords = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         Node<Vector2Int>.Init(coords);
 
-        _items.Add(coords, 0);
+        _itemsNHarvested.Add(coords, 0);
 
-        RBuildTree(Node<Vector2Int>.RootNode, ^1, ySorted: new List<Vector2Int>(_items.Keys));
+        RBuildTree(Node<Vector2Int>.RootNode, ^1, ySorted: new List<Vector2Int>(_itemsNHarvested.Keys));
     }
 
     /*public override Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, int performer)
@@ -74,7 +74,7 @@ public class Forest : Resource
 
     public override void OnHarvestedTile(Vector2Int coords)
     {
-        GameManager.ResourcesManager.RemoveTree(coords);
+        ResourcesManager.RemoveTree(coords);
         TileMapManager.GetLogicalTile(coords).State = TileState.Free;
         CurrentAmount = CurrentAmount.RemoveQuantity(1);
     }

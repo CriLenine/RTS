@@ -71,9 +71,10 @@ public partial class NetworkManager
                     case InputType.Harvest:
                         {
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
-                            int target = message.GetInt(i++);
 
-                            inputs.Add(TickInput.Harvest(position, target, performer));
+                            int[] ids = Extract<int>(message, i, out i);
+
+                            inputs.Add(TickInput.Harvest(position, ids, performer));
                             break;
                         }
                     case InputType.Attack:

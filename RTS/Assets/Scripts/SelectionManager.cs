@@ -88,15 +88,22 @@ public class SelectionManager : MonoBehaviour
 
         LogicalTile rallyTile = TileMapManager.GetLogicalTile(rallyPointCoords);
 
-        if (CharacterManager.SelectedCharacters.Count == 1 &&
-            (GameManager.ResourcesManager.HasRock(rallyPointCoords) || GameManager.ResourcesManager.HasTree(rallyPointCoords)))
+        if (rallyTile == null)
+            return;
+
+        if (!rallyTile.IsFree(NetworkManager.Me))
         {
-            NetworkManager.Input(TickInput.Harvest(rallyPointCoords, CharacterManager.SelectedCharacters[0].ID));
+            if (ResourcesManager.Harvestable(rallyPointCoords))
+            {
+                int[] ids = new int[CharacterManager.SelectedCharacters.Count];
+
+                for (int i = 0; i < CharacterManager.SelectedCharacters.Count; ++i)
+                    ids[i] = CharacterManager.SelectedCharacters[i].ID;
+
+                NetworkManager.Input(TickInput.Harvest(rallyPointCoords, ids));
+            }
             return;
         }
-
-        if (rallyTile == null || !rallyTile.IsFree(NetworkManager.Me))
-            return;
 
         int[] IDs = new int[CharacterManager.SelectedCharacters.Count];
 

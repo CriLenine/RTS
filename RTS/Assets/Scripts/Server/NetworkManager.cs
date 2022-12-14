@@ -348,8 +348,9 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Harvest:
-                message.Add(input.Position.x, input.Position.y, input.Targets[0]);
+                message.Add(input.Position.x, input.Position.y);
 
+                Spread(message, input.Targets);
                 break;
         }
 

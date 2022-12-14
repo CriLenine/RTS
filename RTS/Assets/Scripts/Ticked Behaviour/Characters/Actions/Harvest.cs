@@ -21,19 +21,22 @@ public class Harvest : Action
 
     protected override bool Update()
     {
-        if (--_duration < 0f)
+        if (--_duration < 0f || !ResourcesManager.Harvestable(_coords))
         {
             Peon peon = _character as Peon;
 
-            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
+            if (_duration < 0f)
             {
-                peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
+                if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
+                {
+                    peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
+                }
+
+                peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
             }
 
-            peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
-
             Stopwatch sw = Stopwatch.StartNew();
-            Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _performer);
+            Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _character.Coords, _performer, _duration < 0f);
             sw.Stop();
             Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
             if (newInputCoords == null)
@@ -78,7 +81,7 @@ public class Harvest : Action
             return true;
         }
 
-        return !GameManager.ResourcesManager.Harvestable(_coords);
+        return false;
     }
 
     private Building GetNearestResourceStorer(ResourceType type)

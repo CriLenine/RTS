@@ -152,21 +152,26 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Harvest:
-                    Peon harvester = (Peon)_instance._myEntities[input.Targets[0]];
                     Resource resource = null;
                     Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
-                    if (_instance._resourcesManager.HasTree(input.Position))
+                    if (ResourcesManager.HasTree(input.Position))
                     {
-                        resource = _instance._resourcesManager.GetNearestForest(inputCoords);
+                        resource = ResourcesManager.GetNearestForest(inputCoords);
                     }
-                    else if (_instance._resourcesManager.HasRock(input.Position))
+                    else if (ResourcesManager.HasRock(input.Position))
                     {
-                        resource = _instance._resourcesManager.GetNearestAggregate(inputCoords);
+                        resource = ResourcesManager.GetNearestAggregate(inputCoords);
                     }
-                    Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
-                    Spawn(harvestingCoords);
-                    MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), input.Targets);
-                    harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
+
+                    for (int i = 0; i < input.Targets.Length; ++i)
+                    {
+
+                        Peon harvester = (Peon)_instance._myEntities[input.Targets[i]];
+                        Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
+                        Spawn(harvestingCoords);
+                        MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), new int[] { input.Targets[i] });
+                        harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
+                    }
                     break;
                     
                 case InputType.Attack:
