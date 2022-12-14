@@ -10,11 +10,6 @@ public class Camp : Resource
 
     public void AddEntity(CampEntity entity) => _entities.Add(entity);
 
-    public override void Bake()
-    {
-        throw new NotImplementedException();
-    }
-
     public new void Clear() => _entities?.Clear();
 
     /// <summary>

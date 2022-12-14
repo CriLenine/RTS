@@ -277,7 +277,7 @@ public class TileMapManager : MonoBehaviour
     [SerializeField]
     private List<Vector2Int> _wayPointsLissed;
 
-    public static List<Vector2Int> FindPathWithTag(int performer, Vector2Int startCoords, Vector2Int endCoords, TileTag tag, int additionnalWeight = 0)
+    public static LogicalTile FindPathWithTag(int performer, Vector2Int startCoords, Vector2Int endCoords, TileTag tag, int additionnalWeight = 0)
     {
         if (_instance._debug)
             _instance._stopwatch = Stopwatch.StartNew();
@@ -301,8 +301,6 @@ public class TileMapManager : MonoBehaviour
 
         openTiles.Add(startTile);
 
-        LogicalTile currentTile = startTile, lastTile;
-
         while (openTiles.Count > 0)
         {
             int closestTileIndex = 0;
@@ -311,47 +309,11 @@ public class TileMapManager : MonoBehaviour
                 if (openTiles[i].F < openTiles[closestTileIndex].F)
                     closestTileIndex = i;
 
-            lastTile = currentTile;
-
-            currentTile = openTiles[closestTileIndex];
+            LogicalTile currentTile = openTiles[closestTileIndex];
             openTiles.RemoveAt(closestTileIndex);
 
             if (currentTile == endTile || currentTile.Tag == tag)
-            {
-                currentTile = lastTile;
-
-                List<Vector2Int> path = new List<Vector2Int>();
-                _instance._wayPoints = new List<Vector2Int>();
-
-                Vector2Int lastDirection = Vector2Int.zero;
-
-                while (currentTile != startTile)
-                {
-                    Vector2Int direction = currentTile.Parent.Coords - currentTile.Coords;
-
-                    _instance._wayPoints.Add(currentTile.Coords);
-
-                    if (direction != lastDirection)
-                        path.Add(currentTile.Coords);
-
-                    lastDirection = direction;
-                    currentTile = currentTile.Parent;
-                }
-
-                _instance._wayPoints.Add(startTile.Coords);
-                path.Add(startTile.Coords);
-
-                _instance._wayPointsLissed = path;
-
-                if (_instance._debug)
-                {
-                    _instance._stopwatch.Stop();
-
-                    Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
-                }
-
-                return path;
-            }
+                return currentTile.Parent ?? startTile;
 
             for (int moveIndex = 0; moveIndex < _instance._unitDisplacements.Length; ++moveIndex)
             {
@@ -361,6 +323,9 @@ public class TileMapManager : MonoBehaviour
                     continue;
 
                 if (neighborTile.IsObstacle(performer) && neighborTile.Tag != tag)
+                    continue;
+
+                if (neighborTile.Tag == tag && moveIndex >= 4)
                     continue;
 
                 float moveWeight = moveIndex < 4 ? 1f : 1.4f;
@@ -575,6 +540,9 @@ public class TileMapManager : MonoBehaviour
         foreach (LogicalTile tile in _instance._tiles.Values)
         {
             Gizmos.color = tile.IsFree(0) ? Color.green : Color.red;
+
+            Gizmos.color = tile.Tag == TileTag.None ? Color.green : tile.Tag == TileTag.Tree ? Color.blue : Color.red;
+
 
             Gizmos.DrawWireSphere(TilemapCoordsToWorld(tile.Coords), TileSize / 3f);
         }

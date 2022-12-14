@@ -21,67 +21,64 @@ public class Harvest : Action
 
     protected override bool Update()
     {
-        if (--_duration < 0f || !ResourcesManager.Harvestable(_coords))
+        if (--_duration >= 0f && ResourcesManager.Harvestable(_coords))
+            return false;
+
+        /* The harvested tile is depleted */
+
+        Peon peon = _character as Peon;
+
+        if (_duration < 0f)     // This peon just finished harvesting the tile
         {
-            Peon peon = _character as Peon;
+            if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) // The peon carries another type of resource, or nothing
+                peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
 
-            if (_duration < 0f)
-            {
-                if (peon.CarriedResource.Value == 0 || peon.CarriedResource.Type != _resource.Data.Type) //if peon carries other resource or nothing
-                {
-                    peon.CarriedResource = new Resource.Amount(_resource.Data.Type);
-                }
-
-                peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
-            }
-
-            Stopwatch sw = Stopwatch.StartNew();
-            Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _character.Coords, _performer, _duration < 0f);
-            sw.Stop();
-            //Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
-            if (newInputCoords == null)
-            {
-                Debug.Log("No available tile found to continue harvest.");
-                return true;
-            }
-            sw = Stopwatch.StartNew();
-            Vector2Int nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords, _performer);
-            sw.Stop();
-            //Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
-
-            Vector2Int nextCoordsToHarvest = _resource.GetTileToHarvest(nextCoordsToGo, _attractionPoint);
-
-            Action nextAction;
-
-            List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo);
-
-            if(wayPointsToGo == null)
-                Debug.Log("fdp go");
-
-            if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) //need to deposit
-            {
-                Building building = GetNearestResourceStorer(_resource.Data.Type);
-                if (building == null)
-                {
-                    Debug.Log("No suitable resource storer found");
-                    return true;
-                }
-                List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, GetDepositPosition(building));
-
-                if (wayPointsToDeposit == null)
-                    Debug.Log("fdp deposit");
-                nextAction = new MoveHarvest(_character, wayPointsToDeposit, nextCoordsToGo, (IResourceStorer)building, _performer);
-            }
-            else
-                nextAction = new Move(_character, wayPointsToGo);
-
-            AddAction(nextAction);
-            AddAction(new Harvest(_character, nextCoordsToHarvest, _attractionPoint, _resource, _performer));
-
-            return true;
+            peon.CarriedResource = peon.CarriedResource.AddQuantity(_resource.Data.AmountPerHarvest);
         }
 
-        return false;
+        //Stopwatch sw = Stopwatch.StartNew();
+        Vector2Int? newInputCoords = _resource.GetNext(_coords, _attractionPoint, _character.Coords, _performer, _duration < 0f);
+        //sw.Stop();
+        //Debug.Log($"GetNext in {sw.Elapsed.TotalMilliseconds} ms");
+        if (newInputCoords == null)
+            return true;
+
+        //sw = Stopwatch.StartNew();
+        Vector2Int? nextCoordsToGo = _resource.GetHarvestingPosition((Vector2Int)newInputCoords, _character.Coords, _performer);
+        //sw.Stop();
+        //Debug.Log($"GetHarvestingPosition in {sw.Elapsed.TotalMilliseconds} ms");
+        if (nextCoordsToGo == null)
+            return true;
+
+        Vector2Int? nextCoordsToHarvest = _resource.GetTileToHarvest((Vector2Int)nextCoordsToGo, _attractionPoint);
+        if (nextCoordsToHarvest == null)
+            return true;
+
+        Action nextAction;
+
+        List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, (Vector2Int)nextCoordsToGo);
+        if (wayPointsToGo == null)
+            Debug.LogError("Pathfinding failed unexpectedly.");
+
+        if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) // The peon needs to deposit his resources
+        {
+            Building building = GetNearestResourceStorer(_resource.Data.Type);
+            if (building == null)
+                Debug.LogError($"There is no suitable resource storer of {_resource.Data.Type}.");
+
+            List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, GetDepositPosition(building));
+            if (wayPointsToDeposit == null)
+                Debug.LogError("Pathfinding failed unexpectedly.");
+
+            nextAction = new MoveHarvest(_character, wayPointsToDeposit, (Vector2Int)nextCoordsToGo, (IResourceStorer)building, _performer);
+        }
+        else
+            nextAction = new Move(_character, wayPointsToGo);
+
+        AddAction(nextAction);
+        AddAction(new Harvest(_character, (Vector2Int)nextCoordsToHarvest, _attractionPoint, _resource, _performer));
+
+        return true;
     }
 
     private Building GetNearestResourceStorer(ResourceType type)

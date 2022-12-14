@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static UnityEngine.GraphicsBuffer;
+using UnityEngine.TextCore.Text;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
@@ -165,11 +167,20 @@ public class GameManager : MonoBehaviour
 
                     for (int i = 0; i < input.Targets.Length; ++i)
                     {
-
                         Peon harvester = (Peon)_instance._myEntities[input.Targets[i]];
-                        Vector2Int harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
-                        MoveCharacters(input.Performer, TileMapManager.TilemapCoordsToWorld(harvestingCoords), new int[] { input.Targets[i] });
-                        harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
+
+                        Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
+                        if (harvestingCoords == null)
+                            break;
+
+                        List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(input.Performer, harvester, (Vector2Int)harvestingCoords);
+
+                        Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);
+                        if (coordsToHarvest == null)
+                            break;
+
+                        harvester.AddAction(new Move(harvester, wayPoints));
+                        harvester.AddAction(new Harvest(harvester, (Vector2Int)coordsToHarvest, inputCoords, resource, input.Performer));
                     }
                     break;
                     
