@@ -115,7 +115,7 @@ Transform:
   m_Children:
   - {fileID: 865985280468655041}
   m_Father: {fileID: 4670712230874212594}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &8293188086938032494
 LineRenderer:
@@ -246,7 +246,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4670712230874212594}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1438679105530170776
 SpriteRenderer:
@@ -298,7 +298,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &5609837110896195792
 GameObject:
@@ -331,7 +331,7 @@ RectTransform:
   m_Children:
   - {fileID: 9152381362142037677}
   m_Father: {fileID: 4670712230874212594}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -389,7 +389,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4670712230874212594}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4683618110804923485
 SpriteRenderer:
@@ -564,10 +564,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 692117549513410441, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4096350244577638114, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
       propertyPath: m_Name
       value: Character
@@ -575,6 +571,10 @@ PrefabInstance:
     - target: {fileID: 4096350244577638114, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5444996235768900461, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7370534773866142992, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
       propertyPath: m_RootOrder
