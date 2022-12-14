@@ -17,8 +17,8 @@ TagManager:
   - view
   - Cursor
   - 
-  - FogOfWarMain
-  - FogOfWarSecondary
+  - FogOfWarPersistent
+  - FogOfWarCurrent
   - 
   - HUD
   - 

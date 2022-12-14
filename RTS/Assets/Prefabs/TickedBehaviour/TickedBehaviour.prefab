@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2619145643378677395}
   - component: {fileID: 4466580008226640735}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: Sprite View Persistent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a965cb7d8ba173f4aafca1251536db7f, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 0.49019608}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5444996235768900461}
   - component: {fileID: 4253772688821612047}
-  m_Layer: 12
+  m_Layer: 13
   m_Name: Sprite View Current
   m_TagString: Untagged
   m_Icon: {fileID: 0}
