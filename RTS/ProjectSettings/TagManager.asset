@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - MainCamera
   - Water
   - UI
   - 
@@ -16,8 +16,8 @@ TagManager:
   - Clickable
   - view
   - 
-  - 
-  - 
+  - FogOfWarMain
+  - FogOfWarSecondary
   - 
   - 
   - 
@@ -43,4 +43,7 @@ TagManager:
     locked: 0
   - name: Secondary
     uniqueID: 2080985327
+    locked: 0
+  - name: FogOfWar
+    uniqueID: 2623993843
     locked: 0

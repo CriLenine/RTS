@@ -12,6 +12,9 @@ public abstract class TickedBehaviour : MonoBehaviour
     {
         T tickedBehaviour = Instantiate(prefab, position, quaternion);
 
+        if (performer != NetworkManager.Me)
+            tickedBehaviour.ViewRadius = 0;
+
         tickedBehaviour.ID = NextID;
         tickedBehaviour.Performer = performer;
 
@@ -39,7 +42,10 @@ public abstract class TickedBehaviour : MonoBehaviour
     private int _viewRadius = 10;
 
     [SerializeField]
-    private SpriteMask _fogRepeller;
+    private Transform _persistentView;
+
+    [SerializeField]
+    private Transform _currenttView;
 
     public int ViewRadius
     {
@@ -55,14 +61,15 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _fogRepeller = GetComponentInChildren<SpriteMask>();
+        _persistentView = transform.GetChild(0);
+        _currenttView = transform.GetChild(1);
 
         ApplyViewRadius();
     }
 
     private void ApplyViewRadius()
     {
-        _fogRepeller.transform.localScale = Vector3.one * ViewRadius;
+        _persistentView.localScale = _currenttView.localScale = Vector3.one * ViewRadius;
     }
 
     public void SetPosition(Vector3 position)

@@ -269,6 +269,8 @@ public partial class NetworkManager : MonoBehaviour
 
                     _tickPeriod = BaseTickPeriod;
 
+                    _ticks.Clear();
+
                     _id = message.GetInt(1);
                     _roomSize = message.GetInt(0);
 
@@ -295,6 +297,8 @@ public partial class NetworkManager : MonoBehaviour
                 case "Disconnect":
                     Debug.Log("Disconnect : " + message.GetString(0));
 
+                    QuitRoom();
+
                     break;
             }
         }
@@ -318,8 +322,6 @@ public partial class NetworkManager : MonoBehaviour
                 break;
 
             case InputType.Move:
-                
-
                 message.Add(input.Position.x,input.Position.y);
 
                 Spread(message, input.Targets);
@@ -455,6 +457,8 @@ public partial class NetworkManager : MonoBehaviour
 
             _instance._server.Disconnect();
 
+            _instance.StopCoroutine(_instance.Loop());
+
             _instance._server = null;
 
             _instance._isRunning = false;
@@ -475,9 +479,7 @@ public partial class NetworkManager : MonoBehaviour
     {
         Debug.Log("Disconnected from room : " + reason);
 
-        _instance.StopCoroutine(_instance.Loop());
-
-        _instance._server = null;
+        QuitRoom();
     }
 
     private void OnDestroy()
