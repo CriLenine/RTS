@@ -10,14 +10,11 @@ public class Harvest : Action
     private readonly Vector2Int _attractionPoint;
     private readonly Resource _resource;
     private float _duration;
-    private readonly int _performer;
     private bool _isHarvesting;
-    public Harvest(Character character, Vector2Int coords, Vector2Int attractionPoint, Resource resource, int performer) : base(character)
+    public Harvest(Character character, Vector2Int attractionPoint, Resource resource) : base(character)
     {
         _attractionPoint = attractionPoint;
         _resource = resource;
-        //_duration = resource.Data.HarvestingTime / 0.025f;
-        _performer = performer;
     }
 
     protected override bool Update()
@@ -48,13 +45,13 @@ public class Harvest : Action
         {
             Building building = GetNearestResourceStorer(_resource.Data.Type);
             if (building == null)
-                Debug.LogError($"There is no suitable resource storer of {_resource.Data.Type}.");
+                Debug.LogError($"There is no resource storer of {_resource.Data.Type}.");
 
-            List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_performer, _character, GetDepositPosition(building));
+            List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, GetDepositPosition(building));
             if (wayPointsToDeposit == null)
                 Debug.LogError("Pathfinding failed unexpectedly.");
 
-            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, (IResourceStorer)building, _resource, _performer));
+            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, (IResourceStorer)building, _resource));
             return true;
         }
 
@@ -71,14 +68,14 @@ public class Harvest : Action
 
         /* The peon needs to move to find resources */
 
-        Vector2Int? newInputCoords = _resource.GetNext(_attractionPoint, _character.Coords, _performer);
+        Vector2Int? newInputCoords = _resource.GetNext(_attractionPoint, _character.Coords, _character.Performer);
         if (newInputCoords != null)
         {
-            Vector2Int? nextCoordsToGo = _resource.GetHarvestingPosition(newInputCoords.Value, _character.Coords, _performer);
+            Vector2Int? nextCoordsToGo = _resource.GetHarvestingPosition(newInputCoords.Value, _character.Coords, _character.Performer);
             if (nextCoordsToGo == null)
                 return true;
 
-            List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo.Value);
+            List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, nextCoordsToGo.Value);
             if (wayPointsToGo == null)
                 Debug.LogError("Pathfinding failed unexpectedly.");
 
@@ -124,8 +121,8 @@ public class Harvest : Action
                     if (i != -outline && i != outline && j != -outline && j != outline)
                         continue;
                     Vector2Int tileCoords = building.Coords + new Vector2Int(i, j);
-                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(_performer) == true
-                        && TileMapManager.FindPath(_performer, _character.Coords, tileCoords)?.Count > 0)
+                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(_character.Performer) == true
+                        && TileMapManager.FindPath(_character.Performer, _character.Coords, tileCoords)?.Count > 0)
                         availableTiles.Add(tileCoords);
                 }
             }

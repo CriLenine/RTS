@@ -175,8 +175,8 @@ public class GameManager : MonoBehaviour
                         if (coordsToHarvest == null)
                             break;
 
-                        harvester.AddAction(new Move(harvester, wayPoints));
-                        harvester.AddAction(new Harvest(harvester, (Vector2Int)coordsToHarvest, inputCoords, resource, input.Performer));
+                        harvester.SetAction(new Move(harvester, wayPoints));
+                        harvester.AddAction(new Harvest(harvester, inputCoords, resource));
                     }
                     break;
 
@@ -191,7 +191,7 @@ public class GameManager : MonoBehaviour
                 case InputType.GameOver:
                     if(input.Performer != NetworkManager.Me)
                     {
-                        Debug.Log("Player " + input.Performer + " is bad and loose. GameOver");
+                        Debug.Log("Player " + input.Performer + " is bad and loses. GameOver");
                         NetworkManager.QuitRoom();
                     }
                     break;

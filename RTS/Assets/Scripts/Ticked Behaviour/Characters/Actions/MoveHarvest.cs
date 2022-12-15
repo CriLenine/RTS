@@ -5,12 +5,10 @@ public class MoveHarvest : Move
 {
     private readonly Resource _resource;
     private readonly IResourceStorer _resourceStorer;
-    private readonly int _performer;
-    public MoveHarvest(Character character, List<Vector2> depositPositions, IResourceStorer resourceStorer, Resource resource, int performer) : base(character, depositPositions)
+    public MoveHarvest(Character character, List<Vector2> depositPositions, IResourceStorer resourceStorer, Resource resource) : base(character, depositPositions)
     {
         _resource = resource;
         _resourceStorer = resourceStorer;
-        _performer = performer;
     }
 
     protected override bool Update()
@@ -29,9 +27,17 @@ public class MoveHarvest : Move
 
             Peon harvester = _character as Peon;
 
-            _resourceStorer.Fill(harvester.CarriedResource, _performer);
+            _resourceStorer.Fill(harvester.CarriedResource, _character.Performer);
 
             harvester.CarriedResource = new Resource.Amount(harvester.CarriedResource.Type);
+
+            Vector2Int? harvestingPosition = _resource.GetHarvestingPosition(_resource.GetFirst(), _character.Coords, _character.Performer);
+
+            if (harvestingPosition != null)
+            {
+                harvester.SetAction(new Move(_character, LocomotionManager.RetrieveWayPoints(_character.Performer, _character, harvestingPosition.Value)));
+                harvester.SetAction(new Harvest(_character, harvestingPosition.Value, _resource));
+            }
 
             return true;
         }

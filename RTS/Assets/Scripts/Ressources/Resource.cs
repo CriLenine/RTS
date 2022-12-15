@@ -67,21 +67,17 @@ public abstract class Resource : MonoBehaviour
     /// </summary>
     public bool IsHarvestable(Vector2Int coords) => _itemsNHarvested.ContainsKey(coords);
 
+    public void AddItem(Vector2Int newItem) => _itemsNHarvested.Add(newItem, 0);
+
+    public void Clear() => _itemsNHarvested?.Clear();
+
+    public Vector2Int GetFirst() => new List<Vector2Int>(_itemsNHarvested.Keys)[0];
+
     /// <summary>
     /// Called when a tile is harvested. Executes the needed operations on the tile.
     /// </summary>
     /// <param name="coords">The coords of the harvested tile</param>
     public abstract void OnHarvestedTile(Vector2Int coords);
-
-    public void AddItem(Vector2Int newItem)
-    { 
-        _itemsNHarvested.Add(newItem, 0);
-    }
-
-    public void Clear()
-    {
-        _itemsNHarvested?.Clear();
-    }
 
     public void Init()
     {
