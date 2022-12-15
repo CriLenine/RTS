@@ -133,26 +133,18 @@ public abstract class Resource : MonoBehaviour
     /// Called when a tile is harvested.
     /// </summary>
     /// <returns>The position of the next tile to harvest, or <see langword="null"/> if the resource is depleted or if no close suitable tile has been found.</returns>
-    public virtual Vector2Int? GetNext(Vector2Int lastHarvested, Vector2Int attractionPoint, Vector2Int characterCoords, int performer, bool harvested)
+    public virtual Vector2Int? GetNext(Vector2Int attractionPoint, Vector2Int characterCoords, int performer)
     {
-        if (harvested && _itemsNHarvested.ContainsKey(lastHarvested))
+        if (CurrentAmount.Value < 1)
         {
-            OnHarvestedTile(lastHarvested);
-            if (++_itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile)
-                _itemsNHarvested.Remove(lastHarvested);
-
-            if (CurrentAmount.Value < 1)
-            {
-                Debug.Log("This resource is completely depleted.");
-                return null;
-            }
+            Debug.Log("This resource is completely depleted.");
+            return null;
         }
-
         /* Naive search around the last harvested tile */
 
         List<Vector2Int> availableTiles = new List<Vector2Int>();
         int outline = 0;
-        const int MAX_OUTLINE_SEARCH = 5;
+        const int MAX_OUTLINE_SEARCH = 10;
         while (++outline <= MAX_OUTLINE_SEARCH)
         {
             for (int i = -outline; i <= outline; ++i)
@@ -162,7 +154,7 @@ public abstract class Resource : MonoBehaviour
                     if (i != -outline && i != outline && j != -outline && j != outline)
                         continue;
 
-                    Vector2Int tileCoords = lastHarvested + new Vector2Int(i, j);
+                    Vector2Int tileCoords = characterCoords + new Vector2Int(i, j);
 
                     if (_itemsNHarvested.ContainsKey(tileCoords)
                         && !IsSurrounded(tileCoords, performer)
@@ -176,8 +168,18 @@ public abstract class Resource : MonoBehaviour
                 return FindClosestCoords(availableTiles, attractionPoint);
         }
 
-        Debug.Log($"There is no havestable and accessible tile within a {MAX_OUTLINE_SEARCH} tiles square around {lastHarvested}.");
+        Debug.Log($"There is no havestable and accessible tile within a {MAX_OUTLINE_SEARCH} tiles square around {characterCoords}.");
         return null;
+    }
+
+    public void HarvestTile(Vector2Int lastHarvested)
+    {
+        if (_itemsNHarvested.ContainsKey(lastHarvested))
+        {
+            OnHarvestedTile(lastHarvested);
+            if (++_itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile)
+                _itemsNHarvested.Remove(lastHarvested);
+        }
     }
 
     /// <summary>
@@ -197,7 +199,7 @@ public abstract class Resource : MonoBehaviour
         if (availableTiles.Count > 0)
             return FindClosestCoords(availableTiles, attractionPoint);
 
-        Debug.Log($"There's no harvestable tile from {coords}.");
+        //Debug.Log($"There's no harvestable tile from {coords}.");
         return null;
     }
 

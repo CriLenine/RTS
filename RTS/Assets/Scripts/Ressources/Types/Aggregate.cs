@@ -6,5 +6,6 @@ public class Aggregate : Resource
     public override void OnHarvestedTile(Vector2Int coords)
     {
         CurrentAmount = CurrentAmount.RemoveQuantity(Data.AmountPerHarvest);
+        TileMapManager.GetLogicalTile(coords).Tag = TileTag.None;
     }
 }

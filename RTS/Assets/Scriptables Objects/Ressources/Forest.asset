@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 1
   _amount: 0
-  _harvestingTime: 2
+  _harvestingTime: 0.5
   _amountPerHarvest: 1
   _nMaxHarvestPerTile: 1
