@@ -109,6 +109,8 @@ public partial class NetworkManager
                     case InputType.GameOver:
                         {
                             inputs.Add(TickInput.GameOver(performer));
+                            break;
+                        }
 
                     case InputType.GuardPosition:
                         {

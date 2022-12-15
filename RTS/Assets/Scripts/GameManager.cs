@@ -524,10 +524,10 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(2f, 0));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-2f, 0));
-            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(-1f, -2f));
-            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(1f, -2f));
+            CreateCharacter(i,0,(int)Character.Type.Peon,spawnPoint + new Vector2(2f, 0),true);
+            CreateCharacter(i, 0, (int)Character.Type.Peon, spawnPoint + new Vector2(-2f, 0), true);
+            CreateCharacter(i, 0, (int)Character.Type.Naked, spawnPoint + new Vector2(-1f, -2f), true);
+            CreateCharacter(i+1, 0, (int)Character.Type.Peon, spawnPoint + new Vector2(1f, -2f), true);
 
             CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, 0f), true);
             //CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f), true);
