@@ -13,7 +13,7 @@ public abstract class TickedBehaviour : MonoBehaviour
         T tickedBehaviour = Instantiate(prefab, position, quaternion);
 
         if (performer != NetworkManager.Me)
-            tickedBehaviour.ViewRadius = 0;
+            tickedBehaviour.DisableViewRadius();
 
         tickedBehaviour.ID = NextID;
         tickedBehaviour.Performer = performer;
@@ -71,6 +71,12 @@ public abstract class TickedBehaviour : MonoBehaviour
     private void ApplyViewRadius()
     {
         _persistentView.localScale = _currenttView.localScale = Vector3.one * ViewRadius;
+    }
+
+    private void DisableViewRadius()
+    {
+        _persistentView.gameObject.SetActive(false);
+        _currenttView.gameObject.SetActive(false);
     }
 
     public void SetPosition(Vector3 position)

@@ -271,8 +271,8 @@ public class TileMapManager : MonoBehaviour
 
     #region PathFinding
 
-    private List<Vector2Int> _wayPoints;
-    private List<Vector2Int> _wayPointsLissed;
+    private List<Vector2Int> _wayPoints = new List<Vector2Int>();
+    private List<Vector2Int> _wayPointsLissed = new List<Vector2Int>();
 
     public static LogicalTile FindPathWithTag(int performer, Vector2Int startCoords, Vector2Int endCoords, TileTag tag, int additionnalWeight = 0)
     {
@@ -538,7 +538,7 @@ public class TileMapManager : MonoBehaviour
         {
             Gizmos.color = tile.IsFree(0) ? Color.green : Color.red;
 
-            Gizmos.color = tile.Tag == TileTag.None ? Color.green : tile.Tag == TileTag.Tree ? Color.blue : Color.red;
+            //Gizmos.color = tile.Tag == TileTag.None ? Color.green : tile.Tag == TileTag.Tree ? Color.blue : Color.red;
 
 
             Gizmos.DrawWireSphere(TilemapCoordsToWorld(tile.Coords), TileSize / 3f);

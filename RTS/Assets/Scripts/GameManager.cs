@@ -373,7 +373,7 @@ public class GameManager : MonoBehaviour
         Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, position, attackers);
         foreach (List<Character> group in groupsAndPathfindings.Keys)
         {
-            if (groupsAndPathfindings[group] != null)
+            if (groupsAndPathfindings[group]?.Count > 0 == true)
             {
                 groupsAndPathfindings[group][^1] = position;
 
