@@ -66,8 +66,4 @@ public abstract class BuildingData : ScriptableObject
     private int _meleeArmor, _rangeArmor;
     public int MeleeArmor => _meleeArmor;
     public int RangeArmor => _rangeArmor;
-
-    [SerializeField]
-    private Sprite[] _buildingProgressSprites;
-    public Sprite[] BuildingProgressSprites => _buildingProgressSprites;
 }

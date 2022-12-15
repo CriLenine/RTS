@@ -285,7 +285,6 @@ public class GameManager : MonoBehaviour
 
         if (!inPlace)
             MoveCharacters(performer, rallyPoint, new int[1] { character.ID });
-
     }
 
     private static void Kill(int performer, int[] targets)

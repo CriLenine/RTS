@@ -4,15 +4,19 @@ using System.Collections.Generic;
 public class HUDActions : HUD
 {
     [SerializeField]
-    private GameObject _characterActions, _defaultBuildingActions, _HeadQuartersActions;
+    private GameObject _characterActions, _defaultBuildingActions, _HeadQuartersActions, _BarracksActions;
 
     [SerializeField]
     private List<ActionButton> _HeadQuartersDynamicButtons = new List<ActionButton>();
+    [SerializeField]
+    private List<ActionButton> _BarracksDynamicButtons = new List<ActionButton>();
+    
     private List<ActionButton> _dynamicButtons;
 
     private HashSet<Building.Type> _typesWithActions = new HashSet<Building.Type>
     {
         Building.Type.HeadQuarters,
+        Building.Type.Barracks,
     };
 
     private bool _dynamicUpdate = false;
@@ -24,7 +28,7 @@ public class HUDActions : HUD
         _characterActions.SetActive(true);
         _defaultBuildingActions.SetActive(false);
         _HeadQuartersActions.SetActive(false);
-        //_SawmillActions.SetActive(false);
+        _BarracksActions.SetActive(false);
     }
 
     public void UpdateActions(Building.Type type)
@@ -34,10 +38,13 @@ public class HUDActions : HUD
         _defaultBuildingActions.SetActive(!_typesWithActions.Contains(type));
         _dynamicUpdate = _typesWithActions.Contains(type);
         _HeadQuartersActions.SetActive(type == Building.Type.HeadQuarters);
+        _BarracksActions.SetActive(type == Building.Type.Barracks);
 
         if (type == Building.Type.HeadQuarters)
             _dynamicButtons = _HeadQuartersDynamicButtons;
-        //_SawmillActions.SetActive(type == Building.Type.Sawmill);
+
+        if (type == Building.Type.Barracks)
+            _dynamicButtons = _BarracksDynamicButtons;
     }
 
     private void Update()

@@ -13,22 +13,18 @@ MonoBehaviour:
   m_Name: HeadQuarters
   m_EditorClassIdentifier: 
   _type: 0
-  _timeCost: 115
   _cost:
   - _type: 0
-    _value: 150
+    _value: 300
   - _type: 1
-    _value: 200
+    _value: 250
   - _type: 2
-    _value: 200
+    _value: 250
   _building: {fileID: 1201046603458702877, guid: b2d42f6fd20d2ac4e887508e9de0921a, type: 3}
   _outline: 2
   _HUDIcon: {fileID: 21300000, guid: 752150149e8db6847b3e40e8be92eb7a, type: 3}
   _requiredBuildTicks: 1000
-  _maxHealth: 200
+  _maxHealth: 500
   _housingProvided: 10
   _meleeArmor: 10
-  _rangeArmor: 15
-  _buildingProgressSprites: []
-  _views: 
-  _spawnable: 
+  _rangeArmor: 10

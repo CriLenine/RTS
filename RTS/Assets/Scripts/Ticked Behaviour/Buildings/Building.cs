@@ -7,6 +7,8 @@ public abstract class Building : TickedBehaviour, IDamageable
         HeadQuarters,
         Housing,
         Sawmill,
+        Quarry,
+        Barracks
     }
 
 
@@ -81,6 +83,8 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         base.Awake();
 
+        _type = Data.Type;
+
         float scale = .95f * (TileMapManager.TileSize * (1 + 2 * Data.Outline));
         _visualTransform.localScale = new Vector3(scale, scale, 1);
         _boxCollider.size = new Vector2(scale, scale);
@@ -96,6 +100,7 @@ public abstract class Building : TickedBehaviour, IDamageable
         _completionVisualTransform.localScale = new Vector3(0, 0, 1);
 
         _completionVisualSprite.color = _completionVisualStartColor;
+        _iconSprite.sprite = Data.HUDIcon;
         _iconSprite.color = _iconSpriteStartColor;
         _visualBackgroundSprite.color = _visualBackgroundStartColor;
     }

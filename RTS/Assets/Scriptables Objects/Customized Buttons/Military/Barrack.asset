@@ -15,4 +15,4 @@ MonoBehaviour:
   _actionType: 0
   Sprite: {fileID: 21300000, guid: 4c7b6fd28b2d9d845a555b793d9f0d5b, type: 3}
   ToogledSprite: {fileID: 0}
-  Color: {r: 0.40784314, g: 0.40784314, b: 0.40784314, a: 1}
+  Color: {r: 0.65882355, g: 0.5921569, b: 0, a: 1}

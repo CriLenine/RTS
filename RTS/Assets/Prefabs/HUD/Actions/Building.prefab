@@ -87,6 +87,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Destroy
       objectReference: {fileID: 0}
+    - target: {fileID: 4062715433747195668, guid: 15d5959e2ead1c54899236446a1701ee, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4906016181431866739, guid: 15d5959e2ead1c54899236446a1701ee, type: 3}
       propertyPath: m_Name
       value: Building

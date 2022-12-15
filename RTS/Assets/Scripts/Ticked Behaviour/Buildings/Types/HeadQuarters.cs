@@ -23,7 +23,6 @@ public class HeadQuarters : Building, ISpawner, IResourceStorer
     private void Start()
     {
         _rallyPoint = (Vector2)transform.position + new Vector2(0.7f, 0.7f);
-        _type = Type.HeadQuarters;
     }
     public override Hash128 GetHash128()
     {
