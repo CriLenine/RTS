@@ -247,8 +247,8 @@ public class QuadTreeNode
 
         if (depth % 2 == 0) //Discriminate via x
         {
-            GizmosManager.toDrawStart.Add(new Vector3(x, YMAX));
-            GizmosManager.toDrawEnd.Add(new Vector3(x, YMIN));
+            QuadTreeDebugger.toDrawStart.Add(new Vector3(x, YMAX));
+            QuadTreeDebugger.toDrawEnd.Add(new Vector3(x, YMIN));
 
             float xCurrent = _charactersPositions[ID].x;
             float width = _charactersHitBoxes[ID].width;
@@ -261,8 +261,8 @@ public class QuadTreeNode
         }
         else //Discriminate via y
         {
-            GizmosManager.toDrawStart.Add(new Vector3(XMAX, y));
-            GizmosManager.toDrawEnd.Add(new Vector3(XMIN, y));
+            QuadTreeDebugger.toDrawStart.Add(new Vector3(XMAX, y));
+            QuadTreeDebugger.toDrawEnd.Add(new Vector3(XMIN, y));
 
             float yCurrent = _charactersPositions[ID].y;
             float height = _charactersHitBoxes[ID].height;
