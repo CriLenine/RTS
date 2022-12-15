@@ -5,11 +5,12 @@ public class HeadQuarters : Building, ISpawner, IResourceStorer
 {
     private Vector2 _rallyPoint;
 
-    private Queue<(Character.Type, CharacterData)> _spawningCharas = new();
-    private (Character.Type type, CharacterData data) _currentSpawningChara;
-    private float _spawningTimer = 0;
+    private Queue<CharacterData> _queuedSpawnCharactersData = new();
+    private CharacterData _onGoingSpawnCharacterData;
 
-    float ISpawner.SpawningTime { get => _spawningTimer > 0 ? _spawningTimer / _currentSpawningChara.data.SpawnTicks : 0; }
+    private int _spawningTicks = 0;
+
+    private bool _onGoingSpawn = false;
 
     public List<ResourceType> StorableResources => new List<ResourceType>
     {
@@ -22,7 +23,6 @@ public class HeadQuarters : Building, ISpawner, IResourceStorer
     private void Start()
     {
         _rallyPoint = (Vector2)transform.position + new Vector2(0.7f, 0.7f);
-        _type = Type.HeadQuarters;
     }
     public override Hash128 GetHash128()
     {
@@ -31,20 +31,22 @@ public class HeadQuarters : Building, ISpawner, IResourceStorer
 
     public override void Tick()
     {
-        if (_spawningTimer > 0)
+        if (_onGoingSpawn)
         {
-            _spawningTimer += NetworkManager.TickPeriod;
+            _spawningTicks++;
 
-            if (_spawningTimer >= _currentSpawningChara.data.SpawnTicks)
+            if (_spawningTicks >= _onGoingSpawnCharacterData.SpawnTicks && GameManager.MyCharacters.Count < GameManager.Housing)
             {
-                _spawningTimer = 0;
-                NetworkManager.Input(TickInput.Spawn((int)_currentSpawningChara.type, ID, transform.position));
+                _spawningTicks = 0;
+                _onGoingSpawn = false;
+                NetworkManager.Input(TickInput.Spawn((int)_onGoingSpawnCharacterData.Type, ID, _rallyPoint));
             }
         }
-        else if (_spawningCharas.Count > 0)
+
+        if (!_onGoingSpawn && _queuedSpawnCharactersData.Count > 0)
         {
-            _currentSpawningChara = _spawningCharas.Dequeue();
-            _spawningTimer += NetworkManager.TickPeriod;
+            _onGoingSpawn = true;
+            _onGoingSpawnCharacterData = _queuedSpawnCharactersData.Dequeue();
         }
     }
 
@@ -58,8 +60,8 @@ public class HeadQuarters : Building, ISpawner, IResourceStorer
         _rallyPoint = newRallyPoint;
     }
 
-    void ISpawner.EnqueueSpawningCharas(Character.Type type)
+    void ISpawner.EnqueueSpawningCharas(CharacterData data)
     {
-        _spawningCharas.Enqueue((type, PrefabManager.GetCharacterData(_currentSpawningChara.type)));
+        _queuedSpawnCharactersData.Enqueue(data);
     }
 }

@@ -30,7 +30,37 @@ public class ActionsManager : MonoBehaviour
             Attack();
         };
     }
-    
+
+    public void KillUnits()
+    {
+        List<Character> selectedCharacters = CharacterManager.SelectedCharacters;
+
+        int[] IDs = new int[selectedCharacters.Count];
+
+        for (int i = 0; i < selectedCharacters.Count; ++i)
+            IDs[i] = selectedCharacters[i].ID;
+
+        NetworkManager.Input(TickInput.Kill(IDs));
+    }
+
+    public void DestroyBuilding()
+    {
+        NetworkManager.Input(TickInput.Destroy(CharacterManager.SelectedBuilding.ID));
+    }
+
+    public void QueueUnitSpawn(ActionButton button)
+    {
+        SpawnResearchToolTip toolTip = button.ButtonToolTip as SpawnResearchToolTip;
+
+        CharacterData data = toolTip.CharacterData;
+
+        foreach (Resource.Amount cost in data.Cost)
+            GameManager.Pay(cost.Type, cost.Value);
+
+        ISpawner building = CharacterManager.SelectedBuilding as ISpawner;
+        building.EnqueueSpawningCharas(data);
+    }
+
 
     #region Attack
     private void Attack()
@@ -42,15 +72,15 @@ public class ActionsManager : MonoBehaviour
             return;
 
         GameEventsManager.PlayEvent("UIConfirm");
-        if (collider.TryGetComponent(out TickedBehaviour entitie) && entitie.TryGetComponent(out IDamageable damageable)) //hit a tickedbehaviour damageable
+        if (collider.TryGetComponent(out TickedBehaviour entity) && entity.TryGetComponent(out IDamageable damageable)) //hit a tickedbehaviour damageable
         {
-            if (CharacterManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entitie)) //selected characters && not my entitie
-                NetworkManager.Input(TickInput.Attack(entitie.ID, entitie.transform.position, CharacterManager.GetSelectedIds()));
+            if (CharacterManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entity)) //selected characters && not my entity
+                NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, CharacterManager.GetSelectedIds()));
         }
         else  // sinon hit le sol on y vas et on surveille (target id = -1)
         {
             if (CharacterManager.SelectedCharacters.Count > 0) //selected characters
-                NetworkManager.Input(TickInput.Attack(-1, worldPoint, CharacterManager.GetSelectedIds()));
+                NetworkManager.Input(TickInput.GuardPosition(worldPoint, CharacterManager.GetSelectedIds()));
         }
 
     }

@@ -5,7 +5,6 @@ public class HUDPopulation : HUD
 {
     [SerializeField]
     private TextMeshProUGUI _supplyBlockIndicatorUI;
-    private int _maxHousing;
 
     [SerializeField]
     private TextMeshProUGUI _idleUnitsUI;

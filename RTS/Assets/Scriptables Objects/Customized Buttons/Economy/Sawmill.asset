@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a40b3bbf79eb44b4ea26eba8595af, type: 3}
   m_Name: Sawmill
   m_EditorClassIdentifier: 
+  _actionType: 0
   Sprite: {fileID: 21300000, guid: 2c18f4678c0f3ab4eab8a7781d2c0567, type: 3}
-  Color: {r: 0.754717, g: 0.61903566, b: 0.15307939, a: 1}
+  ToogledSprite: {fileID: 0}
+  Color: {r: 0.65882355, g: 0.5921569, b: 0, a: 1}

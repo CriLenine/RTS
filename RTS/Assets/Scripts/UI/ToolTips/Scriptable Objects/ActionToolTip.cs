@@ -4,4 +4,8 @@ using UnityEngine;
 
 public class ActionToolTip : StatToolTip
 {
+    public override void Init()
+    {
+        Type = ToolTipType.Action;
+    }
 }

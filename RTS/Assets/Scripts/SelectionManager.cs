@@ -63,6 +63,9 @@ public class SelectionManager : MonoBehaviour
 
     public void GiveOrder()
     {
+        if (CharacterManager.SelectedBuilding != null && CharacterManager.SelectedBuilding is ISpawner spawner)
+            spawner.SetRallyPoint(_camera.ScreenToWorldPoint(_mouse.position.ReadValue()));
+
         if (CharacterManager.SelectedCharacters.Count == 0)
             return;
 

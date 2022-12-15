@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _character: {fileID: -3724668761118074979, guid: ea78c6a1672922740a5582c16600174d, type: 3}
-  _neededBuildingLevel: 0
-  _initialSpawningTime: 5
-  _cost: []
-  _charaUiIcon: {fileID: 421678573, guid: d7814ef2a39d44448b058b1508661bb3, type: 3}
-  _unitName: Naked
-  _views: 01000000
+  _spawnTicks: 150
+  _cost:
+  - _type: 0
+    _value: 100
+  - _type: 2
+    _value: 100
+  _HUDIcon: {fileID: 21300000, guid: 242105fce5414db4aabce715c5bf75c0, type: 3}
   _maxHealth: 100
   _attackDamage: 10
   _meleeArmor: 0

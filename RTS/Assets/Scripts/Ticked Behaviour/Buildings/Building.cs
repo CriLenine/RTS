@@ -7,6 +7,8 @@ public abstract class Building : TickedBehaviour, IDamageable
         HeadQuarters,
         Housing,
         Sawmill,
+        Quarry,
+        Barracks
     }
 
 
@@ -31,6 +33,10 @@ public abstract class Building : TickedBehaviour, IDamageable
 
     [SerializeField]
     private BoxCollider2D _boxCollider;
+
+    [SerializeField]
+    protected LineRenderer _pathRenderer;
+    public LineRenderer PathRenderer => _pathRenderer;
 
     [Space]
     [Space]
@@ -60,11 +66,10 @@ public abstract class Building : TickedBehaviour, IDamageable
 
 
     private bool _buildComplete;
+    public bool BuildComplete => _buildComplete;
 
     private int _completedBuildTicks;
 
-    private LineRenderer _pathRenderer;
-    public LineRenderer PathRenderer => _pathRenderer;
 
     protected Type _type;
     public Type BuildingType => _type;
@@ -78,7 +83,7 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         base.Awake();
 
-        _pathRenderer = GetComponentInChildren<LineRenderer>(true);
+        _type = Data.Type;
 
         float scale = .95f * (TileMapManager.TileSize * (1 + 2 * Data.Outline));
         _visualTransform.localScale = new Vector3(scale, scale, 1);
@@ -95,30 +100,28 @@ public abstract class Building : TickedBehaviour, IDamageable
         _completionVisualTransform.localScale = new Vector3(0, 0, 1);
 
         _completionVisualSprite.color = _completionVisualStartColor;
+        _iconSprite.sprite = Data.HUDIcon;
         _iconSprite.color = _iconSpriteStartColor;
         _visualBackgroundSprite.color = _visualBackgroundStartColor;
     }
 
-    //private void Update()
-    //{
-    //    if (UIManager.CurrentManager is BuildingUI buildingUI)
-    //    {
-    //        if (!buildingUI.Building.TryGetComponent(out ISpawner spawner)) return;
+    private void Update()
+    {
+        if (_selected && this is ISpawner spawner)
+        {
+            Vector2 rallypoint = spawner.GetRallyPoint();
 
-    //        Vector2 rallypoint = spawner.GetRallyPoint();
-    //        _pathRenderer.SetPosition(0, transform.position);
-    //        _pathRenderer.SetPosition(1, rallypoint);
+            _pathRenderer.SetPosition(0, transform.position);
+            _pathRenderer.SetPosition(1, rallypoint);
 
-    //        _pathRenderer.transform.position = rallypoint;
+            _pathRenderer.transform.position = rallypoint;
 
-    //        _pathRenderer.startColor = Color.cyan;
-    //        _pathRenderer.endColor = Color.cyan;
+            _pathRenderer.startColor = Color.cyan;
+            _pathRenderer.endColor = Color.cyan;
 
-    //        _pathRenderer.gameObject.SetActive(true);
-    //    }
-    //    else
-    //        _pathRenderer.gameObject.SetActive(false);
-    //}
+            _pathRenderer.gameObject.SetActive(true);
+        }
+    }
 
     /// <returns><see langword="true"/> if it finishes the building's construction,
     /// <see langword="false"/> otherwise </returns>
@@ -166,6 +169,9 @@ public abstract class Building : TickedBehaviour, IDamageable
     {
         _selected = false;
         _visualBackgroundSprite.color = _buildComplete ? _visualBackgroundEndColor : _visualBackgroundStartColor;
+
+        if(this is ISpawner)
+            _pathRenderer.gameObject.SetActive(false);
     }
 
     public bool TakeDamage(int damage)

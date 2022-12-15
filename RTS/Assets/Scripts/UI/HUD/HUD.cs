@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class HUD : MonoBehaviour
 {
     [SerializeField]
-    private GameObject HUDSection;
+    protected GameObject HUDSection;
 
     public void Show()
     {
