@@ -6,6 +6,9 @@ public class ResourcesManager : MonoBehaviour
     private static ResourcesManager _instance;
 
     [SerializeField]
+    private Tilemap _obstaclesTilemap;
+
+    [SerializeField]
     private Tilemap _treesTilemap;
 
     [SerializeField]
@@ -79,7 +82,7 @@ public class ResourcesManager : MonoBehaviour
         foreach (Resource resource in resources)
             resource.Clear();
 
-        foreach (Vector3Int position in _treesTilemap.cellBounds.allPositionsWithin)
+        foreach (Vector3Int position in _obstaclesTilemap.cellBounds.allPositionsWithin)
         {
             Vector2Int pos2d = (Vector2Int)position;
             if (_treesTilemap.HasTile(position))

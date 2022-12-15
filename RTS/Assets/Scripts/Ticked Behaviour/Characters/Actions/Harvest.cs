@@ -44,7 +44,6 @@ public class Harvest : Action
 
         /* The harvested tile is depleted or the harvest didn't start */
 
-
         if (peon.CarriedResource.Value >= peon.Data.NMaxCarriedResources) // The peon needs to deposit his resources
         {
             Building building = GetNearestResourceStorer(_resource.Data.Type);
@@ -55,7 +54,7 @@ public class Harvest : Action
             if (wayPointsToDeposit == null)
                 Debug.LogError("Pathfinding failed unexpectedly.");
 
-            SetAction(new MoveHarvest(_character, wayPointsToDeposit, (IResourceStorer)building, _performer));
+            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, (IResourceStorer)building, _resource, _performer));
             return true;
         }
 
@@ -75,11 +74,9 @@ public class Harvest : Action
         Vector2Int? newInputCoords = _resource.GetNext(_attractionPoint, _character.Coords, _performer);
         if (newInputCoords != null)
         {
-            Stopwatch sw = Stopwatch.StartNew();
             Vector2Int? nextCoordsToGo = _resource.GetHarvestingPosition(newInputCoords.Value, _character.Coords, _performer);
             if (nextCoordsToGo == null)
                 return true;
-            Debug.Log(sw.Elapsed.TotalMilliseconds);
 
             List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_performer, _character, nextCoordsToGo.Value);
             if (wayPointsToGo == null)

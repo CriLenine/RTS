@@ -498,7 +498,7 @@ public class GameManager : MonoBehaviour
 
         TileMapManager.ResetViews();
 
-        QuadTreeNode.Init(3, 20, 13);
+        QuadTreeNode.Init(3, 25, 25);
 
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {

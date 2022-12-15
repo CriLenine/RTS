@@ -3,16 +3,12 @@ using UnityEngine;
 
 public class MoveHarvest : Move
 {
+    private readonly Resource _resource;
     private readonly IResourceStorer _resourceStorer;
     private readonly int _performer;
-    public MoveHarvest(Character character, Vector2 depositPosition, IResourceStorer resourceStorer, int performer) : base(character, depositPosition)
+    public MoveHarvest(Character character, List<Vector2> depositPositions, IResourceStorer resourceStorer, Resource resource, int performer) : base(character, depositPositions)
     {
-        _resourceStorer = resourceStorer;
-        _performer = performer;
-    }
-
-    public MoveHarvest(Character character, List<Vector2> depositPositions, IResourceStorer resourceStorer, int performer) : base(character, depositPositions)
-    {
+        _resource = resource;
         _resourceStorer = resourceStorer;
         _performer = performer;
     }
