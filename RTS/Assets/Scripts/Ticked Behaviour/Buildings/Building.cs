@@ -174,7 +174,7 @@ public abstract class Building : TickedBehaviour, IDamageable
             HealthBar.gameObject.SetActive(true);
 
         _currentHealth -= damage;
-        HealthBar.SetHealth((float)_currentHealth / MaxHealth);
+        HealthBar.SetHealth((float)_currentHealth / MaxHealth); 
         return _currentHealth <= 0;
     }
 

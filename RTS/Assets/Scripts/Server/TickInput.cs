@@ -8,7 +8,8 @@ public enum InputType
     Build,
     Harvest,
     Hunt,
-    Attack
+    Attack,
+    GameOver
 }
 
 public class TickInput
@@ -116,6 +117,16 @@ public class TickInput
             ID = targetID,
 
             Position = targetpos,
+
+            Performer = performer,
+        };
+    }
+
+    public static TickInput GameOver(int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.GameOver,
 
             Performer = performer,
         };

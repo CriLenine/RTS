@@ -182,6 +182,13 @@ public class GameManager : MonoBehaviour
                         MoveAndAttack(input.Performer, input.Position , input.Targets, target);
                     }
                     break;
+                case InputType.GameOver:
+                    if(input.Performer != NetworkManager.Me)
+                    {
+                        Debug.Log("Player " + input.Performer + " is bad and loose. GameOver");
+                        NetworkManager.QuitRoom();
+                    }
+                    break;
             }
         }
 
@@ -221,6 +228,9 @@ public class GameManager : MonoBehaviour
                 _instance._myBuildings.Remove(building);
 
                 TileMapManager.RemoveBuilding(building);
+
+                if (building is HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
+                    _instance.GameOver();
             }
 
             Destroy(entity.gameObject);
@@ -245,6 +255,17 @@ public class GameManager : MonoBehaviour
 
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
+
+    #region GamePlay Logic
+    
+    private void GameOver()
+    {
+        NetworkManager.Input(TickInput.GameOver());
+        Debug.Log("You loose");
+        NetworkManager.QuitRoom();
+    }
+
+    #endregion
 
     #region Create & Destroy TickedBehaviours
 
@@ -464,14 +485,14 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, 0.75f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.75f, 0.75f));
-            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.75f, -0.75f));
-            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, -0.75f));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(2f, 0));
+            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-2f, 0));
+            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(-1f, -2f));
+            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(1f, -2f));
 
-            CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, -2f), true);
+            CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, 0f), true);
             //CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f), true);
-            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
+            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint , true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
