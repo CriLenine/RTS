@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour
 
     public static ResourcesManager ResourcesManager => _instance._resourcesManager;
 
-    public GameObject prefab;
-
     #region Init & Variables
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
@@ -190,6 +188,13 @@ public class GameManager : MonoBehaviour
                 case InputType.GuardPosition:
                     MoveAndWatch(input.Performer, input.Position, input.Targets);
                     break;
+                case InputType.GameOver:
+                    if(input.Performer != NetworkManager.Me)
+                    {
+                        Debug.Log("Player " + input.Performer + " is bad and loose. GameOver");
+                        NetworkManager.QuitRoom();
+                    }
+                    break;
             }
         }
 
@@ -238,6 +243,9 @@ public class GameManager : MonoBehaviour
                 _instance._myBuildings.Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
+
+                if (building is HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
+                    _instance.GameOver();
             }
 
             Destroy(entity.gameObject);
@@ -269,6 +277,17 @@ public class GameManager : MonoBehaviour
 
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
     }
+
+    #region GamePlay Logic
+    
+    private void GameOver()
+    {
+        NetworkManager.Input(TickInput.GameOver());
+        Debug.Log("You loose");
+        NetworkManager.QuitRoom();
+    }
+
+    #endregion
 
     #region Create & Destroy TickedBehaviours
 
@@ -432,36 +451,18 @@ public class GameManager : MonoBehaviour
 
     private static void DestroyBuilding(int performer, int buildingID)
     {
-        if (performer != NetworkManager.Me)
+        if (performer == NetworkManager.Me)
         {
-            DestroyEntity(buildingID);
-            return;
+            Building building = _instance._buildings[buildingID];
+
+            if (!building.BuildComplete)
+                foreach (Resource.Amount cost in building.Data.Cost)
+                    _instance._myResources[cost.Type] += cost.Value;
+            else
+                _instance._housing -= building.Data.HousingProvided;
         }
 
-        Building building = _instance._buildings[buildingID];
-
-        if (CharacterManager.SelectedBuilding != null && CharacterManager.SelectedBuilding == building)
-            CharacterManager.DeselectAll();
-
-        if (!building.BuildComplete)
-            foreach (Resource.Amount cost in building.Data.Cost)
-                _instance._myResources[cost.Type] += cost.Value;
-        else
-            _instance._housing -= building.Data.HousingProvided;
-
-        _instance._entities.Remove(buildingID);
-        _instance._myEntities.Remove(buildingID);
-
-        _instance._buildings.Remove(buildingID);
-        _instance._myBuildings.Remove(buildingID);
-
-        TileMapManager.RemoveBuilding(building);
-
-        Destroy(building.gameObject);
-
-        HUDManager.UpdateHUD();
-        HUDManager.UpdateHousing();
-        ToolTipManager.HideToolTip();
+        DestroyEntity(buildingID);
     }
 
     public static void DestroyEntity(int id)
@@ -503,12 +504,12 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-0.75f, 0.75f));
-            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(0.75f, 0.75f));
-            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(0.75f, -0.75f));
-            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-0.75f, -0.75f));
+            CreateCharacter(i,-1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(2f, 0));
+            CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-2f, 0));
+            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-1f, -2f));
+            CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
 
-            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
+            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint , true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
@@ -563,11 +564,6 @@ public class GameManager : MonoBehaviour
         Gizmos.color = Color.red;
 
         Gizmos.DrawLine(TileMapManager.TilemapCoordsToWorld(PStart), TileMapManager.TilemapCoordsToWorld(PEnd));*/
-    }
-
-    public static void Spawn(Vector2Int coords)
-    {
-        Instantiate(_instance.prefab, TileMapManager.TilemapCoordsToWorld(coords), Quaternion.identity);
     }
 
     #endregion

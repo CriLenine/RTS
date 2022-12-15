@@ -1,16 +1,17 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class ActionsManager : MonoBehaviour
 {
     private UIInputs _uiInputs;
+
+    private ActionButton _currentButton;
     private void Start()
     {
         _uiInputs = HUDManager.GetUIInputs();
+
+
     }
 
     private void  OnClickCommon()
@@ -23,12 +24,10 @@ public class ActionsManager : MonoBehaviour
 
         if (!button.ToogleButton()) return;
 
-        _uiInputs.UI.Attack.started += _ =>
-        {
-            _uiInputs.UI.Attack.canceled += _ => AttackCanceled(button);
-            CharacterManager.DisableInputs();
-            Attack();
-        };
+        _currentButton = button;
+
+        CharacterManager.DisableInputs();
+        _uiInputs.UI.Attack.started += Attack;
     }
 
     public void KillUnits()
@@ -63,7 +62,7 @@ public class ActionsManager : MonoBehaviour
 
 
     #region Attack
-    private void Attack()
+    private void Attack(InputAction.CallbackContext ctx )
     {
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Collider2D collider = Physics2D.OverlapPoint(worldPoint);
@@ -83,14 +82,11 @@ public class ActionsManager : MonoBehaviour
                 NetworkManager.Input(TickInput.GuardPosition(worldPoint, CharacterManager.GetSelectedIds()));
         }
 
-    }
+        _currentButton.ToogleButton();
 
-    private void AttackCanceled(ActionButton button)
-    {
-        button.ToogleButton();
-        _uiInputs.UI.Attack.started -= _ => Attack();
-        _uiInputs.UI.Attack.canceled -= _ => AttackCanceled(button);
         CharacterManager.EnableInputs();
+
+        _uiInputs.UI.Attack.started -= Attack;
     }
     #endregion
 

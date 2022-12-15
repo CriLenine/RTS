@@ -383,7 +383,7 @@ public partial class NetworkManager : MonoBehaviour
             if (IsRunning)
             {
                 int hash = GameManager.Tick(_ticks[_tick].Inputs);
-
+                 
                 _server.Send("Tick", hash);
 
                 _ticks.Remove(_tick);

@@ -106,6 +106,11 @@ public partial class NetworkManager
                             inputs.Add(TickInput.Attack(targetId,position, attackersIds));
                             break;
                         }
+                    case InputType.GameOver:
+                        {
+                            inputs.Add(TickInput.GameOver(performer));
+                            break;
+                        }
 
                     case InputType.GuardPosition:
                         {

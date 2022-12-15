@@ -7419,6 +7419,7 @@ GameObject:
   - component: {fileID: 7456065522823032501}
   - component: {fileID: 7456065522823032498}
   - component: {fileID: 8561065377073531534}
+  - component: {fileID: 554790319}
   m_Layer: 15
   m_Name: Actions HUD
   m_TagString: Untagged
@@ -7478,6 +7479,18 @@ BoxCollider2D:
   m_Size: {x: 107.9, y: 67.1}
   m_EdgeRadius: 0
 --- !u!114 &8561065377073531534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7456065522823032500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6ee47ef6b32e248b7fc072bbf1bfe6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &554790319
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12188,6 +12201,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6591997474524616921, guid: 4aee8f5da77a8d04eb9759e304ccfa77, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4aee8f5da77a8d04eb9759e304ccfa77, type: 3}
 --- !u!1 &918068602817137362 stripped
@@ -13769,7 +13786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1709803756170476362, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388052777063812353, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Name
@@ -14982,7 +14999,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1709803756170476362, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388052777063812353, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Name
@@ -15631,7 +15648,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1709803756170476362, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388052777063812353, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Name
@@ -16642,6 +16659,10 @@ PrefabInstance:
       propertyPath: onLongClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 7821918466126596798, guid: 245e257e6c473c746a5209eb115c845e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8548204973996763659, guid: 245e257e6c473c746a5209eb115c845e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -16834,7 +16855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1709803756170476362, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388052777063812353, guid: cfdb0f32d00e33741b76dc252209f46e, type: 3}
       propertyPath: m_Name

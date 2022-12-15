@@ -9,6 +9,7 @@ public enum InputType
     Harvest,
     Hunt,
     Attack,
+    GameOver,
     Kill,
     GuardPosition,
     Destroy
@@ -147,6 +148,16 @@ public class TickInput
         };
     }
 
+    public static TickInput GameOver(int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.GameOver,
+
+            Performer = performer,
+        };
+    }
+    
     public static TickInput GuardPosition(Vector2 position, int[] attackers, int performer = 0)
     {
         return new TickInput()

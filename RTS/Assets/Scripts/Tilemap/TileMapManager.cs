@@ -271,10 +271,7 @@ public class TileMapManager : MonoBehaviour
 
     #region PathFinding
 
-    [SerializeField]
     private List<Vector2Int> _wayPoints;
-
-    [SerializeField]
     private List<Vector2Int> _wayPointsLissed;
 
     public static LogicalTile FindPathWithTag(int performer, Vector2Int startCoords, Vector2Int endCoords, TileTag tag, int additionnalWeight = 0)
