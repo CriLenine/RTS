@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a40b3bbf79eb44b4ea26eba8595af, type: 3}
   m_Name: Quarry
   m_EditorClassIdentifier: 
+  _actionType: 0
   Sprite: {fileID: 21300000, guid: 59088665c314b964db2d3730d769c233, type: 3}
-  Color: {r: 0.7529412, g: 0.61960787, b: 0.15294118, a: 1}
+  ToogledSprite: {fileID: 0}
+  Color: {r: 0.65882355, g: 0.5921569, b: 0, a: 1}

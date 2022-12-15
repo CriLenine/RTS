@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a40b3bbf79eb44b4ea26eba8595af, type: 3}
   m_Name: Port
   m_EditorClassIdentifier: 
+  _actionType: 0
   Sprite: {fileID: 21300000, guid: bf77e0009106d964c9fc587d426c3bb1, type: 3}
-  Color: {r: 0.20358667, g: 0.59035563, b: 0.7075472, a: 1}
+  ToogledSprite: {fileID: 0}
+  Color: {r: 0.40784314, g: 0.40784314, b: 0.40784314, a: 1}

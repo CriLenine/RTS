@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 1
   _character: {fileID: 1300237163801353399, guid: 84535e00d9cd9ef4ea82208c2ab37bab, type: 3}
-  _spawnTicks: 1200
+  _spawnTicks: 100
   _cost:
   - _type: 0
     _value: 50

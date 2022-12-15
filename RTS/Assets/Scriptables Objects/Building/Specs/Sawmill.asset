@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: Sawmill
   m_EditorClassIdentifier: 
   _type: 2
-  _timeCost: 45
   _cost:
   - _type: 0
     _value: 200
   - _type: 2
     _value: 75
-  _building: {fileID: 398943385688133377, guid: c065d93fa95c3fe46bab88abab1d3c1b, type: 3}
+  _building: {fileID: 7095546881501006290, guid: c065d93fa95c3fe46bab88abab1d3c1b, type: 3}
   _outline: 1
   _HUDIcon: {fileID: 21300000, guid: 2c18f4678c0f3ab4eab8a7781d2c0567, type: 3}
-  _requiredBuildTicks: 500
+  _requiredBuildTicks: 300
   _maxHealth: 200
-  _buildingProgressSprites: []
-  _views: 
+  _housingProvided: 0
+  _meleeArmor: 0
+  _rangeArmor: 0
   _storableResources: 01000000

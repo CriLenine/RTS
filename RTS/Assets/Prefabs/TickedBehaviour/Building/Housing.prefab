@@ -94,18 +94,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _viewRadius: 10
-  _fogRepeller: {fileID: 0}
+  _persistentView: {fileID: 0}
+  _currenttView: {fileID: 0}
   _buildingData: {fileID: 11400000, guid: 5ba755eef85311b4abadff538de3bb53, type: 2}
   _currentHealth: 0
   HealthBar: {fileID: 5302645336296189215}
   _boxCollider: {fileID: 4001558420925058738}
+  _pathRenderer: {fileID: 0}
   _visualTransform: {fileID: 470520693617963017}
   _completionVisualTransform: {fileID: 5478848495506808719}
   _healthBarTransform: {fileID: 2560914095895993316}
   _completionVisualSprite: {fileID: 1443835764327983158}
   _iconSprite: {fileID: 5162125028318526714}
   _visualBackgroundSprite: {fileID: 939136669198999510}
-  _completionVisualStartColor: {r: 0.09803922, g: 0, b: 0.972549, a: 1}
+  _completionVisualStartColor: {r: 0.14117648, g: 0.11372549, b: 0.65882355, a: 1}
   _completionVisualEndColor: {r: 0.02745098, g: 0, b: 0.23921569, a: 1}
   _iconSpriteStartColor: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 1}
   _iconSpriteEndColor: {r: 1, g: 1, b: 1, a: 1}

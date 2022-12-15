@@ -1,0 +1,92 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class ActionsManager : MonoBehaviour
+{
+    private UIInputs _uiInputs;
+
+    private ActionButton _currentButton;
+    private void Start()
+    {
+        _uiInputs = HUDManager.GetUIInputs();
+
+
+    }
+
+    private void  OnClickCommon()
+    {
+        GameEventsManager.PlayEvent("UIClick");
+    }
+    public void OnClickAttack(ActionButton button)
+    {
+        OnClickCommon();
+
+        if (!button.ToogleButton()) return;
+
+        _currentButton = button;
+
+        CharacterManager.DisableInputs();
+        _uiInputs.UI.Attack.started += Attack;
+    }
+
+    public void KillUnits()
+    {
+        List<Character> selectedCharacters = CharacterManager.SelectedCharacters;
+
+        int[] IDs = new int[selectedCharacters.Count];
+
+        for (int i = 0; i < selectedCharacters.Count; ++i)
+            IDs[i] = selectedCharacters[i].ID;
+
+        NetworkManager.Input(TickInput.Kill(IDs));
+    }
+
+    public void DestroyBuilding()
+    {
+        NetworkManager.Input(TickInput.Destroy(CharacterManager.SelectedBuilding.ID));
+    }
+
+    public void QueueUnitSpawn(ActionButton button)
+    {
+        SpawnResearchToolTip toolTip = button.ButtonToolTip as SpawnResearchToolTip;
+
+        CharacterData data = toolTip.CharacterData;
+
+        foreach (Resource.Amount cost in data.Cost)
+            GameManager.Pay(cost.Type, cost.Value);
+
+        ISpawner building = CharacterManager.SelectedBuilding as ISpawner;
+        building.EnqueueSpawningCharas(data);
+    }
+
+
+    #region Attack
+    private void Attack(InputAction.CallbackContext ctx )
+    {
+        Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Collider2D collider = Physics2D.OverlapPoint(worldPoint);
+
+        if (collider == null)
+            return;
+
+        GameEventsManager.PlayEvent("UIConfirm");
+        if (collider.TryGetComponent(out TickedBehaviour entity) && entity.TryGetComponent(out IDamageable damageable)) //hit a tickedbehaviour damageable
+        {
+            if (CharacterManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entity)) //selected characters && not my entity
+                NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, CharacterManager.GetSelectedIds()));
+        }
+        else  // sinon hit le sol on y vas et on surveille (target id = -1)
+        {
+            if (CharacterManager.SelectedCharacters.Count > 0) //selected characters
+                NetworkManager.Input(TickInput.GuardPosition(worldPoint, CharacterManager.GetSelectedIds()));
+        }
+
+        _currentButton.ToogleButton();
+
+        CharacterManager.EnableInputs();
+
+        _uiInputs.UI.Attack.started -= Attack;
+    }
+    #endregion
+
+}

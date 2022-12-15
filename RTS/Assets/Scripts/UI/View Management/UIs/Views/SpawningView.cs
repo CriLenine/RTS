@@ -19,26 +19,26 @@ public class SpawningView : View
 
     public override void Initialize<T>(T parentManager)
     {
-        _manager = parentManager as BuildingUI;
+        //_manager = parentManager as BuildingUI;
 
-        foreach (var chara in PrefabManager.DataCharacters)
-        {
-            var bUI = Instantiate(_itemUI);
-            bUI.transform.SetParent(_itemsParent);
-            bUI.InitUI(OnClick, chara.HUDIcon, chara.name,chara.Type);
-        }
+        //foreach (var chara in PrefabManager.DataCharacters)
+        //{
+        //    var bUI = Instantiate(_itemUI);
+        //    bUI.transform.SetParent(_itemsParent);
+        //    bUI.InitUI(OnClick, chara.HUDIcon, chara.name, chara.Type);
+        //}
     }
-    private void Update()
-    {
-        _slider.fillAmount = _spawner is null ? 0 : _spawner.SpawningTime;
-    }
-    private void OnClick(Character.Type type)
-    {
-        if(_manager.Building.TryGetComponent(out ISpawner spawner))
-        {
-            _spawner = spawner;
-            spawner.EnqueueSpawningCharas(type);
-        }
-    }
+    //private void Update()
+    //{
+    //    _slider.fillAmount = _spawner is null ? 0 : _spawner.SpawnCompletion;
+    //}
+    //private void OnClick(Character.Type type)
+    //{
+    //    if(_manager.Building.TryGetComponent(out ISpawner spawner))
+    //    {
+    //        _spawner = spawner;
+    //        spawner.EnqueueSpawningCharas(type);
+    //    }
+    //}
 
 }

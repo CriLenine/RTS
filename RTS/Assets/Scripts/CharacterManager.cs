@@ -226,7 +226,7 @@ public class CharacterManager : MonoBehaviour
         building.Select();
     }
 
-    public static void TestEntitieSelection(TickedBehaviour entity)
+    public static void TestEntitySelection(TickedBehaviour entity)
     {
         if (entity is Character character)
         {

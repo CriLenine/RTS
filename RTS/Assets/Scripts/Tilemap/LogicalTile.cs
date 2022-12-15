@@ -7,9 +7,17 @@ public enum TileState
     Obstacle
 }
 
+public enum TileTag
+{
+    None,
+    Tree,
+    Rock
+}
+
 public class LogicalTile
 {
     public TileState State = TileState.Obstacle;
+    public TileTag Tag = TileTag.None;
 
     public readonly bool[] LastState = new bool[4];
 
@@ -40,10 +48,11 @@ public class LogicalTile
             LastState[i] = false;
     }
 
-    public LogicalTile(Vector2Int coords, TileState state)
+    public LogicalTile(Vector2Int coords, TileState state, TileTag tag)
     {
         Coords = coords;
         State = state;
+        Tag = tag;
 
         Reset();
     }

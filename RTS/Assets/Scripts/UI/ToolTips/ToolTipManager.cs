@@ -83,6 +83,8 @@ public class ToolTipManager : MonoBehaviour
             {
                 _instance._buildingToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
                 _instance._buildingToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
+                
+                _instance._buildingToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(true);
                 _instance._buildingToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(true);
             }
             else
@@ -109,6 +111,7 @@ public class ToolTipManager : MonoBehaviour
             {
                 _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
                 _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
+                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(true);
                 _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(true);
             }
             else

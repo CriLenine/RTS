@@ -102,7 +102,7 @@ public class LocomotionManager : MonoBehaviour
         Vector2 characterPos = (Vector2)character.transform.position;
 
         // Récupérer voisins KDTree
-        GizmosManager.Clear();
+        QuadTreeDebugger.Clear();
         neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
 
         List<Vector2> trajectoryAdjustments = new();

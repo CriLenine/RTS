@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a40b3bbf79eb44b4ea26eba8595af, type: 3}
   m_Name: Wall
   m_EditorClassIdentifier: 
+  _actionType: 0
   Sprite: {fileID: 21300000, guid: e306f21c532355849a9fe7a119e5b5e2, type: 3}
-  Color: {r: 0.3764706, g: 0.3764706, b: 0.3764706, a: 1}
+  ToogledSprite: {fileID: 0}
+  Color: {r: 0.40784314, g: 0.40784314, b: 0.40784314, a: 1}

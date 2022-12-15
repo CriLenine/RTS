@@ -5,4 +5,9 @@ using UnityEngine;
 public class SpawnResearchToolTip : StatToolTip
 {
     public CharacterData CharacterData;
+
+    public override void Init()
+    {
+        Type = ToolTipType.SpawnResearch;
+    }
 }

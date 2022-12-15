@@ -1,45 +1,49 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public enum ToolTipType
+{
+    Default,
+    Stat,
+    ActionTogglable,
+    Action,
+    Building,
+    SpawnResearch
+}
+
 public class ToolTipElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    enum ToolTipType
+    [SerializeField]
+    private ToolTip _toolTip;
+    public ToolTip ToolTip => _toolTip;
+
+    public void Init(ToolTip toolTip)
     {
-        Default,
-        Stat,
-        ActionTogglable,
-        Action,
-        Building,
-        SpawnResearch
+        _toolTip = toolTip;
+        toolTip.Init();
     }
-
-    [SerializeField]
-    private ToolTipType _toolTipType;
-
-    [SerializeField]
-    private ToolTip _tooltip;
 
     public void OnPointerEnter(PointerEventData _)
     {
-        switch (_toolTipType) 
+        switch (_toolTip.Type) 
         {
             case ToolTipType.Default:
-                ToolTipManager.DisplayDefaultToolTip(_tooltip);
+                ToolTipManager.DisplayDefaultToolTip(_toolTip);
                 break;
             case ToolTipType.Stat:
-                ToolTipManager.DisplayStatToolTip((StatToolTip)_tooltip);
+                ToolTipManager.DisplayStatToolTip((StatToolTip)_toolTip);
                 break;
             case ToolTipType.Action:
-                ToolTipManager.DisplayActionToolTip((ActionToolTip)_tooltip, false);
+                ToolTipManager.DisplayActionToolTip((ActionToolTip)_toolTip, false);
                 break;
             case ToolTipType.ActionTogglable:
-                ToolTipManager.DisplayActionToolTip((ActionToolTip)_tooltip, true);
+                ToolTipManager.DisplayActionToolTip((ActionToolTip)_toolTip, true);
                 break;
             case ToolTipType.Building:
-                ToolTipManager.DisplayBuildingToolTip((BuildingToolTip)_tooltip);
+                ToolTipManager.DisplayBuildingToolTip((BuildingToolTip)_toolTip);
                 break;
             case ToolTipType.SpawnResearch:
-                ToolTipManager.DisplaySpawnToolTip((SpawnResearchToolTip)_tooltip);
+                ToolTipManager.DisplaySpawnToolTip((SpawnResearchToolTip)_toolTip);
                 break;
         }
     }

@@ -5,4 +5,9 @@ using UnityEngine;
 public class BuildingToolTip : StatToolTip
 {
     public BuildingData BuildingData;
+
+    public override void Init()
+    {
+        Type = ToolTipType.Building;
+    }
 }

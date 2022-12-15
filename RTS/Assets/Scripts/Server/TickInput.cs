@@ -10,6 +10,9 @@ public enum InputType
     Hunt,
     Attack,
     GameOver
+    Kill,
+    GuardPosition,
+    Destroy
 }
 
 public class TickInput
@@ -20,7 +23,7 @@ public class TickInput
 
     public int[] Targets;
 
-    public int ID;
+    public int ID = -1;
     public int Prefab;
 
     public Vector2 Position;
@@ -35,6 +38,17 @@ public class TickInput
             Prefab = prefab,
 
             Position = position,
+            Performer = performer
+        };
+    }
+    public static TickInput Kill(int[] targets,  int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Kill,
+
+            Targets = targets,
+
             Performer = performer
         };
     }
@@ -63,6 +77,18 @@ public class TickInput
             Prefab = prefab,
 
             Position = position,
+            Performer = performer
+        };
+    }
+
+    public static TickInput Destroy(int buildingID, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Destroy,
+
+            ID = buildingID,
+
             Performer = performer
         };
     }
@@ -106,7 +132,7 @@ public class TickInput
     //        Performer = performer
     //    };
     //}
-    public static TickInput Attack(int targetID, Vector2 targetpos,int[] attackers, int performer = 0)
+    public static TickInput Attack(int targetID, Vector2 targetpos, int[] attackers, int performer = 0)
     {
         return new TickInput()
         {
@@ -127,6 +153,18 @@ public class TickInput
         return new TickInput()
         {
             Type = InputType.GameOver,
+        }
+    }
+    
+    public static TickInput GuardPosition(Vector2 position, int[] attackers, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.GuardPosition,
+
+            Targets = attackers,
+
+            Position = position,
 
             Performer = performer,
         };
