@@ -321,6 +321,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.Kill:
+                Spread(message, input.Targets);
+
+                break;
+
             case InputType.Move:
                 message.Add(input.Position.x,input.Position.y);
 
@@ -334,12 +339,20 @@ public partial class NetworkManager : MonoBehaviour
                 Spread(message, input.Targets);
 
                 break;
+
+
             case InputType.Build:
                 message.Add(input.ID);
 
                 Spread(message, input.Targets);
 
                 break;
+
+            case InputType.Destroy:
+                message.Add(input.ID);
+
+                break;
+
             case InputType.Attack:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 

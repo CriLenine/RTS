@@ -5,4 +5,12 @@ using UnityEngine;
 public class ToolTip : ScriptableObject
 {
     public string Name;
+
+    [HideInInspector]
+    public ToolTipType Type;
+
+    public virtual void Init()
+    {
+        Type = ToolTipType.Default;
+    }
 }

@@ -70,8 +70,4 @@ public abstract class BuildingData : ScriptableObject
     [SerializeField]
     private Sprite[] _buildingProgressSprites;
     public Sprite[] BuildingProgressSprites => _buildingProgressSprites;
-
-    [SerializeField]
-    private UtilsView[] _views;
-    public UtilsView[] Views => _views;
 }

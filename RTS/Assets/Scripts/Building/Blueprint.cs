@@ -10,8 +10,11 @@ public class Blueprint : MonoBehaviour
     [SerializeField]
     private SpriteRenderer _blueprintSprite, _iconSprite;
 
-    [SerializeField] 
+    [SerializeField]
     private Color _buildableColor, _notBuildableColor;
+
+    [SerializeField]
+    private LayerMask _HUD;
 
     private int _outline;
 
@@ -35,7 +38,7 @@ public class Blueprint : MonoBehaviour
 
     private void Update()
     {
-        if(_mouse.rightButton.wasPressedThisFrame)
+        if (_mouse.rightButton.wasPressedThisFrame)
             gameObject.SetActive(false);
 
         (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
@@ -44,9 +47,14 @@ public class Blueprint : MonoBehaviour
 
         transform.position = position;
 
+        
+
         if (_mouse.leftButton.wasPressedThisFrame && available)
         {
-            NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
+            RaycastHit2D hit = Physics2D.Raycast(_mouse.position.ReadValue(), Vector2.zero, Mathf.Infinity, _HUD);
+
+            if (hit.collider == null)
+                NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
 
             gameObject.SetActive(false);
         }

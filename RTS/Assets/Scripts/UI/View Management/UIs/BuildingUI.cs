@@ -21,7 +21,6 @@ public class BuildingUI : ViewManager
         Building building = uiOwner as Building;
 
         _title.text = building.Data.name.ToString();
-        UtilViews = building.Data.Views;
         _building = building;
         base.ShowUI(uiOwner);
     }

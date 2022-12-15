@@ -89,4 +89,9 @@ public class HUDManager : MonoBehaviour
     {
         _instance._population.UpdateHousing();
     }
+
+    public static void UpdateResources(int crystal, int wood, int gold, int stone)
+    {
+        _instance._resources.UpdateResources(crystal, wood, gold, stone);
+    }
 }

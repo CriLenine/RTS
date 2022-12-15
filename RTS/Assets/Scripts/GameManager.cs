@@ -51,9 +51,10 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
-    private HashSet<TickedBehaviour> _destroyedEntities = new HashSet<TickedBehaviour>();
+    private HashSet<TickedBehaviour> _entitiesToDestroy = new HashSet<TickedBehaviour>();
 
     private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
+    public static Dictionary<ResourceType, int> MyResources => _instance._myResources;
 
     [SerializeField]
     private List<Sprite> _resourcesSprites;
@@ -71,9 +72,7 @@ public class GameManager : MonoBehaviour
         _resourcesManager = GetComponent<ResourcesManager>();
 
         foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
-        {
-            _myResources[type] = 0;
-        }
+            _myResources[type] = 1000;
     }
     #endregion
 
@@ -81,18 +80,10 @@ public class GameManager : MonoBehaviour
     {
         _instance._myResources[type] += amount;
     }
-    
-    public static bool Pay(ResourceType type, int amount)
+
+    public static void Pay(ResourceType type, int amount)
     {
-        if (_instance._myResources[type] < amount)
-            return false;
         _instance._myResources[type] -= amount;
-        return true;
-    }
-
-    private void Start()
-    {
-
     }
 
     private void Update()
@@ -111,7 +102,8 @@ public class GameManager : MonoBehaviour
         foreach (TickInput input in inputs)
         {
             //test of entity existances
-            if(!_instance._entities.Contains(input.ID) && input.ID != -1 ) continue; // InputID = -1 = special case
+            if (input.ID != -1 && !_instance._entities.Contains(input.ID))
+                continue;
 
             if (input.Targets is not null)
             {
@@ -131,8 +123,11 @@ public class GameManager : MonoBehaviour
             switch (input.Type)
             {
                 case InputType.Spawn:
-                    CreateCharacter(input.Performer,input.ID, input.Prefab, input.Position);
+                    CreateCharacter(input.Performer, input.ID, input.Prefab, input.Position);
+                    break;
 
+                case InputType.Kill:
+                    Kill(input.Performer, input.Targets);
                     break;
 
                 case InputType.NewBuild:
@@ -146,9 +141,12 @@ public class GameManager : MonoBehaviour
                     AssignBuild(input.ID, input.Targets);
                     break;
 
+                case InputType.Destroy:
+                    DestroyBuilding(input.Performer, input.ID);
+                    break;
+
                 case InputType.Move:
                     MoveCharacters(input.Performer, input.Position, input.Targets);
-
                     break;
 
                 case InputType.Harvest:
@@ -172,15 +170,14 @@ public class GameManager : MonoBehaviour
                         harvester.AddAction(new Harvest(harvester, resource.GetTileToHarvest(harvestingCoords, inputCoords), inputCoords, resource, input.Performer));
                     }
                     break;
-                    
+
                 case InputType.Attack:
-                    if(input.ID == -1)
-                        MoveAndWatch(input.Performer, input.Position, input.Targets);
-                    else
-                    {
-                        TickedBehaviour target = _instance._entities[input.ID];
-                        MoveAndAttack(input.Performer, input.Position , input.Targets, target);
-                    }
+                    TickedBehaviour target = _instance._entities[input.ID];
+                    MoveAndAttack(input.Performer, input.Position, input.Targets, target);
+                    break;
+
+                case InputType.GuardPosition:
+                    MoveAndWatch(input.Performer, input.Position, input.Targets);
                     break;
             }
         }
@@ -199,26 +196,35 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
+        #region
+
+        HUDManager.UpdateResources(_instance._myResources[ResourceType.Crystal], _instance._myResources[ResourceType.Wood],
+            _instance._myResources[ResourceType.Gold], _instance._myResources[ResourceType.Stone]);
+
+        #endregion
+
         #region Destroy Pending Entities
 
-        foreach (TickedBehaviour entity in _instance._destroyedEntities)
+        foreach (TickedBehaviour entity in _instance._entitiesToDestroy)
         {
-            CharacterManager.TestEntitieSelection(entity);
+            CharacterManager.TestEntitySelection(entity);
 
-            _instance._entities.Remove(entity);
-            _instance._myEntities.Remove(entity);
+            int ID = entity.ID;
 
-            if (entity is Character character)
+            _instance._entities.Remove(ID);
+            _instance._myEntities.Remove(ID);
+
+            if (entity is Character)
             {
-                _instance._characters.Remove(character);
-                _instance._myCharacters.Remove(character);
-                QuadTreeNode.RemoveCharacter(character.ID);
+                _instance._characters.Remove(ID);
+                _instance._myCharacters.Remove(ID);
+                QuadTreeNode.RemoveCharacter(ID);
             }
 
             if (entity is Building building)
             {
-                _instance._buildings.Remove(building);
-                _instance._myBuildings.Remove(building);
+                _instance._buildings.Remove(ID);
+                _instance._myBuildings.Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
             }
@@ -226,7 +232,14 @@ public class GameManager : MonoBehaviour
             Destroy(entity.gameObject);
         }
 
-        _instance._destroyedEntities.Clear();
+        if (_instance._entitiesToDestroy.Count > 0)
+        {
+            HUDManager.UpdateHUD();
+            HUDManager.UpdateHousing();
+            ToolTipManager.HideToolTip();
+        }
+
+        _instance._entitiesToDestroy.Clear();
 
         #endregion
 
@@ -248,9 +261,10 @@ public class GameManager : MonoBehaviour
 
     #region Create & Destroy TickedBehaviours
 
-    private static void CreateCharacter(int performer, ISpawner spawner , Character.Type type, Vector2 position)
+    private static void CreateCharacter(int performer, int spawnerID, int prefabID, Vector2 rallyPoint,
+        bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
     {
-        CharacterData data = PrefabManager.GetCharacterData(type);
+        CharacterData data = PrefabManager.GetCharacterData((Character.Type)prefabID);
 
         Character character = TickedBehaviour.Create(performer, data.Character);
 
@@ -263,41 +277,21 @@ public class GameManager : MonoBehaviour
             _instance._myCharacters.Add(character);
         }
 
-        character.SetPosition(position);
+        HUDManager.UpdateHousing();
 
-        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
+        character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
 
-        Vector2Int rallypoint = TileMapManager.WorldToTilemapCoords(spawner.GetRallyPoint());
-        character.AddAction(new Move(character, LocomotionManager.RetrieveWayPoints(performer,character, rallypoint)));
+        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
+
+        if (!inPlace)
+            MoveCharacters(performer, rallyPoint, new int[1] { character.ID });
 
     }
 
-    private static void CreateCharacter(int performer, Character.Type type, Vector2 position)
+    private static void Kill(int performer, int[] targets)
     {
-        CharacterData data = PrefabManager.GetCharacterData(type);
-
-        Character character = TickedBehaviour.Create(performer, data.Character);
-
-        _instance._entities.Add(character);
-        _instance._characters.Add(character);
-
-        if (performer == NetworkManager.Me)
-        {
-            _instance._myEntities.Add(character);
-            _instance._myCharacters.Add(character);
-        }
-
-        character.SetPosition(position);
-
-        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, position);
-    }
-
-    private static void CreateCharacter(int performer,int spawnerID, int prefabID, Vector2 position)
-    {
-        if (_instance._entities[spawnerID].TryGetComponent(out ISpawner spawner))
-            CreateCharacter(performer, spawner, (Character.Type)prefabID, position);
-        else
-            throw new Exception("Not a spawner trying to spawn");
+        for (int i = 0; i < targets.Length; i++)
+            DestroyEntity(targets[i]);
     }
 
     private static void MoveCharacters(int performer, Vector2 position, int[] targets) ///TO REMOVE
@@ -324,7 +318,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Path not found!");
         }
     }
-    private static Dictionary<List<Character>,List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector2 position, int[] targets)
+    private static Dictionary<List<Character>, List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector2 position, int[] targets)
     {
         Dictionary<List<Character>, List<Vector2>> output = new();
         List<Character> characters = new();
@@ -347,7 +341,7 @@ public class GameManager : MonoBehaviour
         if (target is Building building)
             position = TileMapManager.GetClosestPosAroundBuilding(building, _instance._entities[attackers[0]] as Character);
 
-        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer,position,attackers);
+        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, position, attackers);
         foreach (List<Character> group in groupsAndPathfindings.Keys)
         {
             if (groupsAndPathfindings[group] != null)
@@ -356,8 +350,8 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < group.Count; ++i)
                 {
-                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group],target));
-                    group[i].AddAction(new Attack(group[i],target,position));
+                    group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group], target));
+                    group[i].AddAction(new Attack(group[i], target, position));
                 }
             }
             else
@@ -387,7 +381,7 @@ public class GameManager : MonoBehaviour
 
     }
     #endregion
-    
+
     private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = PrefabManager.GetBuildingData(type);
@@ -407,7 +401,7 @@ public class GameManager : MonoBehaviour
 
         building.SetPosition(position);
 
-        if(autoComplete)
+        if (autoComplete)
             building.CompleteBuild(building.Data.RequiredBuildTicks);
 
         return building.ID;
@@ -426,9 +420,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private static void DestroyBuilding(int performer, int buildingID)
+    {
+        if (performer != NetworkManager.Me)
+        {
+            DestroyEntity(buildingID);
+            return;
+        }
+
+        Building building = _instance._buildings[buildingID];
+
+        if (CharacterManager.SelectedBuilding != null && CharacterManager.SelectedBuilding == building)
+            CharacterManager.DeselectAll();
+
+        if (!building.BuildComplete)
+            foreach (Resource.Amount cost in building.Data.Cost)
+                _instance._myResources[cost.Type] += cost.Value;
+        else
+            _instance._housing -= building.Data.HousingProvided;
+
+        _instance._entities.Remove(buildingID);
+        _instance._myEntities.Remove(buildingID);
+
+        _instance._buildings.Remove(buildingID);
+        _instance._myBuildings.Remove(buildingID);
+
+        TileMapManager.RemoveBuilding(building);
+
+        Destroy(building.gameObject);
+
+        HUDManager.UpdateHUD();
+        HUDManager.UpdateHousing();
+        ToolTipManager.HideToolTip();
+    }
+
     public static void DestroyEntity(int id)
     {
-        _instance._destroyedEntities.Add(_instance._entities[id]);
+        _instance._entitiesToDestroy.Add(_instance._entities[id]);
     }
 
     public static void DestroyAllEntities()
@@ -448,7 +476,8 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    public static void Prepare() {
+    public static void Prepare()
+    {
 
         DestroyAllEntities();
 
@@ -464,13 +493,11 @@ public class GameManager : MonoBehaviour
         {
             Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
 
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, 0.75f));
-            CreateCharacter(i, Character.Type.Peon, spawnPoint + new Vector2(0.75f, 0.75f));
-            CreateCharacter(i, Character.Type.Naked, spawnPoint + new Vector2(0.75f, -0.75f));
-            CreateCharacter(i+1, Character.Type.Peon, spawnPoint + new Vector2(-0.75f, -0.75f));
+            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-0.75f, 0.75f));
+            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(0.75f, 0.75f));
+            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(0.75f, -0.75f));
+            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-0.75f, -0.75f));
 
-            CreateBuilding(i, Building.Type.Sawmill, spawnPoint + new Vector2(-4f, -2f), true);
-            //CreateBuilding(i, Building.Type.GoldOutpost, spawnPoint + new Vector2(-2f, -5f), true);
             CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint + new Vector2(0.25f, -1.75f), true);
 
             if (i == NetworkManager.Me)

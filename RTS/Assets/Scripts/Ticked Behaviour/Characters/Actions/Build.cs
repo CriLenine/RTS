@@ -13,7 +13,7 @@ public class Build : Action
 
     protected override bool Update()
     {
-        if(_building.CompleteBuild(_peon.Data.BuildEfficiencyMultiplier))
+        if(!GameManager.Buildings.Contains(_building.ID) || _building.CompleteBuild(_peon.Data.BuildEfficiencyMultiplier))
         {
             _peon.SetBuild(null);
             return true;
