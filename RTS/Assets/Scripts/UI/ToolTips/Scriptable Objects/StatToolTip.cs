@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class StatToolTip : ToolTip
 {
+    [TextArea(3, 10)]
     public string Description;
 
     public override void Init()

@@ -4,37 +4,42 @@ using UnityEngine.UI;
 public class BuildingButton : MonoBehaviour
 {
     [SerializeField]
-    private ButtonCustomization _custom;
-
-    [SerializeField]
     private Image _image;
 
-    [SerializeField]
     private Button _button;
 
-    [SerializeField]
-    private ToolTip _toolTip;
-    public ToolTip ButtonToolTip => _toolTip;
+    private ToolTipElement toolTipElement = null;
 
-    private void Awake()
+    private BuildingData _data;
+
+    public void SetupButton(BuildingData data)
     {
-        _image.color = _custom.Color;
-        _image.sprite = _custom.Sprite;
+        _data = data;
 
-        ToolTipElement toolTipElement = null;
+        _button = gameObject.AddComponent<Button>();
+        _button.onClick.AddListener(() => Blueprint.SetActiveBlueprint(data));
 
-        if (_toolTip != null)
+        _image.color = data.Color;
+        _image.sprite = data.HUDIcon;
+
+        if (data.ToolTip != null)
         {
             toolTipElement = gameObject.AddComponent<ToolTipElement>();
-            toolTipElement.Init(_toolTip);
+            toolTipElement.Init(data.ToolTip);
         }
-
-        if (_button != null && (toolTipElement == null || toolTipElement.ToolTip.Type != ToolTipType.Building))
-            _button.interactable = false;
     }
-    public void SetButtonInteractability(bool value)
+
+    private void Update()
     {
-        _button.interactable = value;
+        _button.interactable = TestInteractability();
+    }
+
+    private bool TestInteractability()
+    {
+        foreach (Resource.Amount cost in _data.Cost)
+            if (GameManager.MyResources[cost.Type] < cost.Value)
+                return false;
+        return true;
     }
 
 }

@@ -38,7 +38,7 @@ public class HUDStats : HUD
     private Slider _healthBar;
 
     [SerializeField]
-    private GameObject _attackSection, _bottomSeparator;
+    private GameObject _bottomSeparator;
 
     private Character _character;
     private Building _building;
@@ -55,7 +55,6 @@ public class HUDStats : HUD
         _name.text = character.CharaType.ToString();
         _desc.text = character is Peon ? "Economy Unit" : "Military Unit";
         _type.sprite = character is Peon ? _economyIconSprite : _militaryIconSprite;
-        _attackSection.SetActive(true);
         _attackDamage.text = $"{data.AttackDamage}";
         _attackRange.text = $"{data.AttackRange}";
         _meleeArmor.text = $"{data.MeleeArmor}";
@@ -89,10 +88,11 @@ public class HUDStats : HUD
         _character = null;
 
         BuildingData data = _building.Data;
-        _attackSection.SetActive(false);
         _name.text = _building.Data.Type.ToString();
         _desc.text = _building.BuildingType.ToString() == "Barracks" ? "Military Building" : "Economy Building";
         _type.sprite = _building.BuildingType.ToString() == "Barracks" ? _militaryIconSprite : _economyIconSprite;
+        _attackDamage.text = "0";
+        _attackRange.text = "0";
         _meleeArmor.text = $"{data.MeleeArmor}";
         _rangeArmor.text = $"{data.RangeArmor}";
 

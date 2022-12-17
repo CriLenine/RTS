@@ -7,6 +7,7 @@ public class HUDManager : MonoBehaviour
     private static HUDManager _instance;
 
     [Header("HUD Components")]
+    [Space]
 
     [SerializeField]
     private HUDResources _resources;
@@ -20,6 +21,19 @@ public class HUDManager : MonoBehaviour
     private HUDBuildings _buildings;
 
     private UIInputs _uiInputs;
+
+    [Space]
+    [Space]
+    [Header("Misc")]
+    [Space]
+
+    [SerializeField]
+    private GameObject _buttonFill;
+    public static GameObject ButtonFill => _instance._buttonFill;
+
+    [SerializeField]
+    private Color _defaultButtonColor;
+    public static Color DefaultButtonColor => _instance._defaultButtonColor;
 
     protected void Awake()
     {
@@ -42,6 +56,8 @@ public class HUDManager : MonoBehaviour
 
     public static void UpdateHUD()
     {
+        ToolTipManager.HideToolTip();
+
         List<Character> characters = CharacterManager.SelectedCharacters;
         Building building = CharacterManager.SelectedBuilding;
 
@@ -59,11 +75,11 @@ public class HUDManager : MonoBehaviour
         if (building != null)
         {
             _instance._stats.DisplayStats(building);
-            _instance._actions.UpdateActions(building.BuildingType);
+            _instance._actions.ShowBuildingActions(building.Data);
             return;
         }
 
-        _instance._actions.UpdateActions();
+        _instance._actions.ShowCharacterActions();
         
         if (charactersCount == 1)
         {

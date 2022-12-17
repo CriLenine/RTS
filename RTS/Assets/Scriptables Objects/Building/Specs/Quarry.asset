@@ -20,7 +20,25 @@ MonoBehaviour:
     _value: 75
   _building: {fileID: 8711191359588001194, guid: f99afd94f56740a4e93e42ff3b5db5a6, type: 3}
   _outline: 1
-  _HUDIcon: {fileID: 21300000, guid: 59088665c314b964db2d3730d769c233, type: 3}
+  Icon: {fileID: 21300000, guid: 59088665c314b964db2d3730d769c233, type: 3}
+  _color: {r: 1, g: 1, b: 1, a: 1}
+  _toolTip: {fileID: 11400000, guid: 27b84baec8605fc448c806c484b3a67c, type: 2}
+  _buildingActions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
   _requiredBuildTicks: 300
   _maxHealth: 200
   _housingProvided: 0

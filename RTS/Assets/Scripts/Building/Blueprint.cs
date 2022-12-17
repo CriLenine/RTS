@@ -3,9 +3,14 @@ using UnityEngine.InputSystem;
 
 public class Blueprint : MonoBehaviour
 {
+    private static Blueprint _instance;
+
     private Mouse _mouse;
 
     private Building.Type _buildType;
+
+    [SerializeField]
+    private GameObject _holder;
 
     [SerializeField]
     private SpriteRenderer _blueprintSprite, _iconSprite;
@@ -18,45 +23,59 @@ public class Blueprint : MonoBehaviour
 
     private int _outline;
 
+    private bool _inBlueprintMode = false;
+
     private void Awake()
     {
+        if (_instance != null && _instance != this)
+            Destroy(this);
+        else
+            _instance = this;
+
         _mouse = Mouse.current;
     }
 
-    public void SetActiveBlueprint(BuildingData data)
+    public static void SetActiveBlueprint(BuildingData data)
     {
-        gameObject.SetActive(true);
+        _instance._inBlueprintMode = true;
 
-        _buildType = data.Type;
-        _outline = data.Outline;
+        _instance._holder.SetActive(true);
 
-        float scale = TileMapManager.TileSize * (2 * _outline + 1);
-        transform.localScale = new Vector3(scale, scale, 1);
+        _instance._buildType = data.Type;
+        _instance._outline = data.Outline;
 
-        _iconSprite.sprite = data.HUDIcon;
+        float scale = TileMapManager.TileSize * (2 * _instance._outline + 1);
+        _instance._holder.transform.localScale = new Vector3(scale, scale, 1);
+
+        _instance._iconSprite.sprite = data.HUDIcon;
     }
 
     private void Update()
     {
-        if (_mouse.rightButton.wasPressedThisFrame)
-            gameObject.SetActive(false);
-
-        (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
-
-        _blueprintSprite.color = available ? _buildableColor : _notBuildableColor;
-
-        transform.position = position;
-
-        
-
-        if (_mouse.leftButton.wasPressedThisFrame && available)
+        if (_inBlueprintMode)
         {
-            RaycastHit2D hit = Physics2D.Raycast(_mouse.position.ReadValue(), Vector2.zero, Mathf.Infinity, _HUD);
+            if (_mouse.rightButton.wasPressedThisFrame)
+            {
+                _holder.SetActive(false);
+                _inBlueprintMode = false;
+            }
 
-            if (hit.collider == null)
-                NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
+            (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
 
-            gameObject.SetActive(false);
+            _blueprintSprite.color = available ? _buildableColor : _notBuildableColor;
+
+            _holder.transform.position = position;
+
+            if (_mouse.leftButton.wasPressedThisFrame && available)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(_mouse.position.ReadValue(), Vector2.zero, Mathf.Infinity, _HUD);
+
+                if (hit.collider == null)
+                    NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
+
+                _holder.SetActive(false);
+                _inBlueprintMode = false;
+            }
         }
     }
 }

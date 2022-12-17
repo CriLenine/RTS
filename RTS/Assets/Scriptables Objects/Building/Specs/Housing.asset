@@ -13,19 +13,32 @@ MonoBehaviour:
   m_Name: Housing
   m_EditorClassIdentifier: 
   _type: 1
-  _timeCost: 30
   _cost:
   - _type: 0
     _value: 150
-  - _type: 2
-    _value: 100
   _building: {fileID: 5819366344183183922, guid: bc7c5ca2b36374d49906c7f07ece8b92, type: 3}
   _outline: 1
-  _HUDIcon: {fileID: 21300000, guid: 2bbf9ce8b32260843a6594d535767450, type: 3}
+  Icon: {fileID: 21300000, guid: 929a4355de5ffc242a0eb3b27ffc5849, type: 3}
+  _color: {r: 1, g: 1, b: 1, a: 1}
+  _toolTip: {fileID: 11400000, guid: d159c9966c98fad4c8e880e3d985150e, type: 2}
+  _buildingActions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
   _requiredBuildTicks: 150
   _maxHealth: 100
   _housingProvided: 5
   _meleeArmor: 0
   _rangeArmor: 0
-  _buildingProgressSprites: []
-  _views: 

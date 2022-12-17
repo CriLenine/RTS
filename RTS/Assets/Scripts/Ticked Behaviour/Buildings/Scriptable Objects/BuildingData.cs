@@ -38,8 +38,20 @@ public abstract class BuildingData : ScriptableObject
     [Header("UI")]
 
     [SerializeField]
-    private Sprite _HUDIcon;
-    public Sprite HUDIcon => _HUDIcon;
+    private Sprite Icon;
+    public Sprite HUDIcon => Icon;
+
+    [SerializeField]
+    private Color _color;
+    public Color Color => _color;
+
+    [SerializeField]
+    private ToolTip _toolTip;
+    public ToolTip ToolTip => _toolTip;
+
+    [SerializeField]
+    private List<ActionData> _buildingActions;
+    public List<ActionData> BuildingActions => _buildingActions;
 
     [Space]
     [Space]

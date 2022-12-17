@@ -4,30 +4,39 @@ using UnityEngine.InputSystem;
 
 public class ActionsManager : MonoBehaviour
 {
+    private static ActionsManager _instance;
+
     private UIInputs _uiInputs;
 
     private ActionButton _currentButton;
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+            Destroy(this);
+        else
+            _instance = this;
+    }
+
     private void Start()
     {
         _uiInputs = HUDManager.GetUIInputs();
-
-
     }
 
-    private void  OnClickCommon()
+    private static void OnClickCommon()
     {
         GameEventsManager.PlayEvent("UIClick");
     }
-    public void OnClickAttack(ActionButton button)
+    public static void OnClickAttack(/*ActionButton button*/)
     {
         OnClickCommon();
 
-        if (!button.ToogleButton()) return;
+        //if (!button.ToogleButton()) return;
 
-        _currentButton = button;
+        //_instance._currentButton = button;
 
         CharacterManager.DisableInputs();
-        _uiInputs.UI.Attack.started += Attack;
+        _instance._uiInputs.UI.Attack.started += Attack;
     }
 
     public void KillUnits()
@@ -47,12 +56,8 @@ public class ActionsManager : MonoBehaviour
         NetworkManager.Input(TickInput.Destroy(CharacterManager.SelectedBuilding.ID));
     }
 
-    public void QueueUnitSpawn(ActionButton button)
+    public static void QueueUnitSpawn(CharacterData data)
     {
-        SpawnResearchToolTip toolTip = button.ButtonToolTip as SpawnResearchToolTip;
-
-        CharacterData data = toolTip.CharacterData;
-
         foreach (Resource.Amount cost in data.Cost)
             GameManager.Pay(cost.Type, cost.Value);
 
@@ -62,7 +67,7 @@ public class ActionsManager : MonoBehaviour
 
 
     #region Attack
-    private void Attack(InputAction.CallbackContext ctx )
+    private static void Attack(InputAction.CallbackContext ctx)
     {
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Collider2D collider = Physics2D.OverlapPoint(worldPoint);
@@ -82,11 +87,11 @@ public class ActionsManager : MonoBehaviour
                 NetworkManager.Input(TickInput.GuardPosition(worldPoint, CharacterManager.GetSelectedIds()));
         }
 
-        _currentButton.ToogleButton();
+        _instance._currentButton.ToogleButton();
 
         CharacterManager.EnableInputs();
 
-        _uiInputs.UI.Attack.started -= Attack;
+        _instance._uiInputs.UI.Attack.started -= Attack;
     }
     #endregion
 

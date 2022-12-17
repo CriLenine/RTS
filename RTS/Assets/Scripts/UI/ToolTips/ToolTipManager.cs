@@ -60,10 +60,10 @@ public class ToolTipManager : MonoBehaviour
         _instance._actionToolTipVisual.Visual.SetActive(true);
         _instance._actionToolTipVisual.Name.text = toolTip.Name;
         _instance._actionToolTipVisual.Description.text = toolTip.Description;
-        if (togglable)
-            _instance._actionToolTipVisual.ToggledStatus.text = "Toggle status : " + (true ? "enabled" : "disabled");
-        else
-            _instance._actionToolTipVisual.ToggledStatus.text = "";
+        //if (togglable)
+        //    _instance._actionToolTipVisual.ToggledStatus.text = "Toggle status : " + (true ? "enabled" : "disabled");
+        //else
+        //    _instance._actionToolTipVisual.ToggledStatus.text = "";
 
         _instance._currentToolTipVisual = _instance._actionToolTipVisual;
     }
@@ -83,14 +83,12 @@ public class ToolTipManager : MonoBehaviour
             {
                 _instance._buildingToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
                 _instance._buildingToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
-                
-                _instance._buildingToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(true);
-                _instance._buildingToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(true);
+                _instance._buildingToolTipVisual.ResourceCostIcons[i].color = new Color(1,1,1,1);
             }
             else
             {
-                _instance._buildingToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(false);
-                _instance._buildingToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(false);
+                _instance._buildingToolTipVisual.ResourceCostTexts[i].text = string.Empty ;
+                _instance._buildingToolTipVisual.ResourceCostIcons[i].color = new Color(0,0,0,0);
             }
 
         _instance._currentToolTipVisual = _instance._buildingToolTipVisual;
@@ -102,7 +100,7 @@ public class ToolTipManager : MonoBehaviour
 
         _instance._displayed = true;
         _instance._spawnResearchToolTipVisual.Visual.SetActive(true);
-        _instance._spawnResearchToolTipVisual.Icon.sprite = data.HUDIcon;
+        _instance._spawnResearchToolTipVisual.Icon.sprite = data.Icon;
         _instance._spawnResearchToolTipVisual.Name.text = toolTip.Name;
         _instance._spawnResearchToolTipVisual.Description.text = toolTip.Description;
 
@@ -111,13 +109,12 @@ public class ToolTipManager : MonoBehaviour
             {
                 _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
                 _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
-                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(true);
-                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(true);
+                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].color = new Color(1, 1, 1, 1);
             }
             else
             {
-                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].gameObject.SetActive(false);
-                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].gameObject.SetActive(false);
+                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].text = string.Empty;
+                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].color = new Color(0, 0, 0, 0);
             }
 
 
@@ -130,7 +127,8 @@ public class ToolTipManager : MonoBehaviour
 
     public static void HideToolTip()
     {
-        _instance._currentToolTipVisual.Visual.SetActive(false);
+        if(_instance._currentToolTipVisual != null)
+            _instance._currentToolTipVisual.Visual.SetActive(false);
     }
 
     private void Update()

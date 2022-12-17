@@ -15,7 +15,12 @@ public class ToolTipElement : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 {
     [SerializeField]
     private ToolTip _toolTip;
-    public ToolTip ToolTip => _toolTip;
+
+    private void Awake()
+    {
+        if (_toolTip != null)
+            _toolTip.Init();
+    }
 
     public void Init(ToolTip toolTip)
     {

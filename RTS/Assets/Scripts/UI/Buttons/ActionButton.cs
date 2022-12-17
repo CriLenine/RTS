@@ -6,58 +6,138 @@ public enum ActionType
     Trigger,
     Toogle
 }
+
 public class ActionButton : MonoBehaviour
 {
     [SerializeField]
-    private ButtonCustomization _custom;
-
-    [SerializeField]
     private Image _image;
 
-    [SerializeField]
     private Button _button;
+    private LongClickButton _longClickButton;
 
-    [SerializeField]
-    private ToolTip _toolTip;
-    public ToolTip ButtonToolTip => _toolTip;
+    private ToolTipElement toolTipElement = null;
 
-    private bool _isToogle = false;
-    private void Awake()
+    private CharacterData _data;
+
+    private GameObject _buttonFill;
+
+    private bool _isToggle = false;
+
+    public void SetupButton(ActionData data)
     {
-        _image.color = _custom.Color;
-        _image.sprite = _custom.Sprite;
-
-        ToolTipElement toolTipElement = null;
-
-        if (_toolTip != null)
+        if (data is ConstantActionData currentActionData)
         {
-            toolTipElement = gameObject.AddComponent<ToolTipElement>();
-            toolTipElement.Init(_toolTip);
-        }
+            _image.color = currentActionData.Color;
+            _image.sprite = currentActionData.Icon;
 
-        if (_button != null && (toolTipElement == null || toolTipElement.ToolTip.Type != ToolTipType.Action))
-            _button.interactable = false;
+            if (currentActionData.ButtonType == ButtonType.Regular)
+            {
+                if (_button == null)
+                    _button = gameObject.AddComponent<Button>();
+
+                _button.onClick = data.OnClick;
+
+                TryDestroyLongClickButton();
+            }
+            else
+            {
+                if (_buttonFill == null)
+                    _buttonFill = Instantiate(HUDManager.ButtonFill);
+
+                if (_longClickButton == null)
+                    _longClickButton = gameObject.AddComponent<LongClickButton>();
+
+                _buttonFill.transform.SetParent(gameObject.transform, false);
+
+                _longClickButton.FillImage = _buttonFill.GetComponent<Image>();
+
+                _longClickButton.RequiredHoldTime = currentActionData.HoldTime;
+
+                _longClickButton.OnLongClick = data.OnClick;
+            }
+
+            SetupToolTip(currentActionData.ToolTip);
+        }
+        else if(data is CharacterData characterData)
+        {
+            _image.color = characterData.Color;
+            _image.sprite = characterData.Icon;
+
+            if (_button == null)
+                _button = gameObject.AddComponent<Button>();
+
+            _button.onClick = data.OnClick;
+
+            TryDestroyLongClickButton();
+
+            SetupToolTip(characterData.ToolTip);
+        }
     }
 
-    public void SetButtonInteractability(bool value)
+    public void ResetButton()
     {
-        _button.interactable = value;
+        _image.sprite = null;
+        _image.color = HUDManager.DefaultButtonColor;
+
+        if(_button != null)
+            Destroy(_button);
+
+        TryDestroyLongClickButton();
+    }
+
+    private void TryDestroyLongClickButton()
+    {
+        if (_longClickButton != null)
+            Destroy(_longClickButton);
+
+        if(_buttonFill != null)
+            Destroy(_buttonFill);
+    }
+
+    private void SetupToolTip(ToolTip toolTip)
+    {
+        if (toolTip != null)
+        {
+            if (toolTipElement == null)
+                toolTipElement = gameObject.AddComponent<ToolTipElement>();
+
+            toolTipElement.Init(toolTip);
+        }
+        else if (toolTipElement != null)
+            Destroy(toolTipElement);
+
+    }
+
+    private void Update()
+    {
+        if (_data != null)
+            _button.interactable = TestInteractability();
+    }
+
+    private bool TestInteractability()
+    {
+        foreach (Resource.Amount cost in _data.Cost)
+            if (GameManager.MyResources[cost.Type] < cost.Value)
+                return false;
+        return true;
     }
 
     public bool ToogleButton()
     {
-        if(_isToogle)
-        {
-            _isToogle = false;
-            _image.sprite = _custom.Sprite;
-        }
-        else
-        {
-            _isToogle = true;
-            _image.sprite = _custom.ToogledSprite;
-        }
+        //if (_isToogle)
+        //{
+        //    _isToogle = false;
+        //    _image.sprite = _custom.Sprite;
+        //}
+        //else
+        //{
+        //    _isToogle = true;
+        //    _image.sprite = _custom.ToogledSprite;
+        //}
 
-        return _isToogle;
+        //return _isToogle;
+
+        return _isToggle;
     }
 
 }

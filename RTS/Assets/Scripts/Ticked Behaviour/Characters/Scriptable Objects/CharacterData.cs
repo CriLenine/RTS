@@ -2,20 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class CharacterData : ScriptableObject
+public abstract class CharacterData : ActionData
 {
     [Header("Spawn Data")]
     [Space]
 
     [SerializeField]
     private Character.Type _type;
+    public Character.Type Type => _type;
 
     [SerializeField]
     private Character _character;
+    public Character Character => _character;
 
     [SerializeField]
     [Min(1)]
     private int _spawnTicks;
+    public float SpawnTicks => _spawnTicks;
 
     [SerializeField]
     private Resource.Amount[] _cost;
@@ -23,12 +26,16 @@ public abstract class CharacterData : ScriptableObject
 
     [Header("UI")]
     [SerializeField]
-    private Sprite _HUDIcon;
-    public Character.Type Type => _type;
-    public Character Character => _character;
-    public Sprite HUDIcon => _HUDIcon;
+    private Sprite _icon;
+    public Sprite Icon => _icon;
 
-    public float SpawnTicks => _spawnTicks;
+    [SerializeField]
+    private Color _color;
+    public Color Color => _color;
+
+    [SerializeField]
+    private ToolTip _toolTip;
+    public ToolTip ToolTip => _toolTip;
 
     [Space]
     [Space]
