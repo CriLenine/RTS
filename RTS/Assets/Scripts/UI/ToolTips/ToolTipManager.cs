@@ -1,6 +1,9 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class ToolTipManager : MonoBehaviour
 {
@@ -9,15 +12,11 @@ public class ToolTipManager : MonoBehaviour
     private static ToolTipManager _instance;
 
     [SerializeField]
-    private ToolTipVisual _defaultToolTipVisual;
-    [SerializeField]
-    private StatToolTipVisual _statToolTipVisual;
-    [SerializeField]
-    private ActionToolTipVisual _actionToolTipVisual;
-    [SerializeField]
-    private BuildingToolTipVisual _buildingToolTipVisual;
-    [SerializeField]
-    private SpawnResearchToolTipVisual _spawnResearchToolTipVisual;
+    private List<ToolTipVisualBind> toolTipVisualBinds;
+
+    private Dictionary<ToolTipType, ToolTipVisual> toolTipVisuals = new Dictionary<ToolTipType, ToolTipVisual>();
+
+    private List<ToolTipType> _visualTypes = new List<ToolTipType>();
 
     private ToolTipVisual _currentToolTipVisual;
 
@@ -33,109 +32,94 @@ public class ToolTipManager : MonoBehaviour
             _instance = this;
         else
             Destroy(this);
+
+        foreach (ToolTipVisualBind bind in toolTipVisualBinds)
+        {
+            toolTipVisuals.Add(bind.Type, bind.Visual);
+            _visualTypes.Add(bind.Type);
+        }
     }
 
-    public static void DisplayDefaultToolTip(ToolTip toolTip)
+    public static void DisplayToolTip(ToolTip toolTip)
     {
-        _instance._displayed = true;
-        _instance._defaultToolTipVisual.Visual.SetActive(true);
-        _instance._defaultToolTipVisual.Name.text = toolTip.Name;
+        _instance._currentToolTipVisual = _instance.toolTipVisuals[toolTip.Type];
 
-        _instance._currentToolTipVisual = _instance._defaultToolTipVisual;
-    }
+        _instance.ShowToolTip(toolTip.Type);
 
-    public static void DisplayStatToolTip(StatToolTip toolTip)
-    {
-        _instance._displayed = true;
-        _instance._statToolTipVisual.Visual.SetActive(true);
-        _instance._statToolTipVisual.Name.text = toolTip.Name;
-        _instance._statToolTipVisual.Description.text = toolTip.Description;
+        _instance._currentToolTipVisual.Name.text = toolTip.Name;
 
-        _instance._currentToolTipVisual = _instance._statToolTipVisual;
-    }
+        if (toolTip.Type == ToolTipType.Default)
+            return;
 
-    public static void DisplayActionToolTip(ActionToolTip toolTip, bool togglable)
-    {
-        _instance._displayed = true;
-        _instance._actionToolTipVisual.Visual.SetActive(true);
-        _instance._actionToolTipVisual.Name.text = toolTip.Name;
-        _instance._actionToolTipVisual.Description.text = toolTip.Description;
-        //if (togglable)
-        //    _instance._actionToolTipVisual.ToggledStatus.text = "Toggle status : " + (true ? "enabled" : "disabled");
-        //else
-        //    _instance._actionToolTipVisual.ToggledStatus.text = "";
+        _instance._currentToolTipVisual.Description.text = toolTip.Description;
 
-        _instance._currentToolTipVisual = _instance._actionToolTipVisual;
-    }
+        if (toolTip.Type == ToolTipType.Stat || toolTip.Type == ToolTipType.Action)
+            return;
 
-    public static void DisplayBuildingToolTip(BuildingToolTip toolTip)
-    {
-        BuildingData data = toolTip.BuildingData;
+        TextMeshProUGUI[] costTexts = _instance._currentToolTipVisual.ResourceCostTexts.Value;
+        Image[] costIcons = _instance._currentToolTipVisual.ResourceCostIcons.Value;
 
-        _instance._displayed = true;
-        _instance._buildingToolTipVisual.Visual.SetActive(true);
-        _instance._buildingToolTipVisual.Icon.sprite = data.HUDIcon;
-        _instance._buildingToolTipVisual.Icon.color = toolTip.BuildingData.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
-        _instance._buildingToolTipVisual.Name.text = toolTip.Name;
-        //_instance._buildingToolTipVisual.Description.text = toolTip.Description;
-        //_instance._buildingToolTipVisual.Type.text = toolTip.BuildingData.SubType == SubType.Economy ? ;
+        Resource.Amount[] costs;
 
-        for (int i = 0; i < _instance._buildingToolTipVisual.ResourceCostTexts.Length; ++i)
-            if (i < data.Cost.Length)
+        if (toolTip.Type == ToolTipType.Building)
+        {
+            _instance._currentToolTipVisual.Icon.sprite = toolTip.BuildingData.HUDIcon;
+            _instance._currentToolTipVisual.Icon.color = toolTip.BuildingData.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
+
+            costs = toolTip.BuildingData.Cost;
+        }
+        else
+        {
+            _instance._currentToolTipVisual.Icon.sprite = toolTip.Data.Icon;
+            _instance._currentToolTipVisual.Icon.color = toolTip.Data.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
+
+            costs = toolTip.Data.Cost;
+        }
+
+        for (int i = 0; i < _instance._currentToolTipVisual.ResourceCostTexts.Value.Length; ++i)
+            if (i < costs.Length)
             {
-                _instance._buildingToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
-                _instance._buildingToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
-                _instance._buildingToolTipVisual.ResourceCostIcons[i].color = new Color(1,1,1,1);
+                costTexts[i].text = $"{costs[i].Value}";
+                costTexts[i].color = new Color(1, 1, 1, 1);
+                costIcons[i].sprite = GameManager.ResourcesSprites[(int)costs[i].Type];
             }
             else
             {
-                _instance._buildingToolTipVisual.ResourceCostTexts[i].text = string.Empty ;
-                _instance._buildingToolTipVisual.ResourceCostIcons[i].color = new Color(0,0,0,0);
+                costTexts[i].text = string.Empty;
+                costIcons[i].color = new Color(0, 0, 0, 0);
             }
 
-        _instance._currentToolTipVisual = _instance._buildingToolTipVisual;
+        if (toolTip.Type == ToolTipType.Building)
+            return;
+
+        int seconds = Mathf.CeilToInt(toolTip.Data.SpawnTicks * NetworkManager.TickPeriod);
+        _instance._currentToolTipVisual.TimeCost.text = $"{seconds / 60}m{seconds % 60}s";
     }
 
-    public static void DisplaySpawnToolTip(SpawnResearchToolTip toolTip)
+    [Serializable]
+    struct ToolTipVisualBind
     {
-        CharacterData data = toolTip.CharacterData;
+        public ToolTipType Type;
+        public ToolTipVisual Visual;
+    }
 
+    private void ShowToolTip(ToolTipType wantedType)
+    {
+        toolTipVisuals[wantedType].gameObject.SetActive(true);
         _instance._displayed = true;
-        _instance._spawnResearchToolTipVisual.Visual.SetActive(true);
-        _instance._spawnResearchToolTipVisual.Icon.sprite = data.Icon;
-        _instance._spawnResearchToolTipVisual.Name.text = toolTip.Name;
-        _instance._spawnResearchToolTipVisual.Description.text = toolTip.Description;
-
-        for (int i = 0; i < _instance._spawnResearchToolTipVisual.ResourceCostTexts.Length; ++i)
-            if (i < data.Cost.Length)
-            {
-                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].text = $"{data.Cost[i].Value}";
-                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].sprite = GameManager.ResourcesSprites[(int)data.Cost[i].Type];
-                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].color = new Color(1, 1, 1, 1);
-            }
-            else
-            {
-                _instance._spawnResearchToolTipVisual.ResourceCostTexts[i].text = string.Empty;
-                _instance._spawnResearchToolTipVisual.ResourceCostIcons[i].color = new Color(0, 0, 0, 0);
-            }
-
-
-        int seconds = Mathf.CeilToInt(data.SpawnTicks * NetworkManager.TickPeriod);
-
-        _instance._spawnResearchToolTipVisual.TimeCost.text = $"{seconds / 60}m{seconds % 60}s";
-
-        _instance._currentToolTipVisual = _instance._spawnResearchToolTipVisual;
     }
 
     public static void HideToolTip()
     {
-        if(_instance._currentToolTipVisual != null)
-            _instance._currentToolTipVisual.Visual.SetActive(false);
+        if (_instance._currentToolTipVisual != null)
+            _instance._currentToolTipVisual.gameObject.SetActive(false);
+
+        _instance._displayed = false;
     }
 
     private void Update()
     {
         if (_instance._displayed)
-            _instance._currentToolTipVisual.Visual.transform.position = _instance._offset + _mouse.position.ReadValue();
+            _instance._currentToolTipVisual.gameObject.transform.position = _instance._offset + _mouse.position.ReadValue();
     }
 }

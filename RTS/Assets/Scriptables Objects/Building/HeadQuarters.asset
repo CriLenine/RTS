@@ -12,6 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d701c73d794ccc40865d318629c8e8c, type: 3}
   m_Name: HeadQuarters
   m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1419917682958475346, guid: 5a551cf55c188e04aa2a825b8ba413fd, type: 3}
+        m_TargetAssemblyTypeName: Blueprint, Assembly-CSharp
+        m_MethodName: SetActiveBlueprint
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000}
+          m_ObjectArgumentAssemblyTypeName: BuildingData, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _type: 0
   _subType: 0
   _building: {fileID: 260249734484503702, guid: 4e2313134fbfef642a7677d746ac054b, type: 3}
@@ -31,10 +46,10 @@ MonoBehaviour:
     Value: 00000000010000000200000003000000
   Icon: {fileID: 21300000, guid: 6b0bade92aa391e478980a3c6bb7700d, type: 3}
   _color: {r: 1, g: 1, b: 1, a: 1}
-  _toolTip: {fileID: 11400000, guid: 36e6b48579bb33e429e9d33f0d5e899d, type: 2}
+  _toolTip: {fileID: 11400000, guid: e24b073c3dd439e4e9f500675bc32d9d, type: 2}
   _actions:
   - ButtonData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
     ButtonPosition: {x: 0, y: 0}
   - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
     ButtonPosition: {x: 4, y: 2}
-  CanSpawnUnits: 0
+  CanSpawnUnits: 1

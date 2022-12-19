@@ -9,10 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da8cf78a1f7087641975eacbcc3831c4, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d5c9b36cc98d724088e5b5a44a171d6, type: 3}
   m_Name: Spawn Peon
   m_EditorClassIdentifier: 
-  Name: Peon
-  Description: Basic economy unit. Can build & harvest resources but fighting is
-    really not their strongsuit.
-  CharacterData: {fileID: 11400000, guid: 6af51e8e1fe6a34439a5104355b7f6c1, type: 2}
+  _type: 4
+  _name: Peon
+  _description: 'Basic economy unit that can construct new buildings and harvest
+    resources.
+
+
+    <i>Hint : keep your peons from being idle to maximize productivity.
+    </i>'
+  _buildingData: {fileID: 0}
+  _data: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}

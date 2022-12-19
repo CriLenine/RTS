@@ -31,4 +31,4 @@ MonoBehaviour:
   HoldTime: 0
   Icon: {fileID: 21300000, guid: 38d483c27e3ec17429685ff8b5a6eebc, type: 3}
   Color: {r: 1, g: 1, b: 1, a: 1}
-  ToolTip: {fileID: 11400000, guid: 75aae381a58af564fa2d92b66d7d95c2, type: 2}
+  ToolTip: {fileID: 11400000, guid: b23aaf46a1a2dee428bdb2060122385b, type: 2}

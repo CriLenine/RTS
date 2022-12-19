@@ -5,7 +5,7 @@ using System;
 
 [CreateAssetMenu(fileName = "BuildingData", menuName = "BuildingData", order = 1)]
 
-public class BuildingData : ScriptableObject
+public class BuildingData : ButtonData
 {
     [Separator("Spawn Data")]
     [Space]
@@ -90,7 +90,7 @@ public class BuildingData : ScriptableObject
 
     [HideInInspector]
     public bool CanSpawnUnits = false;
-
-    [Serializable]
-    public class ResourceCollection : CollectionWrapper<ResourceType> { }
 }
+
+[Serializable]
+public class ResourceCollection : CollectionWrapper<ResourceType> { }

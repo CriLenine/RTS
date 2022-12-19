@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8905947644763508805}
   - component: {fileID: 7758146038501096532}
   - component: {fileID: 979017454962203647}
-  - component: {fileID: 1709803756170476362}
   - component: {fileID: -2783067952345955918}
   m_Layer: 5
   m_Name: Action Slot
@@ -123,7 +122,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1709803756170476362
+--- !u!114 &-2783067952345955918
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,25 +131,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3388052777063812353}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 1, g: 0.94509804, b: 0.80784315, a: 0.27450982}
-  m_EffectDistance: {x: 1, y: -1}
-  m_UseGraphicAlpha: 1
---- !u!114 &-2783067952345955918
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3388052777063812353}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7fdf990d7e989f44b632fb4c0e565a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _custom: {fileID: 11400000, guid: 3ad9b5c4c42b7f0479a2db2c6f89ea89, type: 2}
-  _image: {fileID: 7758146038501096532}
-  _button: {fileID: 979017454962203647}
-  _toolTip: {fileID: 0}
+  _image: {fileID: 0}
+  _button: {fileID: 0}
+  _longClickButton: {fileID: 0}
+  _buttonFill: {fileID: 0}

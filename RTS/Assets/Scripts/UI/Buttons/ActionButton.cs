@@ -13,62 +13,63 @@ public class ActionButton : MonoBehaviour
     private Image _image;
 
     private Button _button;
+
     private LongClickButton _longClickButton;
+
+    private GameObject _buttonFill;
 
     private ToolTipElement toolTipElement = null;
 
     private CharacterData _data;
 
-    private GameObject _buttonFill;
-
     private bool _isToggle = false;
 
     public void SetupButton(ButtonData data)
     {
-        if (data is ConstantButtonData currentActionData)
+        if (data is ConstantButtonData constantButtonData)
         {
-            _image.color = currentActionData.Color;
-            _image.sprite = currentActionData.Icon;
+            _image.color = constantButtonData.Color;
+            _image.sprite = constantButtonData.Icon;
 
-            if (currentActionData.ButtonType == ButtonType.Regular)
+            if (constantButtonData.ButtonType == ButtonType.Regular)
             {
-                if (_button == null)
+                if(_button == null)
                     _button = gameObject.AddComponent<Button>();
 
-                _button.onClick = data.OnClick;
+                if (data.OnClick != null)
+                    _button.onClick = data.OnClick;
 
-                TryDestroyLongClickButton();
+                if(_longClickButton != null)
+                    DestroyLongClickButton();
             }
             else
             {
-                if (_buttonFill == null)
-                    _buttonFill = Instantiate(HUDManager.ButtonFill);
+                _buttonFill = Instantiate(HUDManager.ButtonFill);
+                _buttonFill.transform.SetParent(transform, false);
 
-                if (_longClickButton == null)
+                if(_longClickButton == null)
                     _longClickButton = gameObject.AddComponent<LongClickButton>();
-
-                _buttonFill.transform.SetParent(gameObject.transform, false);
 
                 _longClickButton.FillImage = _buttonFill.GetComponent<Image>();
 
-                _longClickButton.RequiredHoldTime = currentActionData.HoldTime;
-
+                _longClickButton.RequiredHoldTime = constantButtonData.HoldTime;
                 _longClickButton.OnLongClick = data.OnClick;
             }
 
-            SetupToolTip(currentActionData.ToolTip);
+            SetupToolTip(constantButtonData.ToolTip);
         }
         else if(data is CharacterData characterData)
         {
-            _image.color = characterData.Color;
-            _image.sprite = characterData.Icon;
-
             if (_button == null)
                 _button = gameObject.AddComponent<Button>();
 
-            _button.onClick = data.OnClick;
+            _image.color = characterData.Color;
+            _image.sprite = characterData.Icon;
 
-            TryDestroyLongClickButton();
+            if(data.OnClick != null)
+                _button.onClick = data.OnClick;
+
+            DestroyLongClickButton();
 
             SetupToolTip(characterData.ToolTip);
         }
@@ -82,16 +83,19 @@ public class ActionButton : MonoBehaviour
         if(_button != null)
             Destroy(_button);
 
-        TryDestroyLongClickButton();
+        DestroyLongClickButton();
+
+        if(toolTipElement != null)
+            Destroy(toolTipElement);
     }
 
-    private void TryDestroyLongClickButton()
+    private void DestroyLongClickButton()
     {
         if (_longClickButton != null)
+        {
             Destroy(_longClickButton);
-
-        if(_buttonFill != null)
             Destroy(_buttonFill);
+        }
     }
 
     private void SetupToolTip(ToolTip toolTip)

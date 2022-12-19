@@ -39,6 +39,21 @@ public class ActionsManager : MonoBehaviour
         _instance._uiInputs.UI.Attack.started += Attack;
     }
 
+    public void Stop()
+    {
+        // TODO
+    }
+
+    public void MoveToggle()
+    {
+        // TODO
+    }
+
+    public void Station()
+    {
+        // TODO
+    }
+
     public void KillUnits()
     {
         List<Character> selectedCharacters = CharacterManager.SelectedCharacters;

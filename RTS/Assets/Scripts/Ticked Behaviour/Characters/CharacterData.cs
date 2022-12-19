@@ -5,8 +5,8 @@ using MyBox;
 
 public class CharacterData : ButtonData
 {
-    [Space]
     [Separator("Spawn Data")]
+    [Space]
 
     [SerializeField]
     private Character.Type _type;
@@ -29,8 +29,8 @@ public class CharacterData : ButtonData
     private Resource.Amount[] _cost;
     public Resource.Amount[] Cost => _cost;
 
-    [Space]
     [Separator("UI")]
+    [Space]
 
     [SerializeField]
     private Sprite _icon;
@@ -44,15 +44,15 @@ public class CharacterData : ButtonData
     private ToolTip _toolTip;
     public ToolTip ToolTip => _toolTip;
 
-    [Space]
     [Separator("Art")]
+    [Space]
 
     [SerializeField]
     private Sprite _characterSprite;
     public Sprite CharacterSprite => _characterSprite;
 
+    [Separator("Game Specs")]
     [Space]
-    [Separator("Fighting Stats")]
 
     [SerializeField]
     [Min(0)]
@@ -94,8 +94,8 @@ public class CharacterData : ButtonData
     private Sprite _weapon;
     public Sprite Weapon => _weapon;
 
-    [Space]
     [Separator("Economy Stats")]
+    [Space]
 
     [SerializeField]
     private bool _canHarvestResources;

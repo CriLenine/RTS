@@ -11,23 +11,26 @@ public class HUDActions : HUD
 
     public void ShowCharacterActions()
     {
-        ResetButtons();
-
-        foreach (ButtonDataHUDParameters parameters in _characterActions)
-            _actionButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 5].SetupButton(parameters.ButtonData);
+        ShowActions(_characterActions);
     }
 
     public void ShowBuildingActions(BuildingData data)
     {
-        ResetButtons();
-
-        foreach (ButtonDataHUDParameters parameters in data.Actions)
-                _actionButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 5].SetupButton(parameters.ButtonData);
+        ShowActions(data.Actions);
     }
 
-    private void ResetButtons()
+    private void ShowActions(List<ButtonDataHUDParameters> actions)
     {
-        foreach (ActionButton button in _actionButtons)
-            button.ResetButton();
+        List<ActionButton> toReset = new List<ActionButton>(_actionButtons);
+
+        foreach (ButtonDataHUDParameters parameters in actions)
+        {
+            int index = parameters.ButtonPosition.x + parameters.ButtonPosition.y * 5;
+            _actionButtons[index].SetupButton(parameters.ButtonData);
+            toReset.Remove(_actionButtons[index]);
+        }
+
+        foreach (ActionButton buttonToReset in toReset)
+            buttonToReset.ResetButton();
     }
 }

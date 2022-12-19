@@ -4,29 +4,17 @@ using System.Collections.Generic;
 public class HUDBuildings : HUD
 {
     [SerializeField]
-    private List<BuildingData> _economyBuildings = new List<BuildingData>();
+    private List<BuildingButton> _economyButtons, _militaryButtons;
 
     [SerializeField]
-    private List<BuildingData> _militaryBuildings = new List<BuildingData>();
-
-    [SerializeField]
-    private List<BuildingButton> _economyButtons = new List<BuildingButton>();
-
-    [SerializeField]
-    private List<BuildingButton> _militaryButtons = new List<BuildingButton>();
+    private List<ButtonDataHUDParameters> _economyBuildings, _militaryBuildings;
 
     private void Awake()
     {
-        for (int i = 0; i < _economyButtons.Count; i++)
-            if (_economyBuildings[i] != null)
-                _economyButtons[i].SetupButton(_economyBuildings[i]);
-            else
-                Destroy(_economyButtons[i]);
+        foreach(ButtonDataHUDParameters parameters in _economyBuildings)
+            _economyButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 4].SetupButton(parameters.ButtonData as BuildingData);
 
-        for (int i = 0; i < _militaryButtons.Count; i++)
-            if (_militaryBuildings[i] != null)
-                _militaryButtons[i].SetupButton(_militaryBuildings[i]);
-            else
-                Destroy(_militaryButtons[i]);
+        foreach(ButtonDataHUDParameters parameters in _militaryBuildings)
+            _militaryButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 4].SetupButton(parameters.ButtonData as BuildingData);
     }
 }
