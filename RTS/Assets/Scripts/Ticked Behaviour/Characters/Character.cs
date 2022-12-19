@@ -1,45 +1,50 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+using MyBox;
 
-public abstract class Character : TickedBehaviour, IDamageable
+public class Character : TickedBehaviour, IDamageable
 {
-    public Action CurrentAction { get; private set; }
-
-    private Queue<Action> _actions = new Queue<Action>();
-
     public enum Type
     {
-        None,
         Peon,
-        Naked
+        Naked,
+        None
     }
 
-    protected Type _type;
-    public Type CharaType => _type;
+    public Action CurrentAction { get; private set; }
+    private Queue<Action> _actions = new Queue<Action>();
+
+    [Separator("Base Data")]
+    [Space]
+
+    [ReadOnly]
+    [SerializeField]
+    private int _currentHealth;
+    public int CurrentHealth => _currentHealth;
+
+    [SerializeField]
+    protected CharacterData _data;
+    public CharacterData Data => _data;
 
     [SerializeField]
     protected HealthBar HealthBar;
 
     [SerializeField]
-    protected CharacterData _data;
-
-    [SerializeField]
-    private int _currentHealth;
-
-
-    public int CurrentHealth => _currentHealth;
-
-    public abstract bool Idle { get; }
-    public CharacterData Data => _data;
-
-    protected int MaxHealth => Data.MaxHealth;
-    
+    private LineRenderer _pathRenderer;
 
     public GameObject SelectionMarker;
 
-    private LineRenderer _pathRenderer;
+    [Separator("UI")]
+    [Space]
+
+    [SerializeField]
+    private SpriteRenderer _iconSprite;
+
+    private Resource.Amount _harvestedResource;
+    public Resource.Amount HarvestedResource => _harvestedResource;
+
+    public bool Idle => _actions.Count == 0;
 
     private bool _isAgressed = false;
     private bool _isWatching = false;
@@ -48,12 +53,8 @@ public abstract class Character : TickedBehaviour, IDamageable
     {
         base.Awake();
 
-        _pathRenderer = GetComponentInChildren<LineRenderer>(true);
-    }
-
-    protected virtual void Start()
-    {
-        _currentHealth = MaxHealth;
+        _iconSprite.sprite = Data.CharacterSprite;
+        _currentHealth = Data.MaxHealth;
         HealthBar.SetHealth(1);
     }
 
@@ -168,14 +169,14 @@ public abstract class Character : TickedBehaviour, IDamageable
 
     public bool TakeDamage(int damage)
     {
-        if (_currentHealth == MaxHealth)
+        if (_currentHealth == Data.MaxHealth)
             HealthBar.gameObject.SetActive(true);
         _isAgressed = true;
 
         GameEventsManager.PlayEvent("TakeDamage", transform.position);
 
         _currentHealth -= damage;
-        HealthBar.SetHealth((float)_currentHealth/MaxHealth);
+        HealthBar.SetHealth((float)_currentHealth/ Data.MaxHealth);
         return _currentHealth <= 0;
     }
 
@@ -186,16 +187,23 @@ public abstract class Character : TickedBehaviour, IDamageable
 
         HealthBar.SetHealth(_currentHealth);
 
-        if (_currentHealth >= MaxHealth)
+        if (_currentHealth >= Data.MaxHealth)
             HealthBar.gameObject.SetActive(false);
 
-        if (_currentHealth > MaxHealth)
-            _currentHealth = MaxHealth;
+        if (_currentHealth > Data.MaxHealth)
+            _currentHealth = Data.MaxHealth;
     }
 
-    protected void SetType(Type type)
+    public void SetPosition(Vector3 position)
     {
-        _type = type;
+        transform.position = position;
+
+        Coords = TileMapManager.WorldToTilemapCoords(position);
+    }
+
+    public void SetResource(Resource.Amount harvestedResource)
+    {
+        _harvestedResource = harvestedResource;
     }
 
     public void BeginWatch() => _isWatching = true;

@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
+using MyBox;
 
-public abstract class Building : TickedBehaviour, IDamageable
+public class Building : TickedBehaviour, IDamageable
 {
     public enum Type
     {
@@ -11,24 +13,21 @@ public abstract class Building : TickedBehaviour, IDamageable
         Barracks
     }
 
-
-    [Header("Base Data")]
+    [Separator("Base Data")]
     [Space]
 
-    [SerializeField]
-    protected BuildingData _buildingData;
-
+    [ReadOnly]
     [SerializeField]
     private int _currentHealth;
     public int CurrentHealth => _currentHealth;
 
     [SerializeField]
-    protected HealthBar HealthBar;
+    private BuildingData _buildingData;
+    public BuildingData Data => _buildingData;
 
-    [Space]
-    [Space]
+    
 
-    [Header("Utils")]
+    [Separator("Utils")]
     [Space]
 
     [SerializeField]
@@ -38,31 +37,35 @@ public abstract class Building : TickedBehaviour, IDamageable
     protected LineRenderer _pathRenderer;
     public LineRenderer PathRenderer => _pathRenderer;
 
-    [Space]
-    [Space]
-
-    [Header("Construction Progression Art")]
+    [Separator("UI")]
     [Space]
 
-    [Header("Transforms")]
+    [SerializeField]
+    private HealthBar HealthBar;
+
+    [Separator("Art")]
+    [Space]
+
     [SerializeField]
     private Transform _visualTransform;
     [SerializeField]
-    private Transform _completionVisualTransform, _healthBarTransform;
+    private Transform _completionTransform, _healthBarTransform;
 
-    [Header("SpriteRenderers")]
-    [SerializeField]
-    private SpriteRenderer _completionVisualSprite;
-    [SerializeField]
-    private SpriteRenderer _iconSprite, _visualBackgroundSprite;
+    [Space]
 
-    [Header("Colors")]
     [SerializeField]
-    private Color _completionVisualStartColor;
+    private SpriteRenderer _backgroundSprite;
     [SerializeField]
-    private Color _completionVisualEndColor, _iconSpriteStartColor, _iconSpriteEndColor, _selectedColor;
+    private SpriteRenderer _completionSprite, _iconSprite;
+
+    [Space]
+
     [SerializeField]
-    private Color _visualBackgroundStartColor, _visualBackgroundEndColor;
+    private Color _completionStartColor;
+    [SerializeField]
+    private Color _completionEndColor, _iconSpriteStartColor, _iconSpriteEndColor, _selectedColor;
+    [SerializeField]
+    private Color _backgroundStartColor, _backgroundEndColor;
 
 
     private bool _buildComplete;
@@ -70,22 +73,41 @@ public abstract class Building : TickedBehaviour, IDamageable
 
     private int _completedBuildTicks;
 
-
-    protected Type _type;
-    public Type BuildingType => _type;
-    public BuildingData Data => _buildingData;
     protected int MaxHealth => _buildingData.MaxHealth;
     public float BuildCompletionRatio => (float)_completedBuildTicks / _buildingData.RequiredBuildTicks;
 
     private bool _selected;
 
+    #region SpawnerSpecs
+
+    private Vector2 _rallyPoint;
+
+    private Queue<CharacterData> _queuedSpawnCharactersData = new();
+    private CharacterData _onGoingSpawnCharacterData;
+
+    private int _spawningTicks = 0;
+
+    private bool _onGoingSpawn = false;
+
+    #endregion
+
+    public void InitData(BuildingData data)
+    {
+        _buildingData = data;
+    }
+
     protected override void Awake()
     {
         base.Awake();
 
-        _type = Data.Type;
+        foreach (ButtonDataHUDParameters parameter in _buildingData.Actions)
+            if (parameter.ButtonData is CharacterData)
+            {
+                _buildingData.CanSpawnUnits = true;
+                break;
+            }
 
-        float scale = .95f * (TileMapManager.TileSize * (1 + 2 * Data.Outline));
+        float scale = .95f * TileMapManager.TileSize * Data.Size;
         _visualTransform.localScale = new Vector3(scale, scale, 1);
         _boxCollider.size = new Vector2(scale, scale);
 
@@ -97,19 +119,21 @@ public abstract class Building : TickedBehaviour, IDamageable
         _completedBuildTicks = 0;
         _buildComplete = false;
 
-        _completionVisualTransform.localScale = new Vector3(0, 0, 1);
+        _completionTransform.localScale = new Vector3(0, 0, 1);
 
-        _completionVisualSprite.color = _completionVisualStartColor;
+        _completionSprite.color = _completionStartColor;
         _iconSprite.sprite = Data.HUDIcon;
         _iconSprite.color = _iconSpriteStartColor;
-        _visualBackgroundSprite.color = _visualBackgroundStartColor;
+        _backgroundSprite.color = _backgroundStartColor;
+
+        _rallyPoint = (Vector2)transform.position + new Vector2(0.7f, 0.7f);
     }
 
     private void Update()
     {
-        if (_selected && this is ISpawner spawner)
+        if (_selected && _buildingData.CanSpawnUnits)
         {
-            Vector2 rallypoint = spawner.GetRallyPoint();
+            Vector2 rallypoint = _rallyPoint;
 
             _pathRenderer.SetPosition(0, transform.position);
             _pathRenderer.SetPosition(1, rallypoint);
@@ -120,6 +144,27 @@ public abstract class Building : TickedBehaviour, IDamageable
             _pathRenderer.endColor = Color.cyan;
 
             _pathRenderer.gameObject.SetActive(true);
+        }
+    }
+
+    public override void Tick()
+    {
+        if (_onGoingSpawn)
+        {
+            _spawningTicks++;
+
+            if (_spawningTicks >= _onGoingSpawnCharacterData.SpawnTicks && GameManager.MyCharacters.Count < GameManager.Housing)
+            {
+                _spawningTicks = 0;
+                _onGoingSpawn = false;
+                NetworkManager.Input(TickInput.Spawn((int)_onGoingSpawnCharacterData.Type, ID, _rallyPoint));
+            }
+        }
+
+        if (!_onGoingSpawn && _queuedSpawnCharactersData.Count > 0)
+        {
+            _onGoingSpawn = true;
+            _onGoingSpawnCharacterData = _queuedSpawnCharactersData.Dequeue();
         }
     }
 
@@ -140,8 +185,8 @@ public abstract class Building : TickedBehaviour, IDamageable
             _completedBuildTicks = _buildingData.RequiredBuildTicks;
             _iconSprite.color = _iconSpriteEndColor;
 
-            if(!_selected)
-                _visualBackgroundSprite.color = _visualBackgroundEndColor;
+            if (!_selected)
+                _backgroundSprite.color = _backgroundEndColor;
 
             if (GameManager.MyBuildings.Contains(ID))
                 GameManager.UpdateHousing(Data.HousingProvided);
@@ -150,9 +195,9 @@ public abstract class Building : TickedBehaviour, IDamageable
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
-        _completionVisualTransform.localScale = new Vector3(completionValue, completionValue, 1);
+        _completionTransform.localScale = new Vector3(completionValue, completionValue, 1);
 
-        _completionVisualSprite.color = Color.Lerp(_completionVisualStartColor, _completionVisualEndColor, BuildCompletionRatio);
+        _completionSprite.color = Color.Lerp(_completionStartColor, _completionEndColor, BuildCompletionRatio);
 
         return _buildComplete;
     }
@@ -162,15 +207,15 @@ public abstract class Building : TickedBehaviour, IDamageable
         _selected = true;
 
         if (_buildComplete)
-            _visualBackgroundSprite.color = _selectedColor;
+            _backgroundSprite.color = _selectedColor;
     }
 
     public void Unselect()
     {
         _selected = false;
-        _visualBackgroundSprite.color = _buildComplete ? _visualBackgroundEndColor : _visualBackgroundStartColor;
+        _backgroundSprite.color = _buildComplete ? _backgroundEndColor : _backgroundStartColor;
 
-        if(this is ISpawner)
+        if (_buildingData.CanSpawnUnits)
             _pathRenderer.gameObject.SetActive(false);
     }
 
@@ -180,7 +225,7 @@ public abstract class Building : TickedBehaviour, IDamageable
             HealthBar.gameObject.SetActive(true);
 
         _currentHealth -= damage;
-        HealthBar.SetHealth((float)_currentHealth / MaxHealth); 
+        HealthBar.SetHealth((float)_currentHealth / MaxHealth);
         return _currentHealth <= 0;
     }
 
@@ -195,5 +240,47 @@ public abstract class Building : TickedBehaviour, IDamageable
 
         if (_currentHealth > MaxHealth)
             _currentHealth = MaxHealth;
+    }
+
+    public Vector2Int GetClosestOutlinePosition(Character character)
+    {
+        List<Vector2Int> availableTiles = new List<Vector2Int>();
+        for (int x = Coords.x - 1; x <= Coords.x + Data.Size; x += Data.Size + 1)
+        {
+            for (int y = Coords.y - 1; y <= Coords.y + Data.Size; y += Data.Size + 1)
+            {
+                Vector2Int tileCoords = new Vector2Int(x, y);
+
+                if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(character.Performer) == true
+                    && TileMapManager.FindPath(character.Performer, character.Coords, tileCoords)?.Count > 0)
+                    availableTiles.Add(tileCoords);
+            }
+
+            if (availableTiles.Count > 0)
+                return TileMapManager.FindClosestCoords(availableTiles, character.Coords);
+        }
+
+        Debug.LogError("Cannot find a valid outline tile");
+        return character.Coords;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        float offset = ((float)Data.Size - 1) / 2 * TileMapManager.TileSize;
+        Vector3 centerPos = new Vector3(position.x + offset, position.y + offset);
+
+        transform.position = centerPos;
+
+        Coords = TileMapManager.WorldToTilemapCoords(position);
+    }
+
+    public void SetRallyPoint(Vector3 newRallyPoint)
+    {
+        _rallyPoint = newRallyPoint;
+    }
+
+    public void EnqueueSpawningCharas(CharacterData data)
+    {
+        _queuedSpawnCharactersData.Enqueue(data);
     }
 }

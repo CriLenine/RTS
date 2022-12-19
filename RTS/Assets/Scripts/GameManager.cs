@@ -131,13 +131,13 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.NewBuild:
-                    MoveCharacters(input.Performer, input.Position, input.Targets);
                     int newBuildingID = CreateBuilding(input.Performer, (Building.Type)input.Prefab, input.Position);
+                    MoveCharacters(input.Performer, Vector2.zero, newBuildingID, input.Targets, MoveType.ToBuilding);
                     AssignBuild(newBuildingID, input.Targets);
                     break;
 
                 case InputType.Build:
-                    MoveCharacters(input.Performer, Buildings[input.ID].gameObject.transform.position, input.Targets);
+                    MoveCharacters(input.Performer, Vector2.zero, input.ID, input.Targets, MoveType.ToBuilding);
                     AssignBuild(input.ID, input.Targets);
                     break;
 
@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Move:
-                    MoveCharacters(input.Performer, input.Position, input.Targets);
+                    MoveCharacters(input.Performer, input.Position, -1, input.Targets, MoveType.ToPosition);
                     break;
 
                 case InputType.Harvest:
@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
 
                     for (int i = 0; i < input.Targets.Length; ++i)
                     {
-                        Peon harvester = (Peon)_instance._myEntities[input.Targets[i]];
+                        Character harvester = _instance._myEntities[input.Targets[i]] as Character;
 
                         Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
                         if (harvestingCoords == null)
@@ -244,7 +244,7 @@ public class GameManager : MonoBehaviour
 
                 TileMapManager.RemoveBuilding(building);
 
-                if (building is HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
+                if (building.Data.Type == Building.Type.HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
                     _instance.GameOver();
             }
 
@@ -294,9 +294,9 @@ public class GameManager : MonoBehaviour
     private static void CreateCharacter(int performer, int spawnerID, int prefabID, Vector2 rallyPoint,
         bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
     {
-        CharacterData data = PrefabManager.GetCharacterData((Character.Type)prefabID);
+        CharacterData data = DataManager.GetCharacterData((Character.Type)prefabID);
 
-        Character character = TickedBehaviour.Create(performer, data.Character);
+        Character character = TickedBehaviour.Create(performer, data.Prefab);
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
@@ -314,7 +314,7 @@ public class GameManager : MonoBehaviour
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
 
         if (!inPlace)
-            MoveCharacters(performer, rallyPoint, new int[1] { character.ID });
+            MoveCharacters(performer, rallyPoint, -1, new int[1] { character.ID }, MoveType.ToPosition);
     }
 
     private static void Kill(int performer, int[] targets)
@@ -323,7 +323,13 @@ public class GameManager : MonoBehaviour
             DestroyEntity(targets[i]);
     }
 
-    private static void MoveCharacters(int performer, Vector2 position, int[] targets) ///TO REMOVE
+    public enum MoveType
+    {
+        ToPosition,
+        ToBuilding
+    }
+
+    private static void MoveCharacters(int performer, Vector2 position, int buildingID ,int[] targets, MoveType type) 
     {
         List<Character> characters = new List<Character>();
 
@@ -334,11 +340,14 @@ public class GameManager : MonoBehaviour
 
         foreach (List<Character> group in groups)
         {
-            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position));
+            Vector3 targetPos = type == MoveType.ToPosition ? position : 
+                TileMapManager.TilemapCoordsToWorld(_instance._buildings[buildingID].GetClosestOutlinePosition(group[0]));
+
+            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(targetPos));
 
             if (wayPoints != null && wayPoints.Count != 0)
             {
-                wayPoints[^1] = position;
+                wayPoints[^1] = targetPos;
 
                 for (int i = 0; i < group.Count; ++i)
                     group[i].SetAction(new Move(group[i], wayPoints));
@@ -413,7 +422,7 @@ public class GameManager : MonoBehaviour
 
     private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     {
-        BuildingData data = PrefabManager.GetBuildingData(type);
+        BuildingData data = DataManager.GetBuildingData(type);
 
         Building building = TickedBehaviour.Create(performer, data.Building, position);
 
@@ -426,7 +435,7 @@ public class GameManager : MonoBehaviour
             _instance._myBuildings.Add(building);
         }
 
-        TileMapManager.AddBuildingBlueprint(data.Outline, position);
+        TileMapManager.AddBuildingBlueprint(data.Size, position);
 
         building.SetPosition(position);
 
@@ -440,7 +449,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (int ID in targets)
         {
-            Peon builder = (Peon)_instance._entities[ID];
+            Character builder = _instance._entities[ID] as Character;
 
             if (!builder)
                 continue;

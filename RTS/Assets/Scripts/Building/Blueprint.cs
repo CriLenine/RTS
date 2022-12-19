@@ -7,7 +7,7 @@ public class Blueprint : MonoBehaviour
 
     private Mouse _mouse;
 
-    private Building.Type _buildType;
+    private BuildingData _data;
 
     [SerializeField]
     private GameObject _holder;
@@ -21,7 +21,7 @@ public class Blueprint : MonoBehaviour
     [SerializeField]
     private LayerMask _HUD;
 
-    private int _outline;
+    private int _size;
 
     private bool _inBlueprintMode = false;
 
@@ -41,10 +41,10 @@ public class Blueprint : MonoBehaviour
 
         _instance._holder.SetActive(true);
 
-        _instance._buildType = data.Type;
-        _instance._outline = data.Outline;
+        _instance._data = data;
+        _instance._size = data.Size;
 
-        float scale = TileMapManager.TileSize * (2 * _instance._outline + 1);
+        float scale = TileMapManager.TileSize * _instance._size;
         _instance._holder.transform.localScale = new Vector3(scale, scale, 1);
 
         _instance._iconSprite.sprite = data.HUDIcon;
@@ -60,18 +60,20 @@ public class Blueprint : MonoBehaviour
                 _inBlueprintMode = false;
             }
 
-            (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_outline);
+            (Vector3 position, bool available) = TileMapManager.TilesAvailableForBuild(_size);
 
             _blueprintSprite.color = available ? _buildableColor : _notBuildableColor;
 
-            _holder.transform.position = position;
+            float offset = ((float)_data.Size - 1) / 2 * TileMapManager.TileSize;
+
+            _holder.transform.position = new Vector3(position.x + offset, position.y + offset);
 
             if (_mouse.leftButton.wasPressedThisFrame && available)
             {
                 RaycastHit2D hit = Physics2D.Raycast(_mouse.position.ReadValue(), Vector2.zero, Mathf.Infinity, _HUD);
 
                 if (hit.collider == null)
-                    NetworkManager.Input(TickInput.NewBuild((int)_buildType, position, CharacterManager.GetSelectedIds()));
+                    NetworkManager.Input(TickInput.NewBuild((int)_data.Type, position, CharacterManager.GetSelectedIds()));
 
                 _holder.SetActive(false);
                 _inBlueprintMode = false;

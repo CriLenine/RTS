@@ -23,7 +23,7 @@ public abstract class Resource : MonoBehaviour
             _value = value;
         }
 
-    [SerializeField]
+        [SerializeField]
         private ResourceType _type;
 
         [SerializeField]
@@ -161,7 +161,7 @@ public abstract class Resource : MonoBehaviour
             }
 
             if (availableTiles.Count > 0)
-                return FindClosestCoords(availableTiles, attractionPoint);
+                return TileMapManager.FindClosestCoords(availableTiles, attractionPoint);
         }
 
         Debug.Log($"There is no havestable and accessible tile within a {MAX_OUTLINE_SEARCH} tiles square around {characterCoords}.");
@@ -193,25 +193,10 @@ public abstract class Resource : MonoBehaviour
                 availableTiles.Add(coords + dir);
 
         if (availableTiles.Count > 0)
-            return FindClosestCoords(availableTiles, attractionPoint);
+            return TileMapManager.FindClosestCoords(availableTiles, attractionPoint);
 
         //Debug.Log($"There's no harvestable tile from {coords}.");
         return null;
-    }
-
-    /// <summary>
-    /// Finds the <paramref name="availableTiles"/>'s closest element to <paramref name="attractionPoint"/> in euclidean distance.
-    /// </summary>
-    public static Vector2Int FindClosestCoords(List<Vector2Int> availableTiles, Vector2Int attractionPoint)
-    {
-        (int minMagnitude, int index) = ((availableTiles[0] - attractionPoint).sqrMagnitude, 0);
-        for (int i = 1; i < availableTiles.Count; i++)
-        {
-            int currentMagnitude = (availableTiles[i] - attractionPoint).sqrMagnitude;
-            if (currentMagnitude < minMagnitude)
-                (minMagnitude, index) = (currentMagnitude, i);
-        }
-        return availableTiles[index];
     }
 
     /// <summary>

@@ -23,9 +23,9 @@ public class ActionButton : MonoBehaviour
 
     private bool _isToggle = false;
 
-    public void SetupButton(ActionData data)
+    public void SetupButton(ButtonData data)
     {
-        if (data is ConstantActionData currentActionData)
+        if (data is ConstantButtonData currentActionData)
         {
             _image.color = currentActionData.Color;
             _image.sprite = currentActionData.Icon;

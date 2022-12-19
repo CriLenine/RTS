@@ -75,8 +75,10 @@ public class ToolTipManager : MonoBehaviour
         _instance._displayed = true;
         _instance._buildingToolTipVisual.Visual.SetActive(true);
         _instance._buildingToolTipVisual.Icon.sprite = data.HUDIcon;
+        _instance._buildingToolTipVisual.Icon.color = toolTip.BuildingData.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
         _instance._buildingToolTipVisual.Name.text = toolTip.Name;
-        _instance._buildingToolTipVisual.Description.text = toolTip.Description;
+        //_instance._buildingToolTipVisual.Description.text = toolTip.Description;
+        //_instance._buildingToolTipVisual.Type.text = toolTip.BuildingData.SubType == SubType.Economy ? ;
 
         for (int i = 0; i < _instance._buildingToolTipVisual.ResourceCostTexts.Length; ++i)
             if (i < data.Cost.Length)

@@ -161,7 +161,7 @@ public class TileMapManager : MonoBehaviour
 
     #region Buildings
 
-    public static (Vector3, bool) TilesAvailableForBuild(int outlinesCount)
+    public static (Vector3, bool) TilesAvailableForBuild(int size)
     {
         // Retrieval of the mouse position.
         Vector2 currentMousePos = _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue());
@@ -181,8 +181,8 @@ public class TileMapManager : MonoBehaviour
         _instance._hoveredTilePos = TilemapCoordsToWorld(_instance._hoveredTileCoords);
 
         // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
-        _instance._previewMin = new Vector2Int(_instance._hoveredTileCoords.x - outlinesCount, _instance._hoveredTileCoords.y - outlinesCount);
-        _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + outlinesCount, _instance._hoveredTileCoords.y + outlinesCount);
+        _instance._previewMin = _instance._hoveredTileCoords;
+        _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + size - 1, _instance._hoveredTileCoords.y + size - 1);
 
         // If the building steps outside of the map.
         for (int x = _instance._previewMin.x; x <= _instance._previewMax.x; ++x)
@@ -199,40 +199,40 @@ public class TileMapManager : MonoBehaviour
         return (_instance._hoveredTilePos, _instance._previousAvailability);
     }
 
-    public static void AddBuildingBlueprint(int outlinesCount, Vector2 position)
+    public static void AddBuildingBlueprint(int size, Vector2 position)
     {
-        Vector2Int centerCoords = WorldToTilemapCoords(position);
+        Vector2Int bottomLeftCoords = WorldToTilemapCoords(position);
 
-        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlinesCount, centerCoords.y - outlinesCount);
-        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlinesCount, centerCoords.y + outlinesCount);
+        Vector2Int buildingMin = bottomLeftCoords;
+        Vector2Int buildingMax = new Vector2Int(bottomLeftCoords.x + size - 1, bottomLeftCoords.y + size - 1);
 
-        UpdateTilesState(_buildingMin, _buildingMax, TileState.BuildingOutline);
+        UpdateTilesState(buildingMin, buildingMax, TileState.BuildingOutline);
     }
 
-    public static void AddBuilding(int outlinesCount, Vector2 position)
+    public static void AddBuilding(int size, Vector2 position)
     {
-        Vector2Int centerCoords = WorldToTilemapCoords(position);
+        Vector2Int bottomLeftCoords = WorldToTilemapCoords(position);
 
-        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlinesCount, centerCoords.y - outlinesCount);
-        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlinesCount, centerCoords.y + outlinesCount);
+        Vector2Int buildingMin = bottomLeftCoords;
+        Vector2Int buildingMax = new Vector2Int(bottomLeftCoords.x + size - 1, bottomLeftCoords.y + size - 1);
 
-        for (int x = _buildingMin.x + 1; x < _buildingMax.x; ++x)
-            for (int y = _buildingMin.y + 1; y < _buildingMax.y; ++y)
+        for (int x = buildingMin.x + 1; x < buildingMax.x; ++x)
+            for (int y = buildingMin.y + 1; y < buildingMax.y; ++y)
                 UpdateTileState(new Vector2Int(x, y), TileState.Obstacle);
     }
 
     public static void RemoveBuilding(Building building)
     {
-        Vector2Int centerCoords = WorldToTilemapCoords(building.transform.position);
-        BuildingData data = PrefabManager.GetBuildingData(building.BuildingType);
+        Vector2Int bottomLeftCorner = WorldToTilemapCoords(building.transform.position);
+        BuildingData data = DataManager.GetBuildingData(building.Data.Type);
 
-        int outlineCount = data.Outline;
+        int size = data.Size;
 
         //Set building tiles
-        Vector2Int _buildingMin = new Vector2Int(centerCoords.x - outlineCount, centerCoords.y - outlineCount);
-        Vector2Int _buildingMax = new Vector2Int(centerCoords.x + outlineCount, centerCoords.y + outlineCount);
+        Vector2Int buildingMin = bottomLeftCorner;
+        Vector2Int buildingMax = new Vector2Int(bottomLeftCorner.x + size - 1, bottomLeftCorner.y + size - 1);
 
-        UpdateTilesState(_buildingMin, _buildingMax, TileState.Free);
+        UpdateTilesState(buildingMin, buildingMax, TileState.Free);
     }
 
     public static Vector2 GetClosestPosAroundBuilding(Building building,Character character)
@@ -472,6 +472,21 @@ public class TileMapManager : MonoBehaviour
     #endregion
 
     #region Tools
+
+    /// <summary>
+    /// Finds the <paramref name="availableTiles"/>'s closest element to <paramref name="attractionPoint"/> in euclidean distance.
+    /// </summary>
+    public static Vector2Int FindClosestCoords(List<Vector2Int> availableTiles, Vector2Int attractionPoint)
+    {
+        (int minMagnitude, int index) = ((availableTiles[0] - attractionPoint).sqrMagnitude, 0);
+        for (int i = 1; i < availableTiles.Count; i++)
+        {
+            int currentMagnitude = (availableTiles[i] - attractionPoint).sqrMagnitude;
+            if (currentMagnitude < minMagnitude)
+                (minMagnitude, index) = (currentMagnitude, i);
+        }
+        return availableTiles[index];
+    }
 
     public static bool LineOfSight(int performer, Vector2Int start, Vector2Int end)
     {

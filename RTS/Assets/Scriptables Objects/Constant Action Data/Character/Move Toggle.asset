@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8366b1a7cc2df99449997b13390d3267, type: 3}
+  m_Script: {fileID: 11500000, guid: e60059c22e74b6f42b5dbce9126ab9ac, type: 3}
   m_Name: Move Toggle
   m_EditorClassIdentifier: 
   OnClick:
     m_PersistentCalls:
       m_Calls: []
   ButtonType: 0
+  HoldTime: 0
   Icon: {fileID: 21300000, guid: b33ac2c23ff8c424b974a05c9feea139, type: 3}
   Color: {r: 1, g: 1, b: 1, a: 1}
-  ToolTip: {fileID: 11400000, guid: c00ad350c5af8ec4c833e1d17bb8824c, type: 2}
-  HoldTime: 0
+  ToolTip: {fileID: 11400000, guid: bafc18225d8eb434693feb0e2eeacfa4, type: 2}

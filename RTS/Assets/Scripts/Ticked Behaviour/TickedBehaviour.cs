@@ -1,4 +1,5 @@
 using UnityEngine;
+using MyBox;
 
 public abstract class TickedBehaviour : MonoBehaviour
 {
@@ -39,6 +40,8 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     public Vector2Int Coords { get; protected set; }
 
+    [Separator("View Specs")]
+
     [SerializeField]
     private int _viewRadius = 10;
 
@@ -46,7 +49,7 @@ public abstract class TickedBehaviour : MonoBehaviour
     private Transform _persistentView;
 
     [SerializeField]
-    private Transform _currenttView;
+    private Transform _currentView;
 
     public int ViewRadius
     {
@@ -62,28 +65,18 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _persistentView = transform.GetChild(0);
-        _currenttView = transform.GetChild(1);
-
         ApplyViewRadius();
     }
 
     private void ApplyViewRadius()
     {
-        _persistentView.localScale = _currenttView.localScale = Vector3.one * ViewRadius;
+        _persistentView.localScale = _currentView.localScale = Vector3.one * ViewRadius;
     }
 
     private void DisableViewRadius()
     {
         _persistentView.gameObject.SetActive(false);
-        _currenttView.gameObject.SetActive(false);
-    }
-
-    public void SetPosition(Vector3 position)
-    {
-        transform.position = position;
-
-        Coords = TileMapManager.WorldToTilemapCoords(position);
+        _currentView.gameObject.SetActive(false);
     }
 
     public abstract void Tick();

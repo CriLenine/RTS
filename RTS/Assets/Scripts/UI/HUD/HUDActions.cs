@@ -7,23 +7,27 @@ public class HUDActions : HUD
     private List<ActionButton> _actionButtons = new List<ActionButton>();
 
     [SerializeField]
-    private List<ActionData> _characterActions = new List<ActionData>();
+    private List<ButtonDataHUDParameters> _characterActions = new List<ButtonDataHUDParameters>();
 
     public void ShowCharacterActions()
     {
-        for (int i = 0; i < _actionButtons.Count; i++)
-            if (_characterActions[i] != null)
-                _actionButtons[i].SetupButton(_characterActions[i]);
-            else
-                _actionButtons[i].ResetButton();
+        ResetButtons();
+
+        foreach (ButtonDataHUDParameters parameters in _characterActions)
+            _actionButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 5].SetupButton(parameters.ButtonData);
     }
 
     public void ShowBuildingActions(BuildingData data)
     {
-        for (int i = 0; i < data.BuildingActions.Count; i++)
-            if (data.BuildingActions[i] != null)
-                _actionButtons[i].SetupButton(data.BuildingActions[i]);
-            else
-                _actionButtons[i].ResetButton();
+        ResetButtons();
+
+        foreach (ButtonDataHUDParameters parameters in data.Actions)
+                _actionButtons[parameters.ButtonPosition.x + parameters.ButtonPosition.y * 5].SetupButton(parameters.ButtonData);
+    }
+
+    private void ResetButtons()
+    {
+        foreach (ActionButton button in _actionButtons)
+            button.ResetButton();
     }
 }

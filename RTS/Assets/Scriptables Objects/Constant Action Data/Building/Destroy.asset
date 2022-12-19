@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8366b1a7cc2df99449997b13390d3267, type: 3}
+  m_Script: {fileID: 11500000, guid: e60059c22e74b6f42b5dbce9126ab9ac, type: 3}
   m_Name: Destroy
   m_EditorClassIdentifier: 
   OnClick:
@@ -28,7 +28,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   ButtonType: 1
+  HoldTime: 0.75
   Icon: {fileID: 21300000, guid: addf34eb705fb3a47b999e563bb39010, type: 3}
   Color: {r: 1, g: 1, b: 1, a: 1}
   ToolTip: {fileID: 11400000, guid: cfe9e3d9cd317e64db07e8dc380464e0, type: 2}
-  HoldTime: 0.75

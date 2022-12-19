@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using MyBox;
 
 public class HUDStats : HUD
 {
-    [Header("Text Fields")]
-    [Space]
+    [Separator("Text Fields")]
 
     [SerializeField]
     private TextMeshProUGUI _name;
@@ -13,10 +13,7 @@ public class HUDStats : HUD
     private TextMeshProUGUI _desc, _hp, _attackDamage, _attackRange, _meleeArmor, _rangeArmor, _resourceCollected;
 
     [Space]
-    [Space]
-
-    [Header("Icons")]
-    [Space]
+    [Separator("Icons")]
 
     [SerializeField]
     private Image _type;
@@ -25,14 +22,8 @@ public class HUDStats : HUD
     [SerializeField]
     private Image _resource;
 
-    [SerializeField]
-    private Sprite _economyIconSprite, _militaryIconSprite;
-
     [Space]
-    [Space]
-
-    [Header("Misc")]
-    [Space]
+    [Separator("Misc")]
 
     [SerializeField]
     private Slider _healthBar;
@@ -52,9 +43,23 @@ public class HUDStats : HUD
 
         CharacterData data = character.Data;
 
-        _name.text = character.CharaType.ToString();
-        _desc.text = character is Peon ? "Economy Unit" : "Military Unit";
-        _type.sprite = character is Peon ? _economyIconSprite : _militaryIconSprite;
+        _name.text = character.Data.Type.ToString();
+
+        if (character.Data.SubType == SubType.Economy)
+        {
+            _desc.text = "Economy Unit";
+            _desc.color = HUDManager.EconomyTypeColor;
+            _type.sprite = HUDManager.EconomyTypeSprite;
+            _type.color = HUDManager.EconomyTypeColor;
+        }
+        else
+        {
+            _desc.text = "Military Unit";
+            _desc.color = HUDManager.MilitaryTypeColor;
+            _type.sprite = HUDManager.MilitaryTypeSprite;
+            _type.color = HUDManager.MilitaryTypeColor;
+        }
+        
         _attackDamage.text = $"{data.AttackDamage}";
         _attackRange.text = $"{data.AttackRange}";
         _meleeArmor.text = $"{data.MeleeArmor}";
@@ -62,14 +67,12 @@ public class HUDStats : HUD
 
         _weapon.sprite = character.Data.Weapon;
 
-        if (character is Peon)
+        if (character.Data.CanHarvestResources)
         {
-            Peon peon = character as Peon;
-
-            if (peon.CarriedResource.Value > 0)
+            if (character.HarvestedResource.Value > 0)
             {
                 _bottomSeparator.SetActive(true);
-                _resourceCollected.text = $"{peon.CarriedResource.Value}";
+                _resourceCollected.text = $"{character.HarvestedResource.Value}";
                 _resource.gameObject.SetActive(true);
                 return;
             }
@@ -88,9 +91,22 @@ public class HUDStats : HUD
         _character = null;
 
         BuildingData data = _building.Data;
+
         _name.text = _building.Data.Type.ToString();
-        _desc.text = _building.BuildingType.ToString() == "Barracks" ? "Military Building" : "Economy Building";
-        _type.sprite = _building.BuildingType.ToString() == "Barracks" ? _militaryIconSprite : _economyIconSprite;
+
+        if (building.Data.SubType == SubType.Economy)
+        {
+            _desc.text = "Economy Building";
+            _desc.color = HUDManager.EconomyTypeColor;
+            _type.sprite = HUDManager.EconomyTypeSprite;
+        }
+        else
+        {
+            _desc.text = "Military Building";
+            _desc.color = HUDManager.EconomyTypeColor;
+            _type.sprite = HUDManager.EconomyTypeSprite;
+        }
+
         _attackDamage.text = "0";
         _attackRange.text = "0";
         _meleeArmor.text = $"{data.MeleeArmor}";
@@ -112,7 +128,7 @@ public class HUDStats : HUD
 
                 _hp.text = $"{_character.CurrentHealth}/{_character.Data.MaxHealth}";
             }
-            else if(_building != null)
+            else if (_building != null)
             {
                 float healthLossPercentage = 1 - (float)_building.CurrentHealth / _building.Data.MaxHealth;
                 _healthBar.value = 1 - healthLossPercentage;

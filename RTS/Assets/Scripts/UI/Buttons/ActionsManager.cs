@@ -61,8 +61,7 @@ public class ActionsManager : MonoBehaviour
         foreach (Resource.Amount cost in data.Cost)
             GameManager.Pay(cost.Type, cost.Value);
 
-        ISpawner building = CharacterManager.SelectedBuilding as ISpawner;
-        building.EnqueueSpawningCharas(data);
+        CharacterManager.SelectedBuilding.EnqueueSpawningCharas(data);
     }
 
 

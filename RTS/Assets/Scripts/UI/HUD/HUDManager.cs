@@ -1,13 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using MyBox;
 
 public class HUDManager : MonoBehaviour
 {
     private static HUDManager _instance;
 
-    [Header("HUD Components")]
-    [Space]
+    [Separator("HUD Components")]
 
     [SerializeField]
     private HUDResources _resources;
@@ -23,9 +22,7 @@ public class HUDManager : MonoBehaviour
     private UIInputs _uiInputs;
 
     [Space]
-    [Space]
-    [Header("Misc")]
-    [Space]
+    [Separator("Art")]
 
     [SerializeField]
     private GameObject _buttonFill;
@@ -34,6 +31,24 @@ public class HUDManager : MonoBehaviour
     [SerializeField]
     private Color _defaultButtonColor;
     public static Color DefaultButtonColor => _instance._defaultButtonColor;
+
+    [Space]
+
+    [SerializeField]
+    private Sprite _economyTypeSprite;
+    public static Sprite EconomyTypeSprite => _instance._economyTypeSprite;
+
+    [SerializeField]
+    private Color _economyTypeColor;
+    public static Color EconomyTypeColor => _instance._economyTypeColor;
+
+    [SerializeField]
+    private Sprite _militaryTypeSprite;
+    public static Sprite MilitaryTypeSprite => _instance._militaryTypeSprite;
+
+    [SerializeField]
+    private Color _militaryTypeColor;
+    public static Color MilitaryTypeColor => _instance._militaryTypeColor;
 
     protected void Awake()
     {
@@ -84,7 +99,7 @@ public class HUDManager : MonoBehaviour
         if (charactersCount == 1)
         {
             _instance._stats.DisplayStats(characters[0]);
-            if (characters[0] is Peon)
+            if (characters[0].Data.CanBuild)
                 _instance._buildings.Show();
             return;
         }
@@ -92,7 +107,7 @@ public class HUDManager : MonoBehaviour
         _instance._buildings.Show();
 
         for (int i = 0; i < charactersCount; ++i)
-            if(characters[i] is not Peon)
+            if(!characters[i].Data.CanBuild)
             {
                 _instance._buildings.Hide();
                 return;

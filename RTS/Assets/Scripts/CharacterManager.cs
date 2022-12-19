@@ -13,9 +13,6 @@ public class CharacterManager : MonoBehaviour
 
     #region Variables
 
-    private Camera _camera;
-    private Mouse _mouse;
-
     private SelectionManager _selectionManager;
     private LocomotionManager _locomotionManager;
 
@@ -25,17 +22,16 @@ public class CharacterManager : MonoBehaviour
     //* Character Selection *//
 
     private Character.Type _selectedType = Character.Type.None;
-    private HashSet<Character.Type> _selectedTypes = new HashSet<Character.Type>();
-
-    private List<Character> _selectedCharacters = new List<Character>();
-    private HashSet<Character> _allSelectedCharacters = new HashSet<Character>();
-
-    private Building _selectedBuilding;
-
     public static Character.Type SelectedType => _instance._selectedType;
+
+    private HashSet<Character.Type> _selectedTypes = new HashSet<Character.Type>();
     public static HashSet<Character.Type> SelectedTypes => _instance._selectedTypes;
 
+    private HashSet<Character> _allSelectedCharacters = new HashSet<Character>();
+    private List<Character> _selectedCharacters = new List<Character>();
     public static List<Character> SelectedCharacters => _instance._selectedCharacters;
+
+    private Building _selectedBuilding;
     public static Building SelectedBuilding => _instance._selectedBuilding;
 
     public delegate void OnCharacterSelectionUpdatedHandler();
@@ -56,9 +52,6 @@ public class CharacterManager : MonoBehaviour
             Destroy(this.gameObject);
         else
             _instance = this;
-
-        _mouse = Mouse.current;
-        _camera = Camera.main;
     }
 
     private void Start()
@@ -158,11 +151,6 @@ public class CharacterManager : MonoBehaviour
         return _instance._locomotionManager.Move(character, position);
     }
 
-    public static void ChangeView<T>(T owner) where T : TickedBehaviour
-    {
-        UIManager.ShowTickedBehaviourUI(owner);
-    }
-
     #region Character Selection
 
     public static void SpecializesSelection(Character.Type type)
@@ -204,9 +192,9 @@ public class CharacterManager : MonoBehaviour
 
         foreach (Character character in _instance._allSelectedCharacters)
         {
-            SelectedTypes.Add(character.CharaType);
+            SelectedTypes.Add(character.Data.Type);
 
-            if (_instance._selectedType == Character.Type.None || character.CharaType == _instance._selectedType)
+            if (_instance._selectedType == Character.Type.None || character.Data.Type == _instance._selectedType)
             {
                 SelectedCharacters.Add(character);
 
