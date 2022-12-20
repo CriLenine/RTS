@@ -10,13 +10,13 @@ public class HUDStats : HUD
     [SerializeField]
     private TextMeshProUGUI _name;
     [SerializeField]
-    private TextMeshProUGUI _desc, _hp, _attackDamage, _attackRange, _meleeArmor, _rangeArmor, _resourceCollected;
+    private TextMeshProUGUI _subType, _hp, _attackDamage, _attackRange, _meleeArmor, _rangeArmor, _resourceCollected;
 
     [Space]
     [Separator("Icons")]
 
     [SerializeField]
-    private Image _type;
+    private Image _icon;
     [SerializeField]
     private Image _weapon;
     [SerializeField]
@@ -47,19 +47,19 @@ public class HUDStats : HUD
 
         if (character.Data.SubType == SubType.Economy)
         {
-            _desc.text = "Economy Unit";
-            _desc.color = HUDManager.EconomyTypeColor;
-            _type.sprite = HUDManager.EconomyTypeSprite;
-            _type.color = HUDManager.EconomyTypeColor;
+            _subType.text = "Economy Unit";
+            _subType.color = HUDManager.EconomyTypeColor;
+            _icon.sprite = HUDManager.EconomyTypeSprite;
+            _icon.color = HUDManager.EconomyTypeColor;
         }
         else
         {
-            _desc.text = "Military Unit";
-            _desc.color = HUDManager.MilitaryTypeColor;
-            _type.sprite = HUDManager.MilitaryTypeSprite;
-            _type.color = HUDManager.MilitaryTypeColor;
+            _subType.text = "Military Unit";
+            _subType.color = HUDManager.MilitaryTypeColor;
+            _icon.sprite = HUDManager.MilitaryTypeSprite;
+            _icon.color = HUDManager.MilitaryTypeColor;
         }
-        
+
         _attackDamage.text = $"{data.AttackDamage}";
         _attackRange.text = $"{data.AttackRange}";
         _meleeArmor.text = $"{data.MeleeArmor}";
@@ -96,15 +96,17 @@ public class HUDStats : HUD
 
         if (building.Data.SubType == SubType.Economy)
         {
-            _desc.text = "Economy Building";
-            _desc.color = HUDManager.EconomyTypeColor;
-            _type.sprite = HUDManager.EconomyTypeSprite;
+            _subType.text = "Economy Building";
+            _subType.color = HUDManager.EconomyTypeColor;
+            _icon.sprite = HUDManager.EconomyTypeSprite;
+            _icon.color = HUDManager.EconomyTypeColor;
         }
         else
         {
-            _desc.text = "Military Building";
-            _desc.color = HUDManager.EconomyTypeColor;
-            _type.sprite = HUDManager.EconomyTypeSprite;
+            _subType.text = "Military Building";
+            _subType.color = HUDManager.MilitaryTypeColor;
+            _icon.sprite = HUDManager.MilitaryTypeSprite;
+            _icon.color = HUDManager.MilitaryTypeColor;
         }
 
         _attackDamage.text = "0";

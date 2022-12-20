@@ -224,9 +224,7 @@ public class TileMapManager : MonoBehaviour
     public static void RemoveBuilding(Building building)
     {
         Vector2Int bottomLeftCorner = WorldToTilemapCoords(building.transform.position);
-        BuildingData data = DataManager.GetBuildingData(building.Data.Type);
-
-        int size = data.Size;
+        int size = DataManager.GetBuildingData(building.Data.Type).Size;
 
         //Set building tiles
         Vector2Int buildingMin = bottomLeftCorner;

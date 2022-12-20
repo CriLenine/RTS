@@ -14,9 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 3
   _name: HeadQuarters
-  _description: "The HQ is the most important building of your empire. It provides
-    :\n    - 10 Housing Spaces\n    - 10 Station Slots to prevent units from taking
-    damage\n    - new Peons production\n\n<i>Hint : right click when selected to
-    define where to rally new units\n"
+  _description: 'The HQ is the most important building of your empire. It provides
+    :
+
+    - 10 Housing Spaces
+
+    - 10 Station Slots to prevent units from taking
+    damage
+
+    - new Peons production
+
+
+
+    <i>Hint : right click when selected
+    to define where to rally new units
+
+'
   _buildingData: {fileID: 11400000, guid: a38b74e07f3507944833f3363e4dc786, type: 2}
   _data: {fileID: 0}

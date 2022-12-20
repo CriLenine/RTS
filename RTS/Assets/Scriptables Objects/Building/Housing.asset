@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d701c73d794ccc40865d318629c8e8c, type: 3}
-  m_Name: HeadQuarters
+  m_Name: Housing
   m_EditorClassIdentifier: 
   OnClick:
     m_PersistentCalls:
@@ -27,29 +27,25 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  _type: 0
-  _subType: 1
-  _building: {fileID: 260249734484503702, guid: 4e2313134fbfef642a7677d746ac054b, type: 3}
-  _size: 4
-  _requiredBuildTicks: 1500
+  _type: 1
+  _subType: 0
+  _building: {fileID: 4385885305861431378, guid: 2243ee8dc4f902a41b2e05eb8fd70914, type: 3}
+  _size: 3
+  _requiredBuildTicks: 500
   _cost:
   - _type: 1
-    _value: 200
-  - _type: 3
-    _value: 200
-  _maxHealth: 500
-  _housingProvided: 10
-  _meleeArmor: 10
-  _rangeArmor: 10
-  _canCollectResources: 1
+    _value: 50
+  _maxHealth: 100
+  _housingProvided: 5
+  _meleeArmor: 5
+  _rangeArmor: 5
+  _canCollectResources: 0
   _collectableResources:
-    Value: 00000000010000000200000003000000
-  Icon: {fileID: 21300000, guid: 6b0bade92aa391e478980a3c6bb7700d, type: 3}
-  _color: {r: 0.8018868, g: 0.5409797, b: 0.17021184, a: 1}
-  _toolTip: {fileID: 11400000, guid: e24b073c3dd439e4e9f500675bc32d9d, type: 2}
+    Value: 
+  Icon: {fileID: 21300000, guid: 929a4355de5ffc242a0eb3b27ffc5849, type: 3}
+  _color: {r: 0.8, g: 0.5411765, b: 0.16862746, a: 1}
+  _toolTip: {fileID: 11400000, guid: 19144cc5196424c44b7a17fa15ea2c29, type: 2}
   _actions:
-  - ButtonData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
-    ButtonPosition: {x: 0, y: 0}
   - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
     ButtonPosition: {x: 4, y: 2}
-  CanSpawnUnits: 1
+  CanSpawnUnits: 0

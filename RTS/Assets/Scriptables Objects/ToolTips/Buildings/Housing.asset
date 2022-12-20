@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d5c9b36cc98d724088e5b5a44a171d6, type: 3}
-  m_Name: Destroy
+  m_Name: Housing
   m_EditorClassIdentifier: 
-  _type: 2
-  _name: Destroy
-  _description: 'Hold to destroy the current selection
+  _type: 3
+  _name: Housing
+  _description: 'Housing facilities provide 5 additional Housing Spaces.
 
-    <b> Warning : This action
-    cannot be reverted </b>'
-  _buildingData: {fileID: 0}
+
+    Build
+    and protect housing facilities to increase your maximum population.'
+  _buildingData: {fileID: 11400000, guid: 814a8be8610529843a94f8eb9fa8acb7, type: 2}
   _data: {fileID: 0}

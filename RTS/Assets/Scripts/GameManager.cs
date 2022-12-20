@@ -56,10 +56,6 @@ public class GameManager : MonoBehaviour
     private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
     public static Dictionary<ResourceType, int> MyResources => _instance._myResources;
 
-    [SerializeField]
-    private List<Sprite> _resourcesSprites;
-    public static List<Sprite> ResourcesSprites => _instance._resourcesSprites;
-
     private int _housing;
     public static int Housing => _instance._housing;
 
@@ -131,7 +127,7 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.NewBuild:
-                    int newBuildingID = CreateBuilding(input.Performer, (Building.Type)input.Prefab, input.Position);
+                    int newBuildingID = CreateBuilding(input.Performer, input.Prefab, input.Position);
                     MoveCharacters(input.Performer, Vector2.zero, newBuildingID, input.Targets, MoveType.ToBuilding);
                     AssignBuild(newBuildingID, input.Targets);
                     break;
@@ -291,12 +287,10 @@ public class GameManager : MonoBehaviour
 
     #region Create & Destroy TickedBehaviours
 
-    private static void CreateCharacter(int performer, int spawnerID, int prefabID, Vector2 rallyPoint,
+    private static void CreateCharacter(int performer, int spawnerID, int characterType, Vector2 rallyPoint,
         bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
     {
-        CharacterData data = DataManager.GetCharacterData((Character.Type)prefabID);
-
-        Character character = TickedBehaviour.Create(performer, data.Prefab);
+        Character character = TickedBehaviour.Create(performer, DataManager.GetCharacterData((Character.Type)characterType), TickedBehaviorType.Character) as Character;
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
@@ -420,11 +414,11 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
+    private static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
     {
-        BuildingData data = DataManager.GetBuildingData(type);
+        BuildingData data = DataManager.GetBuildingData((Building.Type)buildingType);
 
-        Building building = TickedBehaviour.Create(performer, data.Building, position);
+        Building building = TickedBehaviour.Create(performer, data, TickedBehaviorType.Building) as Building;
 
         _instance._entities.Add(building);
         _instance._buildings.Add(building);
@@ -518,7 +512,7 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-1f, -2f));
             CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
 
-            CreateBuilding(i, Building.Type.HeadQuarters, spawnPoint , true);
+            CreateBuilding(i, (int)Building.Type.HeadQuarters, spawnPoint , true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);

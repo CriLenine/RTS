@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _name: Station
-  _description: Station in a defensive building preventing from taking any damage.
+  _description: Station in a defensive building preventing from taking any damage
   _buildingData: {fileID: 0}
   _data: {fileID: 0}
