@@ -37,7 +37,7 @@ public class BuildingButton : MonoBehaviour
     private bool TestInteractability()
     {
         foreach (Resource.Amount cost in _data.Cost)
-            if (GameManager.MyResources[cost.Type] < cost.Value)
+            if (GameManager.PlayerResources[cost.Type][NetworkManager.Me] < cost.Value)
                 return false;
         return true;
     }

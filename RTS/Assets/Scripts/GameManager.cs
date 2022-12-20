@@ -14,10 +14,6 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Transform _spawnPoints;
 
-    private ResourcesManager _resourcesManager;
-
-    public static ResourcesManager ResourcesManager => _instance._resourcesManager;
-
     #region Init & Variables
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
@@ -53,8 +49,8 @@ public class GameManager : MonoBehaviour
 
     private HashSet<TickedBehaviour> _entitiesToDestroy = new HashSet<TickedBehaviour>();
 
-    private Dictionary<ResourceType, int> _myResources = new Dictionary<ResourceType, int>();
-    public static Dictionary<ResourceType, int> MyResources => _instance._myResources;
+    private Dictionary<ResourceType, int[]> _playerResources = new Dictionary<ResourceType, int[]>();
+    public static Dictionary<ResourceType, int[]> PlayerResources => _instance._playerResources;
 
     private int _housing;
     public static int Housing => _instance._housing;
@@ -65,21 +61,20 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-        _resourcesManager = GetComponent<ResourcesManager>();
-
         foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
-            _myResources[type] = 1000;
+            _playerResources[type] = new int[4] { 1000, 1000, 1000, 1000 };
     }
+
     #endregion
 
-    public static void AddResource(ResourceType type, int amount)
+    public static void AddResource(ResourceType type, int amount, int performer)
     {
-        _instance._myResources[type] += amount;
+        _instance._playerResources[type][performer] += amount;
     }
 
-    public static void Pay(ResourceType type, int amount)
+    public static void Pay(ResourceType type, int amount, int performer)
     {
-        _instance._myResources[type] -= amount;
+        _instance._playerResources[type][performer] -= amount;
     }
 
     private void Update()
@@ -146,34 +141,7 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Harvest:
-                    Resource resource = null;
-                    Vector2Int inputCoords = new Vector2Int((int)input.Position.x, (int)input.Position.y);
-                    if (ResourcesManager.HasTree(input.Position))
-                    {
-                        resource = ResourcesManager.GetNearestForest(inputCoords);
-                    }
-                    else if (ResourcesManager.HasRock(input.Position))
-                    {
-                        resource = ResourcesManager.GetNearestAggregate(inputCoords);
-                    }
-
-                    for (int i = 0; i < input.Targets.Length; ++i)
-                    {
-                        Character harvester = _instance._myEntities[input.Targets[i]] as Character;
-
-                        Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, input.Performer);
-                        if (harvestingCoords == null)
-                            break;
-
-                        List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(input.Performer, harvester, (Vector2Int)harvestingCoords);
-
-                        Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);
-                        if (coordsToHarvest == null)
-                            break;
-
-                        harvester.SetAction(new Move(harvester, wayPoints));
-                        harvester.AddAction(new Harvest(harvester, inputCoords, resource));
-                    }
+                    Harvest(input.Position, input.Targets, input.Performer);
                     break;
 
                 case InputType.Attack:
@@ -208,10 +176,10 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
-        #region
+        #region Update Resources HUD
 
-        HUDManager.UpdateResources(_instance._myResources[ResourceType.Crystal], _instance._myResources[ResourceType.Wood],
-            _instance._myResources[ResourceType.Gold], _instance._myResources[ResourceType.Stone]);
+        HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][NetworkManager.Me], _instance._playerResources[ResourceType.Wood][NetworkManager.Me],
+            _instance._playerResources[ResourceType.Gold][NetworkManager.Me], _instance._playerResources[ResourceType.Stone][NetworkManager.Me]);
 
         #endregion
 
@@ -275,7 +243,7 @@ public class GameManager : MonoBehaviour
     }
 
     #region GamePlay Logic
-    
+
     private void GameOver()
     {
         NetworkManager.Input(TickInput.GameOver());
@@ -285,7 +253,7 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    #region Create & Destroy TickedBehaviours
+    #region Apply Input Methods
 
     private static void CreateCharacter(int performer, int spawnerID, int characterType, Vector2 rallyPoint,
         bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
@@ -295,35 +263,13 @@ public class GameManager : MonoBehaviour
         _instance._entities.Add(character);
         _instance._characters.Add(character);
 
-        if (performer == NetworkManager.Me)
-        {
-            _instance._myEntities.Add(character);
-            _instance._myCharacters.Add(character);
-        }
-
-        HUDManager.UpdateHousing();
-
-        character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
-
-        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
-
-        if (!inPlace)
-            MoveCharacters(performer, rallyPoint, -1, new int[1] { character.ID }, MoveType.ToPosition);
-    }
-
-    private static void Kill(int performer, int[] targets)
-    {
-        for (int i = 0; i < targets.Length; i++)
-            DestroyEntity(targets[i]);
-    }
-
     public enum MoveType
     {
         ToPosition,
         ToBuilding
     }
 
-    private static void MoveCharacters(int performer, Vector2 position, int buildingID ,int[] targets, MoveType type) 
+    private static void MoveCharacters(int performer, Vector2 position, int buildingID, int[] targets, MoveType type)
     {
         List<Character> characters = new List<Character>();
 
@@ -334,7 +280,7 @@ public class GameManager : MonoBehaviour
 
         foreach (List<Character> group in groups)
         {
-            Vector3 targetPos = type == MoveType.ToPosition ? position : 
+            Vector3 targetPos = type == MoveType.ToPosition ? position :
                 TileMapManager.TilemapCoordsToWorld(_instance._buildings[buildingID].GetClosestOutlinePosition(group[0]));
 
             List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(targetPos));
@@ -366,6 +312,8 @@ public class GameManager : MonoBehaviour
         }
         return output;
     }
+
+    #endregion
 
     #region Attack methods
     private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
@@ -414,6 +362,87 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    private static void AssignBuild(int buildingID, int[] targets)
+    {
+        foreach (int ID in targets)
+        {
+            Character builder = _instance._entities[ID] as Character;
+
+            if (!builder)
+                continue;
+
+            builder.AddAction(new Build(builder, Buildings[buildingID]));
+        }
+    }
+
+    private static void Harvest(Vector2 position, int[] targets, int performer)
+    {
+        Resource resource = null;
+        Vector2Int inputCoords = new Vector2Int((int)position.x, (int)position.y);
+        if (ResourcesManager.HasTree(position))
+        {
+            resource = ResourcesManager.GetNearestForest(inputCoords);
+        }
+        else if (ResourcesManager.HasRock(position))
+        {
+            resource = ResourcesManager.GetNearestAggregate(inputCoords);
+        }
+
+        for (int i = 0; i < targets.Length; ++i)
+        {
+            Character harvester = _instance._myEntities[targets[i]] as Character;
+
+            Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, performer);
+            if (harvestingCoords == null)
+                break;
+
+            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
+
+            Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);
+            if (coordsToHarvest == null)
+                break;
+
+            harvester.SetAction(new Move(harvester, wayPoints));
+            harvester.AddAction(new Harvest(harvester, inputCoords, resource));
+        }
+    }
+
+    #endregion
+
+    #region Create & Destroy TickedBehaviours
+
+    private static void CreateCharacter(int performer, int spawnerID, int prefabID, Vector2 rallyPoint,
+        bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
+    {
+        CharacterData data = DataManager.GetCharacterData((Character.Type)prefabID);
+
+        Character character = TickedBehaviour.Create(performer, data.Prefab);
+
+        _instance._entities.Add(character);
+        _instance._characters.Add(character);
+
+        if (performer == NetworkManager.Me)
+        {
+            _instance._myEntities.Add(character);
+            _instance._myCharacters.Add(character);
+        }
+
+        HUDManager.UpdateHousing();
+
+        character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
+
+        QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
+
+        if (!inPlace)
+            MoveCharacters(performer, rallyPoint, -1, new int[1] { character.ID }, MoveType.ToPosition);
+    }
+
+    private static void Kill(int performer, int[] targets)
+    {
+        for (int i = 0; i < targets.Length; i++)
+            DestroyEntity(targets[i]);
+    }
+    private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     private static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = DataManager.GetBuildingData((Building.Type)buildingType);
@@ -439,19 +468,6 @@ public class GameManager : MonoBehaviour
         return building.ID;
     }
 
-    private static void AssignBuild(int buildingID, int[] targets)
-    {
-        foreach (int ID in targets)
-        {
-            Character builder = _instance._entities[ID] as Character;
-
-            if (!builder)
-                continue;
-
-            builder.AddAction(new Build(builder, Buildings[buildingID]));
-        }
-    }
-
     private static void DestroyBuilding(int performer, int buildingID)
     {
         if (performer == NetworkManager.Me)
@@ -460,7 +476,7 @@ public class GameManager : MonoBehaviour
 
             if (!building.BuildComplete)
                 foreach (Resource.Amount cost in building.Data.Cost)
-                    _instance._myResources[cost.Type] += cost.Value;
+                    _instance._playerResources[cost.Type][performer] += cost.Value;
             else
                 _instance._housing -= building.Data.HousingProvided;
         }

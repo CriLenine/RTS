@@ -4,8 +4,8 @@ using UnityEngine;
 public class MoveHarvest : Move
 {
     private readonly Resource _resource;
-    private readonly IResourceStorer _resourceStorer;
-    public MoveHarvest(Character character, List<Vector2> depositPositions, IResourceStorer resourceStorer, Resource resource) : base(character, depositPositions)
+    private readonly Building _resourceStorer;
+    public MoveHarvest(Character character, List<Vector2> depositPositions, Building resourceStorer, Resource resource) : base(character, depositPositions)
     {
         _resource = resource;
         _resourceStorer = resourceStorer;

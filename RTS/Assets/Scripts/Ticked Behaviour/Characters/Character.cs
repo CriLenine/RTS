@@ -41,8 +41,7 @@ public class Character : TickedBehaviour, IDamageable
     [SerializeField]
     private SpriteRenderer _iconSprite;
 
-    private Resource.Amount _harvestedResource;
-    public Resource.Amount HarvestedResource => _harvestedResource;
+    public Resource.Amount HarvestedResource;
 
     public bool Idle => _actions.Count == 0;
 
@@ -208,7 +207,7 @@ public class Character : TickedBehaviour, IDamageable
 
     public void SetResource(Resource.Amount harvestedResource)
     {
-        _harvestedResource = harvestedResource;
+        HarvestedResource = harvestedResource;
     }
 
     public void BeginWatch() => _isWatching = true;

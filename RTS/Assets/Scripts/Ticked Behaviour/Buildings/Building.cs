@@ -283,4 +283,9 @@ public class Building : TickedBehaviour, IDamageable
     {
         _queuedSpawnCharactersData.Enqueue(data);
     }
+
+    public void Fill(Resource.Amount _ressourceAmount, int performer)
+    {
+        GameManager.AddResource(_ressourceAmount.Type, _ressourceAmount.Value, performer);
+    }
 }

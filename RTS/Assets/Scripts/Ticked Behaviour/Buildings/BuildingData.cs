@@ -67,7 +67,7 @@ public class BuildingData : ButtonData
     [ConditionalField(nameof(_canCollectResources))]
     [SerializeField]
     private ResourceCollection _collectableResources;
-    public ResourceCollection CollectableResources => _collectableResources;
+    public List<ResourceType> CollectableResources => new List<ResourceType>(_collectableResources.Value);
 
     [Separator("UI")]
     [Space]

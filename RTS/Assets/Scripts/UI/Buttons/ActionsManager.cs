@@ -74,7 +74,7 @@ public class ActionsManager : MonoBehaviour
     public static void QueueUnitSpawn(CharacterData data)
     {
         foreach (Resource.Amount cost in data.Cost)
-            GameManager.Pay(cost.Type, cost.Value);
+            GameManager.Pay(cost.Type, cost.Value, NetworkManager.Me);
 
         CharacterManager.SelectedBuilding.EnqueueSpawningCharas(data);
     }

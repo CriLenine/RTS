@@ -30,7 +30,7 @@ public class Harvest : Action
                 if (_character.HarvestedResource.Value == 0 || _character.HarvestedResource.Type != _resource.Data.Type) // The peon carries another type of resource, or nothing
                     _character.SetResource(new Resource.Amount(_resource.Data.Type));
 
-                _character.HarvestedResource.AddQuantity(_resource.Data.AmountPerHarvest);
+                _character.HarvestedResource = _character.HarvestedResource.AddQuantity(_resource.Data.AmountPerHarvest);
 
                 _resource.HarvestTile(_coords);
             }
@@ -49,7 +49,7 @@ public class Harvest : Action
             if (wayPointsToDeposit == null)
                 Debug.LogError("Pathfinding failed unexpectedly.");
 
-            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, (IResourceStorer)building, _resource));
+            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, building, _resource));
             return true;
         }
 
@@ -89,9 +89,9 @@ public class Harvest : Action
         float shortestDistance = float.MaxValue;
         foreach (Building building in GameManager.MyBuildings)
         {
-            if (building.BuildCompletionRatio >= 1 && building is IResourceStorer resourceStorer)
+            if (building.BuildCompletionRatio >= 1 && building.Data.CanCollectResources)
             {
-                if (!resourceStorer.StorableResources.Contains(type))
+                if (!building.Data.CollectableResources.Contains(type))
                     continue;
 
                 closestBuilding ??= building;
