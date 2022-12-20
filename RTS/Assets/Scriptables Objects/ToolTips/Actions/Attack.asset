@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _name: Attack
-  _description: "Target a position to guard. \nAny enemy on the way or around the
-    position will be attacked.\n"
+  _description: 'Target a position to guard
+
+    Any enemy on the way or around the
+    position will be attacked
+
+'
   _buildingData: {fileID: 0}
   _data: {fileID: 0}

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 1
   _name: Carried Resources
-  _description: Resources harvested awaiting deposit at a nearby collector.
+  _description: Resources harvested awaiting deposit at a nearby collector
   _buildingData: {fileID: 0}
   _data: {fileID: 0}

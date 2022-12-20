@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using MyBox;
@@ -6,16 +7,28 @@ public class HUDManager : MonoBehaviour
 {
     private static HUDManager _instance;
 
+    [Serializable]
+    struct ResourceSpecs
+    {
+        public ResourceType Type;
+        public Sprite Sprite;
+        public Color Color;
+    }
+
     [Separator("HUD Components")]
 
     [SerializeField]
     private HUDResources _resources;
+
     [SerializeField]
     private HUDPopulation _population;
+
     [SerializeField]
     private HUDStats _stats;
+
     [SerializeField]
     private HUDActions _actions;
+
     [SerializeField]
     private HUDBuildings _buildings;
 
@@ -39,16 +52,28 @@ public class HUDManager : MonoBehaviour
     public static Sprite EconomyTypeSprite => _instance._economyTypeSprite;
 
     [SerializeField]
-    private Color _economyTypeColor;
-    public static Color EconomyTypeColor => _instance._economyTypeColor;
-
-    [SerializeField]
     private Sprite _militaryTypeSprite;
     public static Sprite MilitaryTypeSprite => _instance._militaryTypeSprite;
 
     [SerializeField]
+    private Color _economyTypeColor;
+    public static Color EconomyTypeColor => _instance._economyTypeColor;
+
+    [SerializeField]
     private Color _militaryTypeColor;
     public static Color MilitaryTypeColor => _instance._militaryTypeColor;
+
+    [Space]
+    [Space]
+
+    [SerializeField]
+    private List<ResourceSpecs> _resourcesSpecs;
+
+    private Dictionary<ResourceType, Sprite> _resourceSprites = new Dictionary<ResourceType, Sprite>();
+    public static Dictionary<ResourceType, Sprite> ResourceSprites => _instance._resourceSprites;
+
+    private Dictionary<ResourceType, Color> _resourceColors = new Dictionary<ResourceType, Color>();
+    public static Dictionary<ResourceType, Color> ResourceColors => _instance._resourceColors;
 
     protected void Awake()
     {
@@ -62,6 +87,12 @@ public class HUDManager : MonoBehaviour
 
         _uiInputs = new UIInputs();
         _uiInputs.Enable();
+
+        foreach(ResourceSpecs spec in _resourcesSpecs)
+        {
+            _resourceSprites.Add(spec.Type, spec.Sprite);
+            _resourceColors.Add(spec.Type, spec.Color);
+        }
     }
 
     public static void DisplayStats(Character character)

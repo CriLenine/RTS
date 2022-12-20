@@ -49,16 +49,21 @@ public class Character : TickedBehaviour, IDamageable
     private bool _isAgressed = false;
     private bool _isWatching = false;
 
-    protected override void Awake()
+    public void InitData(CharacterData data)
     {
-        base.Awake();
+        _data = data;
 
-        _iconSprite.sprite = Data.CharacterSprite;
-        _currentHealth = Data.MaxHealth;
+        _iconSprite.sprite = _data.CharacterSprite;
+        _currentHealth = _data.MaxHealth;
         HealthBar.SetHealth(1);
     }
 
-    protected virtual void Update()
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+    protected virtual void LateUpdate()
     {
         if (CurrentAction?.SpecificAction is Move move && move.Positions?.Count > 0)
         {
@@ -71,7 +76,7 @@ public class Character : TickedBehaviour, IDamageable
             for (i = move.Index; i < move.Positions.Count; ++i, ++j)
                 _pathRenderer.SetPosition(j, move.Positions[i]);
 
-            _pathRenderer.transform.position = move.Positions[i - 1];
+            _pathRenderer.transform.position = move.Positions[^1];
 
             _pathRenderer.startColor = GameManager.Colors[Performer];
             _pathRenderer.endColor = GameManager.Colors[Performer];

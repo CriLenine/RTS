@@ -1,10 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
+using MyBox;
 
 public class DataManager : MonoBehaviour
 {
     private static DataManager _instance;
+
+    [Separator("Prefabs")]
+
+    [SerializeField]
+    private Character _character;
+    public static Character CharacterPrefab => _instance._character;
+
+    [SerializeField]
+    private Building _building;
+    public static Building BuildingPrefab => _instance._building;
+
+    [Space]
+    [Separator("Data")]
 
     [SerializeField]
     private List<CharacterData> _dataCharacters;

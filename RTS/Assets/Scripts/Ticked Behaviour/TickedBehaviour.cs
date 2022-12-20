@@ -1,6 +1,12 @@
 using UnityEngine;
 using MyBox;
 
+public enum TickedBehaviorType
+{
+    Building,
+    Character
+}
+
 public abstract class TickedBehaviour : MonoBehaviour
 {
     #region Instantiation
@@ -9,28 +15,30 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     private static int NextID => _globalID++;
 
-    public static T Create<T>(int performer, T prefab, Vector3 position, Quaternion quaternion) where T : TickedBehaviour
+    public static TickedBehaviour Create(int performer, ButtonData data, TickedBehaviorType type) 
     {
-        T tickedBehaviour = Instantiate(prefab, position, quaternion);
+        TickedBehaviour tickedBehaviour;
+
+        if (type == TickedBehaviorType.Building)
+        {
+            Building building = Instantiate(DataManager.BuildingPrefab);
+            building.InitData(data as BuildingData);
+            tickedBehaviour = building;
+        }
+        else
+        {
+            Character character = Instantiate(DataManager.CharacterPrefab);
+            character.InitData(data as CharacterData);
+            tickedBehaviour = character;
+        }
 
         if (performer != NetworkManager.Me)
             tickedBehaviour.DisableViewRadius();
 
         tickedBehaviour.ID = NextID;
         tickedBehaviour.Performer = performer;
-        tickedBehaviour.Coords = TileMapManager.WorldToTilemapCoords(position);
 
         return tickedBehaviour;
-    }
-
-    public static T Create<T>(int performer, T prefab, Vector3 position) where T : TickedBehaviour
-    {
-        return Create(performer, prefab, position, Quaternion.identity);
-    }
-
-    public static T Create<T>(int performer, T prefab) where T : TickedBehaviour
-    {
-        return Create(performer, prefab, Vector3.zero, Quaternion.identity);
     }
 
     #endregion

@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _name: Kill
-  _description: "Hold to kill the current selection. \nThis action cannot be reverted."
+  _description: 'Hold to kill the current selection
+
+    <b> Warning : This action
+    cannot be reverted </b>'
   _buildingData: {fileID: 0}
   _data: {fileID: 0}

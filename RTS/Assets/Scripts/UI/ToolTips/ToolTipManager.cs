@@ -66,12 +66,18 @@ public class ToolTipManager : MonoBehaviour
             _instance._currentToolTipVisual.Icon.sprite = toolTip.BuildingData.HUDIcon;
             _instance._currentToolTipVisual.Icon.color = toolTip.BuildingData.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
 
+            _instance._currentToolTipVisual.SubType.text = toolTip.BuildingData.SubType == SubType.Economy ? "Economy Building" : "Military Building";
+            _instance._currentToolTipVisual.SubType.color = toolTip.BuildingData.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
+
             costs = toolTip.BuildingData.Cost;
         }
         else
         {
             _instance._currentToolTipVisual.Icon.sprite = toolTip.Data.Icon;
             _instance._currentToolTipVisual.Icon.color = toolTip.Data.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
+
+            _instance._currentToolTipVisual.SubType.text = toolTip.Data.SubType == SubType.Economy ? "Economy Character" : "Military Character";
+            _instance._currentToolTipVisual.SubType.color = toolTip.Data.SubType == SubType.Economy ? HUDManager.EconomyTypeColor : HUDManager.MilitaryTypeColor;
 
             costs = toolTip.Data.Cost;
         }
@@ -80,12 +86,13 @@ public class ToolTipManager : MonoBehaviour
             if (i < costs.Length)
             {
                 costTexts[i].text = $"{costs[i].Value}";
-                costTexts[i].color = new Color(1, 1, 1, 1);
-                costIcons[i].sprite = GameManager.ResourcesSprites[(int)costs[i].Type];
+                costTexts[i].color = HUDManager.ResourceColors[costs[i].Type];
+                costIcons[i].color = new Color(1, 1, 1, 1);
+                costIcons[i].sprite = HUDManager.ResourceSprites[costs[i].Type];
             }
             else
             {
-                costTexts[i].text = string.Empty;
+                costTexts[i].text = " ";
                 costIcons[i].color = new Color(0, 0, 0, 0);
             }
 

@@ -22,8 +22,8 @@ public class Building : TickedBehaviour, IDamageable
     public int CurrentHealth => _currentHealth;
 
     [SerializeField]
-    private BuildingData _buildingData;
-    public BuildingData Data => _buildingData;
+    private BuildingData _data;
+    public BuildingData Data => _data;
 
     
 
@@ -73,8 +73,8 @@ public class Building : TickedBehaviour, IDamageable
 
     private int _completedBuildTicks;
 
-    protected int MaxHealth => _buildingData.MaxHealth;
-    public float BuildCompletionRatio => (float)_completedBuildTicks / _buildingData.RequiredBuildTicks;
+    protected int MaxHealth => _data.MaxHealth;
+    public float BuildCompletionRatio => (float)_completedBuildTicks / _data.RequiredBuildTicks;
 
     private bool _selected;
 
@@ -93,17 +93,12 @@ public class Building : TickedBehaviour, IDamageable
 
     public void InitData(BuildingData data)
     {
-        _buildingData = data;
-    }
+        _data = data;
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        foreach (ButtonDataHUDParameters parameter in _buildingData.Actions)
+        foreach (ButtonDataHUDParameters parameter in _data.Actions)
             if (parameter.ButtonData is CharacterData)
             {
-                _buildingData.CanSpawnUnits = true;
+                _data.CanSpawnUnits = true;
                 break;
             }
 
@@ -129,9 +124,14 @@ public class Building : TickedBehaviour, IDamageable
         _rallyPoint = (Vector2)transform.position + new Vector2(0.7f, 0.7f);
     }
 
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     private void Update()
     {
-        if (_selected && _buildingData.CanSpawnUnits)
+        if (_selected && _data.CanSpawnUnits)
         {
             Vector2 rallypoint = _rallyPoint;
 
@@ -182,7 +182,7 @@ public class Building : TickedBehaviour, IDamageable
             // REQUIRES FIXING POSITION WHEN BUILD ORDER IS SENT !
             // TileMapManager.AddBuilding(Data.Outline, transform.position);
 
-            _completedBuildTicks = _buildingData.RequiredBuildTicks;
+            _completedBuildTicks = _data.RequiredBuildTicks;
             _iconSprite.color = _iconSpriteEndColor;
 
             if (!_selected)
@@ -215,7 +215,7 @@ public class Building : TickedBehaviour, IDamageable
         _selected = false;
         _backgroundSprite.color = _buildComplete ? _backgroundEndColor : _backgroundStartColor;
 
-        if (_buildingData.CanSpawnUnits)
+        if (_data.CanSpawnUnits)
             _pathRenderer.gameObject.SetActive(false);
     }
 

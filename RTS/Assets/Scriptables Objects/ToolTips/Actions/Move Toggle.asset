@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 2
   _name: Move Toggle
-  _description: "Toggle to disable displacements. \nOther actions are still performed."
+  _description: 'Toggle to disable displacements
+
+    Other actions are still performed'
   _buildingData: {fileID: 0}
   _data: {fileID: 0}

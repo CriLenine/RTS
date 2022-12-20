@@ -18,6 +18,7 @@ MonoBehaviour:
     resources.
 
 
+
     <i>Hint : keep your peons from being idle to maximize productivity.
     </i>'
   _buildingData: {fileID: 0}
