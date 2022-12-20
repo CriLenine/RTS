@@ -255,13 +255,7 @@ public class GameManager : MonoBehaviour
 
     #region Apply Input Methods
 
-    private static void CreateCharacter(int performer, int spawnerID, int characterType, Vector2 rallyPoint,
-        bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
-    {
-        Character character = TickedBehaviour.Create(performer, DataManager.GetCharacterData((Character.Type)characterType), TickedBehaviorType.Character) as Character;
-
-        _instance._entities.Add(character);
-        _instance._characters.Add(character);
+    #region Move Methods
 
     public enum MoveType
     {
@@ -296,6 +290,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Path not found!");
         }
     }
+
     private static Dictionary<List<Character>, List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector2 position, int[] targets)
     {
         Dictionary<List<Character>, List<Vector2>> output = new();
@@ -407,16 +402,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    #endregion
+#endregion
 
     #region Create & Destroy TickedBehaviours
 
-    private static void CreateCharacter(int performer, int spawnerID, int prefabID, Vector2 rallyPoint,
+    private static void CreateCharacter(int performer, int spawnerID, int characterType, Vector2 rallyPoint,
         bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
     {
-        CharacterData data = DataManager.GetCharacterData((Character.Type)prefabID);
-
-        Character character = TickedBehaviour.Create(performer, data.Prefab);
+        Character character = TickedBehaviour.Create(performer, DataManager.GetCharacterData((Character.Type)characterType), TickedBehaviorType.Character) as Character;
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
@@ -442,7 +435,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < targets.Length; i++)
             DestroyEntity(targets[i]);
     }
-    private static int CreateBuilding(int performer, Building.Type type, Vector2 position, bool autoComplete = false)
     private static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = DataManager.GetBuildingData((Building.Type)buildingType);
