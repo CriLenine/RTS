@@ -13,6 +13,8 @@ public class CampEntity : TickedBehaviour
         _endingPoint = endingPoint;
     }
 
+    public override void InitData<T>(T Data) { }
+
     public override Hash128 GetHash128()
     {
         return base.GetHash128();

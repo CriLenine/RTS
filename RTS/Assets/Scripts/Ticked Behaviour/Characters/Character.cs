@@ -9,7 +9,7 @@ public class Character : TickedBehaviour, IDamageable
     {
         Peon,
         Naked,
-        None
+        All
     }
 
     public Action CurrentAction { get; private set; }
@@ -23,7 +23,6 @@ public class Character : TickedBehaviour, IDamageable
     private int _currentHealth;
     public int CurrentHealth => _currentHealth;
 
-    [SerializeField]
     protected CharacterData _data;
     public CharacterData Data => _data;
 
@@ -48,9 +47,9 @@ public class Character : TickedBehaviour, IDamageable
     private bool _isAgressed = false;
     private bool _isWatching = false;
 
-    public void InitData(CharacterData data)
+    public override void InitData<T>(T data) 
     {
-        _data = data;
+        _data = data as CharacterData;
 
         _iconSprite.sprite = _data.CharacterSprite;
         _currentHealth = _data.MaxHealth;

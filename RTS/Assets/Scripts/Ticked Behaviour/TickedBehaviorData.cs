@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using MyBox;
 
 
 public enum SubType
@@ -16,8 +15,6 @@ public struct ButtonDataHUDParameters
     public Vector2Int ButtonPosition;
 }
 
-public abstract class ButtonData : ScriptableObject
+public abstract class TickedBehaviorData : ButtonData
 {
-    [Separator("Button Binding")]
-    public UnityEngine.UI.Button.ButtonClickedEvent OnClick;
 }

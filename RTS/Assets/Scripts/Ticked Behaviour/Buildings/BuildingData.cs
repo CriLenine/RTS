@@ -5,7 +5,7 @@ using System;
 
 [CreateAssetMenu(fileName = "BuildingData", menuName = "BuildingData", order = 1)]
 
-public class BuildingData : ButtonData
+public class BuildingData : TickedBehaviorData
 {
     [Separator("Spawn Data")]
     [Space]
@@ -17,10 +17,6 @@ public class BuildingData : ButtonData
     [SerializeField]
     private SubType _subType;
     public SubType SubType => _subType;
-
-    [SerializeField]
-    private Building _building;
-    public Building Building => _building;
 
     [SerializeField]
     [Min(1)]

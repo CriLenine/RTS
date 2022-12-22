@@ -1,62 +1,62 @@
 {
-    "name": "CharacterInputs",
+    "name": "Gameplay",
     "maps": [
         {
-            "name": "Selection",
-            "id": "b19c5584-85f2-4cba-b85c-e4e24a4a8b90",
+            "name": "Mouse Controls",
+            "id": "0c89f988-706a-442d-96ee-14aef1a68c31",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "LeftClick",
                     "type": "Button",
-                    "id": "bfcd5b73-bd5e-4f3f-9bac-cff64ccadca6",
+                    "id": "c9daa923-d26d-4196-a43d-76dcce21fc54",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Shift",
+                    "name": "RightClick",
                     "type": "Button",
-                    "id": "7ebd39ea-837a-4d73-a97e-0c7c6d7120b7",
+                    "id": "b76e73fe-8996-4afe-9bda-60136c54024b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "a9b47c8e-2b36-4dd5-ab32-666807c4ed17",
+                    "id": "3b824252-c73a-4945-b6ef-0cdaa24c60b4",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "LeftClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "b1601a41-c8dd-48ea-9219-fe4196e0f443",
-                    "path": "<Keyboard>/leftShift",
-                    "interactions": "",
+                    "id": "379c378c-242d-4c73-afb6-a2ca7779b0b2",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Shift",
+                    "action": "RightClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
             ]
         },
         {
-            "name": "Attack",
-            "id": "38f70ce4-8e57-42bb-b649-da5681ed197e",
+            "name": "Keyboard Controls",
+            "id": "5ddd37fe-42cb-4714-b66e-0055977bcd2b",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "Shift",
                     "type": "Button",
-                    "id": "aa031dbf-b474-43d5-aa79-413f75dfbf74",
+                    "id": "dde66c44-56c3-47a6-9b0d-0ea4bbc1c3dd",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -66,12 +66,12 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "514682de-6557-4772-9407-5edd9220250d",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
+                    "id": "5d2beea5-d354-4379-ad6f-823bc99c92bb",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Shift",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

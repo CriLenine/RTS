@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class LocomotionManager : MonoBehaviour
 {
+    private static LocomotionManager _instance;
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+            Destroy(_instance);
+
+        _instance = this;
+    }
+
     [SerializeField]
     private bool _debug;
-
-    //private System.Random _random = new System.Random(10);
-
-    private HashSet<int> neighborsID;
 
     public static List<Vector2> RetrieveWayPoints(int performer, Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
@@ -43,7 +49,7 @@ public class LocomotionManager : MonoBehaviour
         return positionWayPoints;
     }
 
-    public bool Move(Character character, Vector3 position)
+    public static bool Move(Character character, Vector3 position)
     {
         Vector3 projectedPosition = LocalAvoidance(character, position);
         if ((position - character.transform.position).sqrMagnitude < (character.CurrentAction.SpecificAction as Move).TestThreshold)
@@ -60,7 +66,7 @@ public class LocomotionManager : MonoBehaviour
         return character.transform.position == position;
     }
 
-    private bool MoveComplete(Character character, Vector2 projectedPosition, Vector2 position)
+    private static bool MoveComplete(Character character, Vector2 projectedPosition, Vector2 position)
     {
         Vector2 characterPos = character.transform.position;
 
@@ -97,13 +103,13 @@ public class LocomotionManager : MonoBehaviour
         return Vector2.zero;
     }
 
-    private Vector2 LocalAvoidance(Character character, Vector2 position)
+    private static Vector2 LocalAvoidance(Character character, Vector2 position)
     {
         Vector2 characterPos = (Vector2)character.transform.position;
 
         // Récupérer voisins KDTree
         QuadTreeDebugger.Clear();
-        neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
+        HashSet<int> neighborsID = QuadTreeNode.GetNeighbours(character.ID, character.transform.position);
 
         List<Vector2> trajectoryAdjustments = new();
 

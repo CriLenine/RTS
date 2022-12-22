@@ -2,11 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.TextCore.Text;
-using UnityEngine.UIElements;
 
-[RequireComponent(typeof(LocomotionManager))]
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
@@ -187,7 +183,7 @@ public class GameManager : MonoBehaviour
 
         foreach (TickedBehaviour entity in _instance._entitiesToDestroy)
         {
-            CharacterManager.TestEntitySelection(entity);
+            SelectionManager.TestEntitySelection(entity);
 
             int ID = entity.ID;
 
@@ -270,7 +266,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < targets.Length; i++)
             characters.Add(_instance._entities[targets[i]] as Character);
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
+        List<List<Character>> groups = GroupCreator.MakeGroups(performer, characters.ToArray());
 
         foreach (List<Character> group in groups)
         {
@@ -299,7 +295,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < targets.Length; i++)
             characters.Add((Character)_instance._entities[targets[i]]);
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(performer, characters.ToArray());
+        List<List<Character>> groups = GroupCreator.MakeGroups(performer, characters.ToArray());
 
         foreach (List<Character> group in groups)
         {
@@ -409,7 +405,9 @@ public class GameManager : MonoBehaviour
     private static void CreateCharacter(int performer, int spawnerID, int characterType, Vector2 rallyPoint,
         bool inPlace = false, Vector2? preconfiguredSpawnPoint = null)
     {
-        Character character = TickedBehaviour.Create(performer, DataManager.GetCharacterData((Character.Type)characterType), TickedBehaviorType.Character) as Character;
+        CharacterData characterData = DataManager.GetCharacterData((Character.Type)characterType);
+
+        Character character = TickedBehaviour.Create(performer, characterData, TickedBehaviorType.Character) as Character;
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
@@ -555,7 +553,7 @@ public class GameManager : MonoBehaviour
 
         // Debug Groups //
 
-        List<List<Character>> groups = SelectionManager.MakeGroups(NetworkManager.Me, CharacterManager.SelectedCharacters.ToArray());
+        List<List<Character>> groups = GroupCreator.MakeGroups(NetworkManager.Me, SelectionManager.SelectedCharacters.ToArray());
 
         for (int i = 0, j; i < groups.Count; ++i)
         {

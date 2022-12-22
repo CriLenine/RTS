@@ -7,7 +7,7 @@ public enum TickedBehaviorType
     Character
 }
 
-public abstract class TickedBehaviour : MonoBehaviour
+public abstract class TickedBehaviour : MonoBehaviour 
 {
     #region Instantiation
 
@@ -15,22 +15,10 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     private static int NextID => _globalID++;
 
-    public static TickedBehaviour Create(int performer, ButtonData data, TickedBehaviorType type) 
+    public static TickedBehaviour Create<T>(int performer, T data, TickedBehaviorType type) where T : TickedBehaviorData
     {
-        TickedBehaviour tickedBehaviour;
-
-        if (type == TickedBehaviorType.Building)
-        {
-            Building building = Instantiate(DataManager.BuildingPrefab);
-            building.InitData(data as BuildingData);
-            tickedBehaviour = building;
-        }
-        else
-        {
-            Character character = Instantiate(DataManager.CharacterPrefab);
-            character.InitData(data as CharacterData);
-            tickedBehaviour = character;
-        }
+        TickedBehaviour tickedBehaviour = Instantiate(type == TickedBehaviorType.Building ? DataManager.BuildingPrefab : DataManager.CharacterPrefab) as TickedBehaviour;
+        tickedBehaviour.InitData(data);
 
         if (performer != NetworkManager.Me)
             tickedBehaviour.DisableViewRadius();
@@ -58,6 +46,8 @@ public abstract class TickedBehaviour : MonoBehaviour
 
     [SerializeField]
     private Transform _currentView;
+
+    public abstract void InitData<T>(T Data) where T : TickedBehaviorData;
 
     public int ViewRadius
     {

@@ -16,7 +16,7 @@ public class MoveHarvest : Move
         if (Positions.Count == 0)
             return true;
 
-        if (!CharacterManager.Move(_character, Position))
+        if (!LocomotionManager.Move(_character, Position))
             return false;
 
         /* Move to Position was a success */

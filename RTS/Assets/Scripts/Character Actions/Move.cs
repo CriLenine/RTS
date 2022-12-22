@@ -36,7 +36,7 @@ public class Move : Action
     {
         if (Positions.Count == 0)
             return true;
-        if (CharacterManager.Move(_character, Position))
+        if (LocomotionManager.Move(_character, Position))
             ++Index;
 
         return Index == Positions.Count;

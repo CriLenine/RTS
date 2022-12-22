@@ -6,8 +6,6 @@ public class ActionsManager : MonoBehaviour
 {
     private static ActionsManager _instance;
 
-    private UIInputs _uiInputs;
-
     private ActionButton _currentButton;
 
     private void Awake()
@@ -16,11 +14,6 @@ public class ActionsManager : MonoBehaviour
             Destroy(this);
         else
             _instance = this;
-    }
-
-    private void Start()
-    {
-        _uiInputs = HUDManager.GetUIInputs();
     }
 
     private static void OnClickCommon()
@@ -34,9 +27,6 @@ public class ActionsManager : MonoBehaviour
         //if (!button.ToogleButton()) return;
 
         //_instance._currentButton = button;
-
-        CharacterManager.DisableInputs();
-        _instance._uiInputs.UI.Attack.started += Attack;
     }
 
     public void Stop()
@@ -56,7 +46,7 @@ public class ActionsManager : MonoBehaviour
 
     public void KillUnits()
     {
-        List<Character> selectedCharacters = CharacterManager.SelectedCharacters;
+        List<Character> selectedCharacters = SelectionManager.SelectedCharacters;
 
         int[] IDs = new int[selectedCharacters.Count];
 
@@ -68,7 +58,7 @@ public class ActionsManager : MonoBehaviour
 
     public void DestroyBuilding()
     {
-        NetworkManager.Input(TickInput.Destroy(CharacterManager.SelectedBuilding.ID));
+        NetworkManager.Input(TickInput.Destroy(SelectionManager.SelectedBuilding.ID));
     }
 
     public static void QueueUnitSpawn(CharacterData data)
@@ -76,7 +66,7 @@ public class ActionsManager : MonoBehaviour
         foreach (Resource.Amount cost in data.Cost)
             GameManager.Pay(cost.Type, cost.Value, NetworkManager.Me);
 
-        CharacterManager.SelectedBuilding.EnqueueSpawningCharas(data);
+        SelectionManager.SelectedBuilding.EnqueueSpawningCharas(data);
     }
 
 
@@ -92,20 +82,16 @@ public class ActionsManager : MonoBehaviour
         GameEventsManager.PlayEvent("UIConfirm");
         if (collider.TryGetComponent(out TickedBehaviour entity) && entity.TryGetComponent(out IDamageable damageable)) //hit a tickedbehaviour damageable
         {
-            if (CharacterManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entity)) //selected characters && not my entity
-                NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, CharacterManager.GetSelectedIds()));
+            if (SelectionManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entity)) //selected characters && not my entity
+                NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds()));
         }
         else  // sinon hit le sol on y vas et on surveille (target id = -1)
         {
-            if (CharacterManager.SelectedCharacters.Count > 0) //selected characters
-                NetworkManager.Input(TickInput.GuardPosition(worldPoint, CharacterManager.GetSelectedIds()));
+            if (SelectionManager.SelectedCharacters.Count > 0) //selected characters
+                NetworkManager.Input(TickInput.GuardPosition(worldPoint, SelectionManager.GetSelectedIds()));
         }
 
         _instance._currentButton.ToogleButton();
-
-        CharacterManager.EnableInputs();
-
-        _instance._uiInputs.UI.Attack.started -= Attack;
     }
     #endregion
 

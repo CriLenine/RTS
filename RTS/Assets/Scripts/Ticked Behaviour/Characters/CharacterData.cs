@@ -3,7 +3,7 @@ using MyBox;
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "CharacterData", order = 1)]
 
-public class CharacterData : ButtonData
+public class CharacterData : TickedBehaviorData
 {
     [Separator("Spawn Data")]
     [Space]
@@ -15,10 +15,6 @@ public class CharacterData : ButtonData
     [SerializeField]
     private SubType _subType;
     public SubType SubType => _subType;
-
-    [SerializeField]
-    private Character _prefab;
-    public Character Prefab => _prefab;
 
     [SerializeField]
     [Min(1)]

@@ -30,9 +30,10 @@ public class HUDManager : MonoBehaviour
     private HUDActions _actions;
 
     [SerializeField]
-    private HUDBuildings _buildings;
+    private HUDSpawnPreview _spawnPreview;
 
-    private UIInputs _uiInputs;
+    [SerializeField]
+    private HUDBuildings _buildings;
 
     [Space]
     [Separator("Art")]
@@ -85,9 +86,6 @@ public class HUDManager : MonoBehaviour
         _instance._resources.Show();
         _instance._population.Show();
 
-        _uiInputs = new UIInputs();
-        _uiInputs.Enable();
-
         foreach(ResourceSpecs spec in _resourcesSpecs)
         {
             _resourceSprites.Add(spec.Type, spec.Sprite);
@@ -104,12 +102,13 @@ public class HUDManager : MonoBehaviour
     {
         ToolTipManager.HideToolTip();
 
-        List<Character> characters = CharacterManager.SelectedCharacters;
-        Building building = CharacterManager.SelectedBuilding;
+        List<Character> characters = SelectionManager.SelectedCharacters;
+        Building building = SelectionManager.SelectedBuilding;
 
         _instance._stats.Hide();
         _instance._actions.Hide();
         _instance._buildings.Hide();
+        _instance._spawnPreview.Hide();
 
         int charactersCount = characters.Count;
 
@@ -121,11 +120,15 @@ public class HUDManager : MonoBehaviour
         if (building != null)
         {
             _instance._stats.DisplayStats(building);
+            _instance._spawnPreview.Show();
+            _instance._spawnPreview.UpdateSpawnPreview();
             _instance._actions.ShowBuildingActions(building.Data);
             return;
         }
 
         _instance._actions.ShowCharacterActions();
+
+        
         
         if (charactersCount == 1)
         {
@@ -144,8 +147,6 @@ public class HUDManager : MonoBehaviour
                 return;
             }
     }
-
-    public static UIInputs GetUIInputs() => _instance._uiInputs;
     
     public static void UpdateHousing()
     {
@@ -155,5 +156,10 @@ public class HUDManager : MonoBehaviour
     public static void UpdateResources(int crystal, int wood, int gold, int stone)
     {
         _instance._resources.UpdateResources(crystal, wood, gold, stone);
+    }
+
+    public static void UpdateSpawnPreview()
+    {
+        _instance._spawnPreview.UpdateSpawnPreview();
     }
 }

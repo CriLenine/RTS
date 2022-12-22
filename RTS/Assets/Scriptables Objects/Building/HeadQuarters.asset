@@ -28,7 +28,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   _type: 0
-  _subType: 1
+  _subType: 0
   _building: {fileID: 260249734484503702, guid: 4e2313134fbfef642a7677d746ac054b, type: 3}
   _size: 4
   _requiredBuildTicks: 1500

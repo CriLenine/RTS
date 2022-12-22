@@ -21,11 +21,8 @@ public class Building : TickedBehaviour, IDamageable
     private int _currentHealth;
     public int CurrentHealth => _currentHealth;
 
-    [SerializeField]
     private BuildingData _data;
     public BuildingData Data => _data;
-
-    
 
     [Separator("Utils")]
     [Space]
@@ -81,19 +78,18 @@ public class Building : TickedBehaviour, IDamageable
     #region SpawnerSpecs
 
     private Vector2 _rallyPoint;
+    public List<CharacterData> QueuedSpawnCharacters { get; private set; } = new();
 
-    private Queue<CharacterData> _queuedSpawnCharactersData = new();
-    private CharacterData _onGoingSpawnCharacterData;
+    public CharacterData OnGoingSpawnCharacterData { get; private set; } = null;
 
-    private int _spawningTicks = 0;
-
-    private bool _onGoingSpawn = false;
+    public int SpawningTicks { get; private set; }
+    public bool OnGoingSpawn { get; private set; } = false;
 
     #endregion
 
-    public void InitData(BuildingData data)
+    public override void InitData<T>(T data)
     {
-        _data = data;
+        _data = data as BuildingData;
 
         foreach (ButtonDataHUDParameters parameter in _data.Actions)
             if (parameter.ButtonData is CharacterData)
@@ -149,22 +145,32 @@ public class Building : TickedBehaviour, IDamageable
 
     public override void Tick()
     {
-        if (_onGoingSpawn)
+        if (OnGoingSpawn)
         {
-            _spawningTicks++;
+            SpawningTicks++;
 
-            if (_spawningTicks >= _onGoingSpawnCharacterData.SpawnTicks && GameManager.MyCharacters.Count < GameManager.Housing)
+            if (SpawningTicks >= OnGoingSpawnCharacterData.SpawnTicks && GameManager.MyCharacters.Count < GameManager.Housing)
             {
-                _spawningTicks = 0;
-                _onGoingSpawn = false;
-                NetworkManager.Input(TickInput.Spawn((int)_onGoingSpawnCharacterData.Type, ID, _rallyPoint));
+                SpawningTicks = 0;
+                OnGoingSpawn = false;
+                QueuedSpawnCharacters.RemoveAt(0);
+
+                if (QueuedSpawnCharacters.Count == 0 && SelectionManager.SelectedBuilding == this)
+                    HUDManager.UpdateSpawnPreview();
+
+                NetworkManager.Input(TickInput.Spawn((int)OnGoingSpawnCharacterData.Type, ID, _rallyPoint));
+
+                OnGoingSpawnCharacterData = null;
             }
         }
 
-        if (!_onGoingSpawn && _queuedSpawnCharactersData.Count > 0)
+        if (!OnGoingSpawn && QueuedSpawnCharacters.Count > 0)
         {
-            _onGoingSpawn = true;
-            _onGoingSpawnCharacterData = _queuedSpawnCharactersData.Dequeue();
+            OnGoingSpawn = true;
+            OnGoingSpawnCharacterData = QueuedSpawnCharacters[0];
+
+            if (SelectionManager.SelectedBuilding == this)
+                HUDManager.UpdateSpawnPreview();
         }
     }
 
@@ -281,7 +287,24 @@ public class Building : TickedBehaviour, IDamageable
 
     public void EnqueueSpawningCharas(CharacterData data)
     {
-        _queuedSpawnCharactersData.Enqueue(data);
+        QueuedSpawnCharacters.Add(data);
+        HUDManager.UpdateSpawnPreview();
+    }
+
+    public void CancelSpawn(int index)
+    {
+        foreach(Resource.Amount cost in QueuedSpawnCharacters[index].Cost)
+            GameManager.AddResource(cost.Type, cost.Value, NetworkManager.Me);
+
+        if (index == 0)
+        {
+            SpawningTicks = 0;
+            OnGoingSpawn = false;
+            OnGoingSpawnCharacterData = null;
+        }
+
+        QueuedSpawnCharacters.RemoveAt(index);
+        HUDManager.UpdateSpawnPreview();
     }
 
     public void Fill(Resource.Amount _ressourceAmount, int performer)
