@@ -178,7 +178,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6929195166523159403}
   - component: {fileID: 1733576375514921156}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -296,6 +296,10 @@ PrefabInstance:
     - target: {fileID: 395358019467475683, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1052475951505570353, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1052475951505570353, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}
       propertyPath: m_LocalPosition.y
