@@ -52,8 +52,6 @@ public class Minimap : MonoBehaviour, IPointerDownHandler, IDragHandler
         for (int i = 1; i < 4; ++i)
             bounds.Encapsulate(corners[i]);
 
-        Debug.Log(eventData.position.y - bounds.min.y);
-
         float x = (eventData.position.x - bounds.min.x) / bounds.size.x;
         float y = (eventData.position.y - bounds.min.y) / bounds.size.y;
 
