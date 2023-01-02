@@ -16,7 +16,7 @@ TagManager:
   - Clickable
   - view
   - Cursor
-  - 
+  - Minimap
   - FogOfWarPersistent
   - FogOfWarCurrent
   - 
@@ -40,10 +40,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Secondary
-    uniqueID: 2080985327
-    locked: 0
-  - name: FogOfWar
-    uniqueID: 2623993843
     locked: 0
