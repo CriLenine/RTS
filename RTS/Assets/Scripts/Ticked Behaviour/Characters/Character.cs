@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MyBox;
+using UnityEditor.Animations;
 
 public class Character : TickedBehaviour, IDamageable
 {
@@ -25,6 +26,10 @@ public class Character : TickedBehaviour, IDamageable
 
     protected CharacterData _data;
     public CharacterData Data => _data;
+
+    [SerializeField]
+    private Animator _animator;
+    public Animator Animator => _animator;
 
     [SerializeField]
     protected HealthBar HealthBar;
@@ -51,6 +56,8 @@ public class Character : TickedBehaviour, IDamageable
     {
         _data = data as CharacterData;
 
+
+        _animator.runtimeAnimatorController = _data.AnimatorCtrller;
         _iconSprite.sprite = _data.CharacterSprite;
         _currentHealth = _data.MaxHealth;
         HealthBar.SetHealth(1);
@@ -99,6 +106,17 @@ public class Character : TickedBehaviour, IDamageable
         {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
         }
+
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        if (CurrentAction is null)
+            _animator.Play("Idle");
+        else if (CurrentAction is Move)
+            _animator.Play("Walk");
+
     }
 
     private void OnDrawGizmosSelected()
