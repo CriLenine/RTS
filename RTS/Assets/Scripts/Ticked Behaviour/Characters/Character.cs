@@ -112,7 +112,7 @@ public class Character : TickedBehaviour, IDamageable
 
     private void UpdateAnimation()
     {
-        if (CurrentAction is null)
+        if (CurrentAction is null && _currentHealth > 0)
             _animator.Play("Idle");
         else if (CurrentAction is Move)
             _animator.Play("Walk");

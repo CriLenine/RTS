@@ -65,14 +65,22 @@ public class Attack : Action
         }
 
         if(_attackSpeedTimer == 0)
+        {
+            _character.Animator.Play("Attack");
+
             if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
             {
-                if (_target is Building building && _target.Performer == NetworkManager.Me) 
+                if (_target is Building building && _target.Performer == NetworkManager.Me)
                     GameManager.UpdateHousing(-building.Data.HousingProvided);
+
+                if(_target is Character chara)
+                    chara.Animator.Play("Die");
 
                 GameManager.DestroyEntity(_target.ID);
                 return true;
             }
+        }
+
 
         var newTime = _attackSpeedTimer + NetworkManager.NormalTickPeriod;
         _attackSpeedTimer = newTime  >= _attackSpeed ? 0 : newTime;

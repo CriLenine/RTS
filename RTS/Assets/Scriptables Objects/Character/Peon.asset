@@ -40,7 +40,7 @@ MonoBehaviour:
   _characterSprite: {fileID: -1150918782, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}
   _maxHealth: 500
   _attackDamage: 15
-  _attackRange: 5
+  _attackRange: 0.5
   _attackSpeed: 0.5
   _meleeArmor: 0
   _rangeArmor: 0
