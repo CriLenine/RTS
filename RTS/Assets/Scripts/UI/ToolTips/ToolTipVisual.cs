@@ -6,9 +6,8 @@ using MyBox;
 
 public class ToolTipVisual : MonoBehaviour
 {
-    [ConstantsSelection(typeof(ToolTipVisualTypes))]
     [SerializeField]
-    private string _type = "Default";
+    private ToolTipVisualType _type;
 
     [Separator("Fields")]
     [Space]
@@ -17,31 +16,31 @@ public class ToolTipVisual : MonoBehaviour
 
     [Space]
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Stat, ToolTipVisualTypes.Action, ToolTipVisualTypes.Building, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Stat, ToolTipVisualType.Action, ToolTipVisualType.Building, ToolTipVisualType.Spawn)]
     public TextMeshProUGUI Description;
 
     [Space]
     [Space]
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Building, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Building, ToolTipVisualType.Spawn)]
     public TextMeshProUGUI SubType;
 
     [Space]
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Building, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Building, ToolTipVisualType.Spawn)]
     public Image Icon;
 
     [Space]
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Building, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Building, ToolTipVisualType.Spawn)]
     public TextMeshProUGUICollection ResourceCostTexts;
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Building, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Building, ToolTipVisualType.Spawn)]
     public ImageCollection ResourceCostIcons;
 
     [Space]
 
-    [ConditionalField(nameof(_type), false, ToolTipVisualTypes.Spawn)]
+    [ConditionalField(nameof(_type), false, ToolTipVisualType.Spawn)]
     public TextMeshProUGUI TimeCost;
 }
 
@@ -51,11 +50,11 @@ public class TextMeshProUGUICollection : CollectionWrapper<TextMeshProUGUI> { }
 [Serializable]
 public class ImageCollection : CollectionWrapper<Image> { }
 
-public class ToolTipVisualTypes
+public enum ToolTipVisualType
 {
-    public const string Default = "Default";
-    public const string Stat = "Stat";
-    public const string Action = "Action";
-    public const string Building = "Building";
-    public const string Spawn = "Spawn";
+    Default,
+    Stat,
+    Action,
+    Building,
+    Spawn
 }

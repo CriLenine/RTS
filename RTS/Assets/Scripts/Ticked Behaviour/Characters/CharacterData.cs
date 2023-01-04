@@ -38,9 +38,16 @@ public class CharacterData : TickedBehaviorData
     private Color _color;
     public Color Color => _color;
 
+    [Separator("ToolTip")]
+    [Space]
+
     [SerializeField]
     private ToolTip _toolTip;
     public ToolTip ToolTip => _toolTip;
+
+    [SerializeField]
+    private ToolTip _selectionToolTip;
+    public ToolTip SelectionToolTip => _selectionToolTip;
 
     [Separator("Art")]
     [Space]

@@ -37,8 +37,13 @@ public class Building : TickedBehaviour, IDamageable
     [Separator("UI")]
     [Space]
 
+    public HealthBar HealthBar;
+
     [SerializeField]
-    private HealthBar HealthBar;
+    private GameObject HoverMarker;
+
+    [SerializeField]
+    private GameObject SelectionMarker;
 
     [Separator("Art")]
     [Space]
@@ -46,23 +51,22 @@ public class Building : TickedBehaviour, IDamageable
     [SerializeField]
     private Transform _visualTransform;
     [SerializeField]
-    private Transform _completionTransform, _healthBarTransform;
+    private Transform _minimapIconTransform, _structureTransform, _healthBarTransform;
 
     [Space]
 
     [SerializeField]
-    private SpriteRenderer _backgroundSprite;
+    private SpriteRenderer _structureSprite;
+
     [SerializeField]
-    private SpriteRenderer _completionSprite, _iconSprite;
+    private SpriteRenderer _iconSprite, _minimapIconSprite, _backgroundSprite;
 
     [Space]
 
     [SerializeField]
     private Color _completionStartColor;
     [SerializeField]
-    private Color _completionEndColor, _iconSpriteStartColor, _iconSpriteEndColor, _selectedColor;
-    [SerializeField]
-    private Color _backgroundStartColor, _backgroundEndColor;
+    private Color _completionEndColor, _iconSpriteStartColor, _iconSpriteEndColor;
 
 
     private bool _buildComplete;
@@ -73,7 +77,7 @@ public class Building : TickedBehaviour, IDamageable
     protected int MaxHealth => _data.MaxHealth;
     public float BuildCompletionRatio => (float)_completedBuildTicks / _data.RequiredBuildTicks;
 
-    private bool _selected;
+    private bool _isSelected;
 
     #region SpawnerSpecs
 
@@ -98,8 +102,9 @@ public class Building : TickedBehaviour, IDamageable
                 break;
             }
 
-        float scale = .95f * TileMapManager.TileSize * Data.Size;
+        float scale = .9f * TileMapManager.TileSize * Data.Size;
         _visualTransform.localScale = new Vector3(scale, scale, 1);
+        // _minimapIconTransform.localScale = new Vector3(scale, scale, 1);
         _boxCollider.size = new Vector2(scale, scale);
 
         _healthBarTransform.transform.position += new Vector3(0, .5f * scale);
@@ -110,12 +115,16 @@ public class Building : TickedBehaviour, IDamageable
         _completedBuildTicks = 0;
         _buildComplete = false;
 
-        _completionTransform.localScale = new Vector3(0, 0, 1);
+        _structureTransform.localScale = new Vector3(0, 0, 1);
 
-        _completionSprite.color = _completionStartColor;
+        _structureSprite.color = _completionStartColor;
         _iconSprite.sprite = Data.HUDIcon;
+        _minimapIconSprite.sprite = Data.HUDIcon;
         _iconSprite.color = _iconSpriteStartColor;
-        _backgroundSprite.color = _backgroundStartColor;
+
+        Color tmp = _backgroundSprite.color;
+        tmp.a = .25f;
+        _backgroundSprite.color = tmp;
 
         _rallyPoint = (Vector2)transform.position + new Vector2(0.7f, 0.7f);
     }
@@ -127,7 +136,7 @@ public class Building : TickedBehaviour, IDamageable
 
     private void Update()
     {
-        if (_selected && _data.CanSpawnUnits)
+        if (_isSelected && _data.CanSpawnUnits && BuildComplete)
         {
             Vector2 rallypoint = _rallyPoint;
 
@@ -191,8 +200,9 @@ public class Building : TickedBehaviour, IDamageable
             _completedBuildTicks = _data.RequiredBuildTicks;
             _iconSprite.color = _iconSpriteEndColor;
 
-            if (!_selected)
-                _backgroundSprite.color = _backgroundEndColor;
+            Color tmp = _backgroundSprite.color;
+            tmp.a = 1f;
+            _backgroundSprite.color = tmp;
 
             if (GameManager.MyBuildings.Contains(ID))
                 GameManager.UpdateHousing(Data.HousingProvided);
@@ -201,25 +211,27 @@ public class Building : TickedBehaviour, IDamageable
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
-        _completionTransform.localScale = new Vector3(completionValue, completionValue, 1);
+        _structureTransform.localScale = new Vector3(completionValue, completionValue, 1);
 
-        _completionSprite.color = Color.Lerp(_completionStartColor, _completionEndColor, BuildCompletionRatio);
+        _structureSprite.color = Color.Lerp(_completionStartColor, _completionEndColor, BuildCompletionRatio);
 
         return _buildComplete;
     }
 
     public void Select()
     {
-        _selected = true;
+        _isSelected = true;
 
-        if (_buildComplete)
-            _backgroundSprite.color = _selectedColor;
+        HoverMarker.SetActive(false);
+        SelectionMarker.SetActive(true);
+        HealthBar.gameObject.SetActive(true);
     }
 
     public void Unselect()
     {
-        _selected = false;
-        _backgroundSprite.color = _buildComplete ? _backgroundEndColor : _backgroundStartColor;
+        _isSelected = false;
+        SelectionMarker.SetActive(false);
+        HealthBar.gameObject.SetActive(false);
 
         if (_data.CanSpawnUnits)
             _pathRenderer.gameObject.SetActive(false);
@@ -310,5 +322,17 @@ public class Building : TickedBehaviour, IDamageable
     public void Fill(Resource.Amount _ressourceAmount, int performer)
     {
         GameManager.AddResource(_ressourceAmount.Type, _ressourceAmount.Value, performer);
+    }
+
+    private void OnMouseOver()
+    {
+        if (!_isSelected && Performer == NetworkManager.Me)
+            HoverMarker.SetActive(true);
+    }
+
+    private void OnMouseExit()
+    {
+        if (!_isSelected && Performer == NetworkManager.Me)
+            HoverMarker.SetActive(false);
     }
 }

@@ -80,7 +80,6 @@ public class SelectionTool : MonoBehaviour
                         {
                             SelectionManager.DeselectAll();
                             SelectionManager.AddCharacterToSelection(selectedCharacter);
-                            selectedCharacter.SelectionMarker.SetActive(true);
                         }
                         else // Shift click
                         {

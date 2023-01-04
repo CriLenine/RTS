@@ -8,6 +8,12 @@ using UnityEngine.UI;
 
 public class ToolTip : ScriptableObject
 {
+    public ToolTip(string name)
+    {
+        _type = ToolTipType.Default;
+        _name = name;
+    }
+
     [SerializeField]
     private ToolTipType _type;
     public ToolTipType Type => _type;

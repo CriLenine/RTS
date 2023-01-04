@@ -66,8 +66,6 @@ public class OrderManager : MonoBehaviour
             int[] IDs = SelectionManager.GetSelectedIds();
 
             NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
-
-            SelectionManager.DeselectAll();
         }
     }
 

@@ -19,7 +19,7 @@ public class SelectionManager : MonoBehaviour
     public static List<Character> SelectedCharacters { get; private set; } = new List<Character>();
     public static Character.Type SelectedType { get; private set; } = Character.Type.All;
     public static HashSet<Character.Type> SelectedTypes { get; private set; } = new HashSet<Character.Type>();
-
+    public static Dictionary<Character.Type, int> Counts { get; private set; } = new Dictionary<Character.Type, int>();
 
     public delegate void OnCharacterSelectionUpdatedHandler();
 
@@ -32,6 +32,7 @@ public class SelectionManager : MonoBehaviour
     }
 
     private HashSet<Character> _allSelectedCharacters = new HashSet<Character>();
+    public static int AllSelectedCharactersCount => _instance._allSelectedCharacters.Count;
 
     private void Awake()
     {
@@ -45,7 +46,14 @@ public class SelectionManager : MonoBehaviour
 
     #region Character Selection
 
-    public static void SpecializesSelection(Character.Type type)
+    public static void NoSpecialization()
+    {
+        SelectedType = Character.Type.All;
+
+        _instance.UpdateCharacterSelection();
+    }
+
+    public static void SpecializeSelection(Character.Type type)
     {
         SelectedType = type;
 
@@ -56,7 +64,7 @@ public class SelectionManager : MonoBehaviour
     {
         _instance._allSelectedCharacters.Add(character);
 
-        SpecializesSelection(Character.Type.All);
+        NoSpecialization();
     }
 
     public static void AddCharactersToSelection(List<Character> characters)
@@ -64,9 +72,7 @@ public class SelectionManager : MonoBehaviour
         for (int i = 0; i < characters.Count; ++i)
             _instance._allSelectedCharacters.Add(characters[i]);
 
-        SpecializesSelection(Character.Type.All);
-
-
+        NoSpecialization();
     }
 
     public static void RemoveCharacterFromSelection(Character character)
@@ -80,18 +86,30 @@ public class SelectionManager : MonoBehaviour
     {
         SelectedTypes.Clear();
         SelectedCharacters.Clear();
+        Counts.Clear();
 
         foreach (Character character in _instance._allSelectedCharacters)
         {
+            if(Counts.ContainsKey(character.Data.Type))
+                Counts[character.Data.Type]++;
+            else 
+                Counts[character.Data.Type] = 1;
+
             SelectedTypes.Add(character.Data.Type);
 
             if (SelectedType == Character.Type.All || character.Data.Type == SelectedType)
             {
                 SelectedCharacters.Add(character);
-
-                character.SelectionMarker.SetActive(true);
+                character.Select();
             }
         }
+
+        if(SelectedType != Character.Type.All)
+            foreach(Character character in _instance._allSelectedCharacters)
+                if(character.Data.Type != SelectedType)
+                    character.Unselect();
+
+        HUDSelection.UpdatePulse();
 
         _onCharacterSelectionUpdated?.Invoke();
 
@@ -131,7 +149,9 @@ public class SelectionManager : MonoBehaviour
         SelectedBuilding = null;
 
         foreach (Character character in _instance._allSelectedCharacters)
-            character.SelectionMarker.SetActive(false);
+            character.Unselect();
+
+        Counts.Clear();
 
         _instance._allSelectedCharacters.Clear();
 

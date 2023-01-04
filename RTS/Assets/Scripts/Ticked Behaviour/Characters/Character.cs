@@ -37,7 +37,11 @@ public class Character : TickedBehaviour, IDamageable
     [SerializeField]
     private LineRenderer _pathRenderer;
 
-    public GameObject SelectionMarker;
+    [SerializeField]
+    private GameObject HoverMarker;
+
+    [SerializeField]
+    private GameObject SelectionMarker; 
 
     [Separator("UI")]
     [Space]
@@ -47,6 +51,7 @@ public class Character : TickedBehaviour, IDamageable
 
     public Resource.Amount HarvestedResource;
 
+    private bool _isSelected = false;
     public bool Idle => _actions.Count == 0;
 
     private bool _isAgressed = false;
@@ -117,6 +122,23 @@ public class Character : TickedBehaviour, IDamageable
         else if (CurrentAction is Move)
             _animator.Play("Walk");
 
+    }
+
+    public void Select()
+    {
+        _isSelected = true;
+
+        HoverMarker.SetActive(false);
+        SelectionMarker.SetActive(true);
+        HealthBar.gameObject.SetActive(true);
+    }
+
+    public void Unselect()
+    {
+        _isSelected = false;
+
+        SelectionMarker.SetActive(false);
+        HealthBar.gameObject.SetActive(false);
     }
 
     private void OnDrawGizmosSelected()
@@ -228,4 +250,16 @@ public class Character : TickedBehaviour, IDamageable
     }
 
     public void BeginWatch() => _isWatching = true;
+
+    private void OnMouseOver()
+    {
+        if (!_isSelected && Performer == NetworkManager.Me)
+            HoverMarker.SetActive(true);
+    }
+
+    private void OnMouseExit()
+    {
+        if (!_isSelected && Performer == NetworkManager.Me)
+            HoverMarker.SetActive(false);
+    }
 }

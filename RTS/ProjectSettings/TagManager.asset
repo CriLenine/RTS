@@ -11,8 +11,8 @@ TagManager:
   - MainCamera
   - Water
   - UI
-  - 
   - Environment
+  - Particles
   - Clickable
   - view
   - Cursor
@@ -21,7 +21,7 @@ TagManager:
   - FogOfWarCurrent
   - 
   - HUD
-  - 
+  - ToolTip
   - 
   - 
   - 
