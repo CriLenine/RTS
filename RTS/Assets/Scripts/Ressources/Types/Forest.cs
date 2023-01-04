@@ -1,15 +1,17 @@
-using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class Forest : Resource
 {
-    public override void OnHarvestedTile(Vector2Int coords)
+    public override void OnHarvestedTile(Vector2Int coords, int harvestedAmount, bool tileDepleted)
     {
-        ResourcesManager.RemoveTree(coords);
-        LogicalTile harvestedTile = TileMapManager.GetLogicalTile(coords);
-        harvestedTile.State = TileState.Free;
-        harvestedTile.Tag = TileTag.None;
-        CurrentAmount = CurrentAmount.RemoveQuantity(1);
+        CurrentAmount = CurrentAmount.RemoveQuantity(harvestedAmount);
+        if (tileDepleted)
+        {
+            LogicalTile harvestedTile = TileMapManager.GetLogicalTile(coords);
+            harvestedTile.Tag = TileTag.None;
+            harvestedTile.State = TileState.Free;
+            ResourcesManager.RemoveTree(coords);
+            _itemsNHarvested.Remove(coords);
+        }
     }
 }

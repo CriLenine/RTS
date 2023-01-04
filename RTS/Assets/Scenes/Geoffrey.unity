@@ -1141,6 +1141,7 @@ MonoBehaviour:
   _dataBuildings:
   - {fileID: 11400000, guid: a38b74e07f3507944833f3363e4dc786, type: 2}
   - {fileID: 11400000, guid: 814a8be8610529843a94f8eb9fa8acb7, type: 2}
+  - {fileID: 11400000, guid: def745a44e8024c4d9b8a1ca636cadcf, type: 2}
 --- !u!114 &594557530
 MonoBehaviour:
   m_ObjectHideFlags: 0

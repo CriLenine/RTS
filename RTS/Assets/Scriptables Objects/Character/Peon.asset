@@ -48,5 +48,6 @@ MonoBehaviour:
   _weapon: {fileID: 21300000, guid: a0a5a4c0833176e4195e90ca217a9965, type: 3}
   _canHarvestResources: 1
   _maxCarriedResources: 3
+  _amountGetPerHarvest: 1
   _canBuild: 1
   _buildEfficiencyMultiplier: 1

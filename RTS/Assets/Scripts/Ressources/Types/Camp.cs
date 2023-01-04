@@ -37,7 +37,7 @@ public class Camp : Resource
         return _entities[index];
     }
 
-    public override void OnHarvestedTile(Vector2Int coords)
+    public override void OnHarvestedTile(Vector2Int coords, int amount, bool tileDepleted)
     {
         throw new NotImplementedException();
     }
