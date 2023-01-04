@@ -3,9 +3,14 @@ using UnityEngine;
 
 public class Aggregate : Resource
 {
-    public override void OnHarvestedTile(Vector2Int coords)
+    public override void OnHarvestedTile(Vector2Int coords, int harvestedAmount, bool tileDepleted)
     {
-        CurrentAmount = CurrentAmount.RemoveQuantity(Data.AmountPerHarvest);
-        TileMapManager.GetLogicalTile(coords).Tag = TileTag.None;
+        CurrentAmount = CurrentAmount.RemoveQuantity(harvestedAmount);
+
+        if (tileDepleted)
+        {
+            TileMapManager.GetLogicalTile(coords).Tag = TileTag.None;
+            _itemsNHarvested.Remove(coords);
+        }
     }
 }

@@ -1,8 +1,5 @@
-using Mono.Cecil;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class Harvest : Action
 {
@@ -32,7 +29,7 @@ public class Harvest : Action
 
                 _character.HarvestedResource = _character.HarvestedResource.AddQuantity(_resource.Data.AmountPerHarvest);
 
-                _resource.HarvestTile(_coords);
+                _resource.HarvestTile(_coords, _character.Data.AmountGetPerHarvest);
             }
             return false;
         }
@@ -49,7 +46,7 @@ public class Harvest : Action
             if (wayPointsToDeposit == null)
                 Debug.LogError("Pathfinding failed unexpectedly.");
 
-            SetAction(new MoveHarvest(_character,  wayPointsToDeposit, building, _resource));
+            SetAction(new MoveHarvest(_character, wayPointsToDeposit, building, _resource));
             return true;
         }
 

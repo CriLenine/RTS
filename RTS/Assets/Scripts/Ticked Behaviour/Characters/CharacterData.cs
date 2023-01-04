@@ -109,6 +109,10 @@ public class CharacterData : TickedBehaviorData
     private int _maxCarriedResources;
     public int MaxCarriedResources => _maxCarriedResources;
 
+    [SerializeField]
+    private int _amountGetPerHarvest;
+    public int AmountGetPerHarvest => _amountGetPerHarvest;
+
     [Space]
 
     [SerializeField]

@@ -5,10 +5,12 @@ public class MoveHarvest : Move
 {
     private readonly Resource _resource;
     private readonly Building _resourceStorer;
+    private readonly Vector2Int _initialCoords;
     public MoveHarvest(Character character, List<Vector2> depositPositions, Building resourceStorer, Resource resource) : base(character, depositPositions)
     {
         _resource = resource;
         _resourceStorer = resourceStorer;
+        _initialCoords = character.Coords;
     }
 
     protected override bool Update()
@@ -31,12 +33,14 @@ public class MoveHarvest : Move
 
             harvester.SetResource(new Resource.Amount(harvester.HarvestedResource.Type));
 
-            Vector2Int? harvestingPosition = _resource.GetHarvestingPosition(_resource.GetFirst(), _character.Coords, _character.Performer);
+            Vector2Int newInputCoords = _resource.GetNext(_character.Coords, _initialCoords,  _character.Performer) ?? _resource.GetClosest(_initialCoords);
+
+            Vector2Int? harvestingPosition = _resource.GetHarvestingPosition(newInputCoords, _character.Coords, _character.Performer);
 
             if (harvestingPosition != null)
             {
                 harvester.SetAction(new Move(_character, LocomotionManager.RetrieveWayPoints(_character.Performer, _character, harvestingPosition.Value)));
-                harvester.SetAction(new Harvest(_character, harvestingPosition.Value, _resource));
+                harvester.AddAction(new Harvest(_character, harvestingPosition.Value, _resource));
             }
 
             return true;

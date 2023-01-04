@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d701c73d794ccc40865d318629c8e8c, type: 3}
+  m_Name: Sawmill
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1419917682958475346, guid: 5a551cf55c188e04aa2a825b8ba413fd, type: 3}
+        m_TargetAssemblyTypeName: Blueprint, Assembly-CSharp
+        m_MethodName: SetActiveBlueprint
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000}
+          m_ObjectArgumentAssemblyTypeName: BuildingData, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _type: 2
+  _subType: 0
+  _size: 2
+  _requiredBuildTicks: 1000
+  _cost:
+  - _type: 3
+    _value: 50
+  - _type: 1
+    _value: 50
+  _maxHealth: 200
+  _housingProvided: 0
+  _meleeArmor: 0
+  _rangeArmor: 5
+  _canCollectResources: 1
+  _collectableResources:
+    Value: 01000000
+  Icon: {fileID: 21300000, guid: 2c18f4678c0f3ab4eab8a7781d2c0567, type: 3}
+  _color: {r: 0.8, g: 0.5411765, b: 0.16862746, a: 1}
+  _toolTip: {fileID: 11400000, guid: c07b37a237bf30f4e82f4efdc85641df, type: 2}
+  _actions:
+  - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
+    ButtonPosition: {x: 4, y: 2}
+  CanSpawnUnits: 0
