@@ -208,7 +208,8 @@ public class GameManager : MonoBehaviour
                     _instance.GameOver();
             }
 
-            Destroy(entity.gameObject);
+            Destroy(entity);
+            Destroy(entity.gameObject,2);
         }
 
         if (_instance._entitiesToDestroy.Count > 0)
@@ -516,7 +517,7 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i,-1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(2f, 0));
             CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-2f, 0));
             CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-1f, -2f));
-            CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
+            CreateCharacter(i+1, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
 
             CreateBuilding(i, (int)Building.Type.HeadQuarters, spawnPoint , true);
 

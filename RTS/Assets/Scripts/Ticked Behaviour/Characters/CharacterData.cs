@@ -1,5 +1,7 @@
 using UnityEngine;
 using MyBox;
+using UnityEditor.Animations;
+using UnityEditorInternal;
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "CharacterData", order = 1)]
 
@@ -49,6 +51,10 @@ public class CharacterData : TickedBehaviorData
 
     [Separator("Art")]
     [Space]
+
+    [SerializeField]
+    private RuntimeAnimatorController _animator;
+    public RuntimeAnimatorController AnimatorCtrller => _animator;
 
     [SerializeField]
     private Sprite _characterSprite;

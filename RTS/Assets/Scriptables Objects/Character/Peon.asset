@@ -36,11 +36,12 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 06fb776c4b7ed1e4cb878f5b09aaebde, type: 3}
   _color: {r: 0.9960785, g: 0.75294125, b: 0.454902, a: 1}
   _toolTip: {fileID: 11400000, guid: 16fdac62c1d632e46ad690f6815609c5, type: 2}
+  _animator: {fileID: 9100000, guid: ef04359aa3d137b4896a4a93e8179fed, type: 2}
+  _characterSprite: {fileID: -1150918782, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}
   _selectionToolTip: {fileID: 11400000, guid: ac00fcdb0d6c4a441b9491a1e79985e2, type: 2}
-  _characterSprite: {fileID: 200709051, guid: bd3f9d2d6c2440c45850ab46d89a9c7b, type: 3}
   _maxHealth: 100
   _attackDamage: 15
-  _attackRange: 5
+  _attackRange: 0.5
   _attackSpeed: 0.5
   _meleeArmor: 0
   _rangeArmor: 0
