@@ -5,6 +5,11 @@ using MyBox;
 
 public class CharacterData : TickedBehaviorData
 {
+    [SerializeField]
+    private AudioClip _genericOrderAudio;
+    [SerializeField]
+    private AudioClip _attackOrderAudio;
+
     [Separator("Spawn Data")]
     [Space]
 

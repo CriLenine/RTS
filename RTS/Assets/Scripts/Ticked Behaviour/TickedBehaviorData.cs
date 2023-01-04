@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
-
+using MyBox;
+using System.Collections.Generic;
 
 public enum SubType
 {
@@ -17,4 +18,9 @@ public struct ButtonDataHUDParameters
 
 public abstract class TickedBehaviorData : ButtonData
 {
+    [Separator("Sounds")]
+    [SerializeField]
+    private AudioClip _onSpawnAudio;
+    [SerializeField]
+    private List<AudioClip> _onSelectionAudio;
 }
