@@ -7,6 +7,8 @@ public class HUDManager : MonoBehaviour
 {
     private static HUDManager _instance;
 
+    #region Variables
+
     [Serializable]
     struct ResourceSpecs
     {
@@ -22,6 +24,9 @@ public class HUDManager : MonoBehaviour
 
     [SerializeField]
     private HUDPopulation _population;
+
+    [SerializeField]
+    private HUDSelection _selection;
 
     [SerializeField]
     private HUDStats _stats;
@@ -76,6 +81,8 @@ public class HUDManager : MonoBehaviour
     private Dictionary<ResourceType, Color> _resourceColors = new Dictionary<ResourceType, Color>();
     public static Dictionary<ResourceType, Color> ResourceColors => _instance._resourceColors;
 
+    #endregion
+
     protected void Awake()
     {
         if (_instance == null)
@@ -108,6 +115,7 @@ public class HUDManager : MonoBehaviour
         _instance._stats.Hide();
         _instance._actions.Hide();
         _instance._buildings.Hide();
+        _instance._selection.Hide();
         _instance._spawnPreview.Hide();
 
         int charactersCount = characters.Count;
@@ -127,8 +135,6 @@ public class HUDManager : MonoBehaviour
         }
 
         _instance._actions.ShowCharacterActions();
-
-        
         
         if (charactersCount == 1)
         {
@@ -139,6 +145,9 @@ public class HUDManager : MonoBehaviour
         }
 
         _instance._buildings.Show();
+        _instance._selection.Show();
+
+        _instance._selection.SetupSelection();
 
         for (int i = 0; i < charactersCount; ++i)
             if(!characters[i].Data.CanBuild)

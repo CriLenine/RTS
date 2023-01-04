@@ -29,8 +29,7 @@ MonoBehaviour:
         m_CallState: 2
   _type: 1
   _subType: 0
-  _building: {fileID: 4385885305861431378, guid: 2243ee8dc4f902a41b2e05eb8fd70914, type: 3}
-  _size: 3
+  _size: 4
   _requiredBuildTicks: 500
   _cost:
   - _type: 1

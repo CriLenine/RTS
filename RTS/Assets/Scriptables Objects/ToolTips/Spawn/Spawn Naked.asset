@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d5c9b36cc98d724088e5b5a44a171d6, type: 3}
+  m_Name: Spawn Naked
+  m_EditorClassIdentifier: 
+  _type: 4
+  _name: Naked
+  _description: Basic military unit.
+  _buildingData: {fileID: 0}
+  _data: {fileID: 11400000, guid: be317d5903b8baf4fa60812b492ab4a9, type: 2}
