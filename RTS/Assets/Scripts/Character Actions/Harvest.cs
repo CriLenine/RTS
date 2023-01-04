@@ -55,7 +55,7 @@ public class Harvest : Action
         Vector2Int? nextCoordsToHarvest = _resource.GetTileToHarvest(_character.Coords, _attractionPoint);
         if (nextCoordsToHarvest != null)
         {
-            _duration = _resource.Data.HarvestingTime / 0.025f;
+            _duration = _resource.Data.HarvestingTime / _character.Data.HarvestingSpeed / 0.025f;
             _coords = nextCoordsToHarvest.Value;
             _isHarvesting = true;
             return false;
