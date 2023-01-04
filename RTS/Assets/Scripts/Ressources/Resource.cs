@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public enum ResourceType
 {
@@ -71,17 +70,20 @@ public abstract class Resource : MonoBehaviour
 
     public void Clear() => _itemsNHarvested?.Clear();
 
-    public Vector2Int GetFirst() => new List<Vector2Int>(_itemsNHarvested.Keys)[0];
-
     /// <summary>
     /// Called when a tile is harvested. Executes the needed operations on the tile.
     /// </summary>
     /// <param name="coords">The coords of the harvested tile</param>
-    public abstract void OnHarvestedTile(Vector2Int coords);
+    public abstract void OnHarvestedTile(Vector2Int coords, int harvestedAmount, bool tileDepleted);
 
     public void Init()
     {
         CurrentAmount = new Amount(Data.Type, _itemsNHarvested.Count);
+    }
+
+    public Vector2Int GetClosest(Vector2Int characterCoords)
+    {
+        return TileMapManager.FindClosestCoords(_itemsNHarvested.Keys.ToList(), characterCoords);
     }
 
     ///<summary>Called when a new resource tile is selected to be harvested.</summary>
@@ -94,35 +96,6 @@ public abstract class Resource : MonoBehaviour
             Debug.Log("The pathfinding to the next tile failed.");
 
         return destinationTile?.Coords;
-        #region OldFunction
-        /*
-        List<Vector2Int> availableTiles = new List<Vector2Int>();
-        //Check all the outlines around the tree
-        for (int outline = 1; outline <= 5; ++outline)
-        {
-            for (int i = -outline; i <= outline; ++i)
-            {
-                for (int j = -outline; j <= outline; ++j)
-                {
-                    if (i != -outline && i != outline && j != -outline && j != outline)
-                        continue;
-                    Vector2Int tileCoords = resourceCoords + new Vector2Int(i, j);
-                    if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(performer) == true
-                        && TileMapManager.FindPath(performer, harvesterCoords, tileCoords)?.Count > 0
-                        && IsValidHarvestPosition(tileCoords))
-                        availableTiles.Add(tileCoords);
-                }
-            }
-
-            //If we found at least one candidate
-            if (availableTiles.Count > 0)
-                return FindClosestCoords(availableTiles, resourceCoords);
-        }
-
-        Debug.Log("No free tile found !");
-        return resourceCoords;
-        */
-        #endregion
     }
 
     /// <summary>
@@ -168,13 +141,13 @@ public abstract class Resource : MonoBehaviour
         return null;
     }
 
-    public void HarvestTile(Vector2Int lastHarvested)
+    public void HarvestTile(Vector2Int lastHarvested, int harvestedAmount)
     {
         if (_itemsNHarvested.ContainsKey(lastHarvested))
         {
-            OnHarvestedTile(lastHarvested);
-            if (++_itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile)
-                _itemsNHarvested.Remove(lastHarvested);
+            int trueHarvestedAmount = Mathf.Min(harvestedAmount, Data.NMaxHarvestPerTile - _itemsNHarvested[lastHarvested]);
+            _itemsNHarvested[lastHarvested] += harvestedAmount;
+            OnHarvestedTile(lastHarvested, trueHarvestedAmount, _itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile);
         }
     }
 

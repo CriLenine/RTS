@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Aggregate
   m_EditorClassIdentifier: 
   _type: 0
-  _amount: 0
   _harvestingTime: 0.5
   _amountPerHarvest: 1
-  _nMaxHarvestPerTile: 3
+  _nMaxHarvestPerTile: 10
