@@ -111,8 +111,7 @@ public class Building : TickedBehaviour, IDamageable
 
         _healthBarTransform.transform.position += new Vector3(0, .5f * scale);
 
-        _currentHealth = MaxHealth;
-        HealthBar.SetHealth(1);
+       
 
         _completedBuildTicks = 0;
         _buildComplete = false;
@@ -167,8 +166,8 @@ public class Building : TickedBehaviour, IDamageable
                 if (QueuedSpawnCharacters.Count == 0 && SelectionManager.SelectedBuilding == this)
                     HUDManager.UpdateSpawnPreview();
 
-                NetworkManager.Input(TickInput.Spawn((int)OnGoingSpawnCharacterData.Type, ID, _rallyPoint));
-
+                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.Type, _rallyPoint);
+                
                 OnGoingSpawnCharacterData = null;
             }
         }
@@ -191,6 +190,11 @@ public class Building : TickedBehaviour, IDamageable
             return true;
 
         _completedBuildTicks += completionAmount;
+
+        //Setting health
+        _currentHealth = Mathf.RoundToInt(MaxHealth * BuildCompletionRatio);
+        HealthBar.SetHealth(BuildCompletionRatio);
+        //
 
         if (BuildCompletionRatio >= 1f)
         {
@@ -270,20 +274,21 @@ public class Building : TickedBehaviour, IDamageable
     public Vector2Int GetClosestOutlinePosition(Character character)
     {
         List<Vector2Int> availableTiles = new List<Vector2Int>();
-        for (int x = Coords.x - 1; x <= Coords.x + Data.Size; x += Data.Size + 1)
+        for (int x = Coords.x - 1; x <= Coords.x + Data.Size; x ++)
         {
-            for (int y = Coords.y - 1; y <= Coords.y + Data.Size; y += Data.Size + 1)
+            for (int y = Coords.y - 1; y <= Coords.y + Data.Size; y ++)
             {
+                if (x != Coords.x - 1 && x != Coords.x + Data.Size && y != Coords.y - 1 && y != Coords.y + Data.Size) continue;
+
                 Vector2Int tileCoords = new Vector2Int(x, y);
 
                 if (TileMapManager.GetLogicalTile(tileCoords)?.IsFree(character.Performer) == true
                     && TileMapManager.FindPath(character.Performer, character.Coords, tileCoords)?.Count > 0)
                     availableTiles.Add(tileCoords);
             }
-
-            if (availableTiles.Count > 0)
-                return TileMapManager.FindClosestCoords(availableTiles, character.Coords);
         }
+        if (availableTiles.Count > 0)
+            return TileMapManager.FindClosestCoords(availableTiles, character.Coords);
 
         Debug.LogError("Cannot find a valid outline tile");
         return character.Coords;
@@ -305,16 +310,27 @@ public class Building : TickedBehaviour, IDamageable
         _rallyPoint = newRallyPoint;
     }
 
-    public void EnqueueSpawningCharas(CharacterData data)
+    public void EnqueueSpawningCharas(CharacterData data) // BeforeNetworking
     {
-        QueuedSpawnCharacters.Add(data);
-        HUDManager.UpdateSpawnPreview();
+        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID));
     }
 
-    public void CancelSpawn(int index)
+    public void QueueSpawn(Character.Type charaType) // After networking
     {
-        foreach(Resource.Amount cost in QueuedSpawnCharacters[index].Cost)
-            GameManager.AddResource(cost.Type, cost.Value, NetworkManager.Me);
+        QueuedSpawnCharacters.Add(DataManager.GetCharacterData(charaType));
+
+        if (Performer != NetworkManager.Me) return;
+
+        HUDManager.UpdateSpawnPreview();
+    }
+    public void CancelSpawn(int index)// BeforeNetworking
+    {
+        NetworkManager.Input(TickInput.UnqueueSpawn(index, ID));  
+    }
+    public void UnqueueSpawn(int index)// After networking
+    {
+        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].Cost)
+            GameManager.AddResource(cost.Type, cost.Value, Performer);
 
         if (index == 0)
         {
@@ -322,8 +338,10 @@ public class Building : TickedBehaviour, IDamageable
             OnGoingSpawn = false;
             OnGoingSpawnCharacterData = null;
         }
-
         QueuedSpawnCharacters.RemoveAt(index);
+
+
+        if (Performer != NetworkManager.Me) return;
         HUDManager.UpdateSpawnPreview();
     }
 

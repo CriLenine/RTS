@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
     private HashSet<TickedBehaviour> _entitiesToDestroy = new HashSet<TickedBehaviour>();
+    private HashSet<(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)> _characterToSpawn = new HashSet<(int, int, Character.Type, Vector2)>();
 
     private Dictionary<ResourceType, int[]> _playerResources = new Dictionary<ResourceType, int[]>();
     public static Dictionary<ResourceType, int[]> PlayerResources => _instance._playerResources;
@@ -112,8 +113,20 @@ public class GameManager : MonoBehaviour
 
             switch (input.Type)
             {
-                case InputType.Spawn:
-                    CreateCharacter(input.Performer, input.ID, input.Prefab, input.Position);
+                case InputType.QueueSpawn:
+                    if (!IsPerformerAbleToSpawn(input.Performer, input.Prefab)) break;
+
+                    if(_instance._entities[input.ID] is Building building)
+                        building.QueueSpawn((Character.Type)input.Prefab);
+
+                    break;
+
+                case InputType.UnqueueSpawn:
+                    if (!IsPerformerAbleToSpawn(input.Performer, input.Prefab)) break;
+
+                    if (_instance._entities[input.ID] is Building spawner)
+                        spawner.UnqueueSpawn(input.Prefab);
+
                     break;
 
                 case InputType.Stop:
@@ -125,6 +138,8 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.NewBuild:
+                    if (!IsPerformerAbleToBuild(input.Performer,input.Prefab)) break;
+
                     int newBuildingID = CreateBuilding(input.Performer, input.Prefab, input.Position);
                     MoveCharacters(input.Performer, Vector2.zero, newBuildingID, input.Targets, MoveType.ToBuilding);
                     AssignBuild(newBuildingID, input.Targets);
@@ -190,6 +205,19 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
+        #region Compute Hash
+
+        Hash128 hash = new Hash128();
+
+        foreach (TickedBehaviour entity in _instance._entities)
+        {
+            entity.Tick();
+
+            hash.Append(entity.GetHash128().GetHashCode());
+        }
+
+        #endregion
+
         #region Destroy Pending Entities
 
         foreach (TickedBehaviour entity in _instance._entitiesToDestroy)
@@ -236,20 +264,47 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
-        #region Compute Hash
+        #region Spawn Pending Entitie
 
-        Hash128 hash = new Hash128();
-
-        foreach (TickedBehaviour entity in _instance._entities)
+        foreach(var (performer, spawnerID, type, rallyPoint) in _instance._characterToSpawn)
         {
-            entity.Tick();
-
-            hash.Append(entity.GetHash128().GetHashCode());
+            CreateCharacter(performer, spawnerID, (int)type, rallyPoint);
         }
+
+        if (_instance._characterToSpawn.Count > 0)
+        {
+            HUDManager.UpdateHUD();
+            HUDManager.UpdateHousing();
+            ToolTipManager.HideToolTip();
+        }
+
+        _instance._characterToSpawn.Clear();
 
         #endregion
 
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
+    }
+
+    private static bool IsPerformerAbleToBuild(int performer, int buildType)
+    {
+        var ressourcesCost = DataManager.GetBuildingData((Building.Type)buildType).Cost;
+
+        foreach (var ressourceCost in ressourcesCost)
+            if (PlayerResources[ressourceCost.Type][performer] < ressourceCost.Value)
+                return false;
+
+        return true;
+    }
+
+    private static bool IsPerformerAbleToSpawn(int performer, int charaType)
+    {
+        var charasCost = DataManager.GetCharacterData((Character.Type)charaType).Cost;
+
+        foreach (var charaCost in charasCost)
+            if (PlayerResources[charaCost.Type][performer] < charaCost.Value)
+                return false;
+
+        return true;
     }
 
     #region GamePlay Logic
@@ -301,19 +356,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private static Dictionary<List<Character>, List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector2 position, int[] targets)
+    private static Dictionary<List<Character>, List<Vector2>> RetrieveGroupsAndPathfindings(int performer, TickedBehaviour target, int[] charasID)
     {
         Dictionary<List<Character>, List<Vector2>> output = new();
         List<Character> characters = new();
+        Vector3 position;
 
-        for (int i = 0; i < targets.Length; i++)
-            characters.Add((Character)_instance._entities[targets[i]]);
+        for (int i = 0; i < charasID.Length; i++)
+            characters.Add((Character)_instance._entities[charasID[i]]);
 
         List<List<Character>> groups = GroupCreator.MakeGroups(performer, characters.ToArray());
 
         foreach (List<Character> group in groups)
         {
+            position = target is Building building ? TileMapManager.TilemapCoordsToWorld(building.GetClosestOutlinePosition(group[0])) : target.transform.position;
             output.Add(group, LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(position)));
+        }
+        return output;
+    }
+    private static Dictionary<List<Character>, List<Vector2>> RetrieveGroupsAndPathfindings(int performer, Vector3 targetPos, int[] charasID)
+    {
+        Dictionary<List<Character>, List<Vector2>> output = new();
+        List<Character> characters = new();
+
+        for (int i = 0; i < charasID.Length; i++)
+            characters.Add((Character)_instance._entities[charasID[i]]);
+
+        List<List<Character>> groups = GroupCreator.MakeGroups(performer, characters.ToArray());
+
+        foreach (List<Character> group in groups)
+        {
+            output.Add(group, LocomotionManager.RetrieveWayPoints(performer, group[0], TileMapManager.WorldToTilemapCoords(targetPos)));
         }
         return output;
     }
@@ -323,20 +396,18 @@ public class GameManager : MonoBehaviour
     #region Attack methods
     private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
     {
-        if (target is Building building)
-            position = TileMapManager.GetClosestPosAroundBuilding(building, _instance._entities[attackers[0]] as Character);
-
-        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, position, attackers);
+        Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, target, attackers);
         foreach (List<Character> group in groupsAndPathfindings.Keys)
         {
             if (groupsAndPathfindings[group]?.Count > 0 == true)
             {
+
                 groupsAndPathfindings[group][^1] = position;
 
                 for (int i = 0; i < group.Count; ++i)
                 {
                     group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group], target));
-                    group[i].AddAction(new Attack(group[i], target, position));
+                    group[i].AddAction(new Attack(group[i], target, groupsAndPathfindings[group][^1]));
                 }
             }
             else
@@ -482,6 +553,9 @@ public class GameManager : MonoBehaviour
 
         building.SetPosition(position);
 
+        if(data.CanSpawnUnits)
+            building.SetRallyPoint(position + new Vector2(-1f, 1f));
+
         if (autoComplete)
             building.CompleteBuild(building.Data.RequiredBuildTicks);
 
@@ -533,6 +607,10 @@ public class GameManager : MonoBehaviour
         _instance._myBuildings.Clear();
     }
 
+    public static void AddEntity(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)
+    {
+        _instance._characterToSpawn.Add((performer,spawnerID,type,rallyPoint));
+    }
     #endregion
 
     public static void UpdateHousing(int delta)
@@ -544,7 +622,6 @@ public class GameManager : MonoBehaviour
     #region Debug
 
     private bool _simulateWrongHash = false;
-
     public readonly static Color[] Colors = { new Color(1f, 0f, 0f), new Color(0f, 1f, 0f), new Color(0f, 0f, 1f), new Color(1f, 1f, 0f), new Color(1f, 0f, 1f), new Color(0f, 1f, 1f), new Color(0f, 0f, 0f), new Color(0.5019607843137255f, 0f, 0f), new Color(0f, 0.5019607843137255f, 0f), new Color(0f, 0f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0f), new Color(0.5019607843137255f, 0f, 0.5019607843137255f), new Color(0f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.7529411764705882f, 0f, 0f), new Color(0f, 0.7529411764705882f, 0f), new Color(0f, 0f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0f), new Color(0.7529411764705882f, 0f, 0.7529411764705882f), new Color(0f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.25098039215686274f, 0f, 0f), new Color(0f, 0.25098039215686274f, 0f), new Color(0f, 0f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0f), new Color(0.25098039215686274f, 0f, 0.25098039215686274f), new Color(0f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.12549019607843137f, 0f, 0f), new Color(0f, 0.12549019607843137f, 0f), new Color(0f, 0f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0f), new Color(0.12549019607843137f, 0f, 0.12549019607843137f), new Color(0f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.3764705882352941f, 0f, 0f), new Color(0f, 0.3764705882352941f, 0f), new Color(0f, 0f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0f), new Color(0.3764705882352941f, 0f, 0.3764705882352941f), new Color(0f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.6274509803921569f, 0f, 0f), new Color(0f, 0.6274509803921569f, 0f), new Color(0f, 0f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0f), new Color(0.6274509803921569f, 0f, 0.6274509803921569f), new Color(0f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.8784313725490196f, 0f, 0f), new Color(0f, 0.8784313725490196f, 0f), new Color(0f, 0f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0f), new Color(0.8784313725490196f, 0f, 0.8784313725490196f), new Color(0f, 0.8784313725490196f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0.8784313725490196f) };
 
     private void OnDrawGizmos()

@@ -9,11 +9,15 @@ public class Character : TickedBehaviour, IDamageable
     {
         Peon,
         Naked,
+        Bowman,
+        Paladin,
         All
     }
 
     public Action CurrentAction { get; private set; }
     private Queue<Action> _actions = new Queue<Action>();
+
+    private TickedBehaviour _currentTarget = null;
 
     [Separator("Base Data")]
     [Space]
@@ -56,6 +60,9 @@ public class Character : TickedBehaviour, IDamageable
     private bool _isAgressed = false;
     private bool _isGuardingPosition = false;
 
+    private bool _isShooting = false;
+    private GameObject _projectile;
+    private float _projectileSpeed;
     public override void InitData<T>(T data) 
     {
         _data = data as CharacterData;
@@ -112,10 +119,27 @@ public class Character : TickedBehaviour, IDamageable
 
     private void UpdateAnimation()
     {
-        if (CurrentAction is null && _currentHealth > 0)
-            _animator.Play("Idle");
-        else if (CurrentAction is Move)
+        if (CurrentAction is Move)
             _animator.Play("Walk");
+        else if (_currentHealth > 0 || CurrentAction is null)
+            _animator.Play("Idle");
+
+        if (_isShooting) //shootingAnimation
+        {
+            if (_currentTarget == null || (_currentTarget.transform.position-_projectile.transform.position).magnitude < 0.1f)
+            {
+                if (_projectile != null)
+                    Destroy(_projectile);
+
+                _isShooting = false;
+                return;
+            }
+
+            _projectile.transform.right = _currentTarget.transform.position - _projectile.transform.position;
+            Vector2 movement = Vector2.MoveTowards(_projectile.transform.position, _currentTarget.transform.position, _projectileSpeed * 0.1f);
+
+            _projectile.transform.position = movement;
+        }
     }
 
     public void Select()
@@ -251,7 +275,16 @@ public class Character : TickedBehaviour, IDamageable
         HarvestedResource = harvestedResource;
     }
 
-    public void BeginWatch() => _isGuardingPosition = true;
+    public void SetTarget(TickedBehaviour target) => _currentTarget = target;
+
+    public void BeginWatch() => _isWatching = true;
+    public void Shoot(GameObject projectile, float projectileSpeed)
+    {
+        _isShooting = true;
+        _projectile = projectile;
+        _projectileSpeed = projectileSpeed;
+    }
+
 
     private void OnMouseOver()
     {
