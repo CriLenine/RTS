@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f171d31eb10475543af23df799f0129b, type: 3}
+  m_Name: Paladin
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1340314902019757624, guid: 35c5d689ab54d084788c40ac80704c47, type: 3}
+        m_TargetAssemblyTypeName: ActionsManager, Assembly-CSharp
+        m_MethodName: QueueUnitSpawn
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000}
+          m_ObjectArgumentAssemblyTypeName: CharacterData, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _type: 3
+  _subType: 1
+  _spawnTicks: 175
+  _cost:
+  - _type: 0
+    _value: 60
+  - _type: 0
+    _value: 70
+  _icon: {fileID: 21300000, guid: 242105fce5414db4aabce715c5bf75c0, type: 3}
+  _color: {r: 0.3490566, g: 0.0115254605, b: 0.015009328, a: 1}
+  _toolTip: {fileID: 11400000, guid: 1293e4fe5767fec42b91a20845e961c0, type: 2}
+  _selectionToolTip: {fileID: 11400000, guid: 233fa2e953834a148a8b2c17a56f5dab, type: 2}
+  _animator: {fileID: 9100000, guid: 46f931830b583bb4d975b17a7f0062de, type: 2}
+  _characterSprite: {fileID: -1052263965, guid: 598942ec11a525648b2ddc5691194af0, type: 3}
+  _maxHealth: 250
+  _attackDamage: 40
+  _attackRange: 0.5
+  _attackSpeed: 1
+  _meleeArmor: 20
+  _rangeArmor: 20
+  _weapon: {fileID: 21300000, guid: 768846541852ee248bc59a1754ce94bf, type: 3}
+  _canHarvestResources: 0
+  _maxCarriedResources: 3
+  _amountGetPerHarvest: 1
+  _harvestingSpeed: 0
+  _canBuild: 0
+  _buildEfficiencyMultiplier: 1

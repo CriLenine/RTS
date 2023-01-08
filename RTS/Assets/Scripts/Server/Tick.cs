@@ -23,14 +23,22 @@ public partial class NetworkManager
 
                 switch (type)
                 {
-                    case InputType.Spawn:
+                    case InputType.QueueSpawn:
                         {
                             int spawnerID = message.GetInt(i++);
                             int prefab = message.GetInt(i++);
 
-                            Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
+                            inputs.Add(TickInput.QueueSpawn(prefab,spawnerID, performer));
 
-                            inputs.Add(TickInput.Spawn(prefab,spawnerID, position, performer));
+                            break;
+                        }
+
+                    case InputType.UnqueueSpawn:
+                        {
+                            int spawnerID = message.GetInt(i++);
+                            int prefab = message.GetInt(i++);
+
+                            inputs.Add(TickInput.UnqueueSpawn(prefab, spawnerID, performer));
 
                             break;
                         }

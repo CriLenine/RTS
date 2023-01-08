@@ -39,15 +39,18 @@ MonoBehaviour:
   _color: {r: 0.65882355, g: 0.15686275, b: 0.12156863, a: 1}
   _toolTip: {fileID: 11400000, guid: e52374740d2c5dc49a5ae8e18389d887, type: 2}
   _selectionToolTip: {fileID: 11400000, guid: e0d66d76c3bf6e24ea6826ac83ccb3b4, type: 2}
+  _animator: {fileID: 0}
   _characterSprite: {fileID: 1219476047, guid: d7814ef2a39d44448b058b1508661bb3, type: 3}
   _maxHealth: 200
   _attackDamage: 50
-  _attackRange: 5
+  _attackRange: 1
   _attackSpeed: 0.5
   _meleeArmor: 10
   _rangeArmor: 10
   _weapon: {fileID: 21300000, guid: 768846541852ee248bc59a1754ce94bf, type: 3}
   _canHarvestResources: 0
   _maxCarriedResources: 0
+  _amountGetPerHarvest: 0
+  _harvestingSpeed: 0
   _canBuild: 0
   _buildEfficiencyMultiplier: 0

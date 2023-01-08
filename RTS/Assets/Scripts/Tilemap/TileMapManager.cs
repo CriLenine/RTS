@@ -233,22 +233,6 @@ public class TileMapManager : MonoBehaviour
         UpdateTilesState(buildingMin, buildingMax, TileState.Free);
     }
 
-    public static Vector2 GetClosestPosAroundBuilding(Building building,Character character)
-    {
-        Vector2Int pos = WorldToTilemapCoords(building.transform.position);
-        Vector2Int direction = (character.Coords - pos);
-
-        Dictionary<Vector2Int, LogicalTile> tiles = _instance._tiles;
-
-        while(!tiles[pos].IsFree(building.Performer))
-        {
-            pos.x += direction.x ==0 ? 0 : (int) Mathf.Sign(direction.x);
-            pos.y += direction.y == 0 ? 0 : (int) Mathf.Sign(direction.y);
-        }
-
-        return TilemapCoordsToWorld(pos);
-    }
-
     #endregion
 
     #region Displacement

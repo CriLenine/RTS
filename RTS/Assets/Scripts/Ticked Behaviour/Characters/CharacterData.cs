@@ -115,10 +115,12 @@ public class CharacterData : TickedBehaviorData
     private int _maxCarriedResources;
     public int MaxCarriedResources => _maxCarriedResources;
 
+    [ConditionalField(nameof(_canHarvestResources))]
     [SerializeField]
     private int _amountGetPerHarvest;
     public int AmountGetPerHarvest => _amountGetPerHarvest;
 
+    [ConditionalField(nameof(_canHarvestResources))]
     [SerializeField]
     private int _harvestingSpeed;
     public int HarvestingSpeed => _harvestingSpeed;

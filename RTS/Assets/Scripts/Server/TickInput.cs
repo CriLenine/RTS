@@ -2,7 +2,8 @@ using UnityEngine;
 
 public enum InputType
 {
-    Spawn,
+    QueueSpawn,
+    UnqueueSpawn,
     Move,
     NewBuild,
     Build,
@@ -28,16 +29,27 @@ public class TickInput
 
     public Vector2 Position;
 
-    public static TickInput Spawn(int prefab, int spawnerID, Vector2 position, int performer = 0)
+    public static TickInput QueueSpawn(int prefab, int spawnerID, int performer = 0)
     {
         return new TickInput()
         {
-            Type = InputType.Spawn,
+            Type = InputType.QueueSpawn,
 
             ID = spawnerID,
             Prefab = prefab,
 
-            Position = position,
+            Performer = performer
+        };
+    }
+    public static TickInput UnqueueSpawn(int prefab, int spawnerID, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.UnqueueSpawn,
+
+            ID = spawnerID,
+            Prefab = prefab,
+
             Performer = performer
         };
     }

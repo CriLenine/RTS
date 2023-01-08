@@ -28,5 +28,5 @@ MonoBehaviour:
         _IsAttached: 0
         _Cue:
           _Clips:
-          - {fileID: 8300000, guid: 8ebcb6234d419344daa712ba65bb3798, type: 3}
+          - {fileID: 8300000, guid: a37f44cbf8c2a7443a3c361efa2f233a, type: 3}
           _Parameters: {fileID: 0}

@@ -51,6 +51,10 @@ MonoBehaviour:
     ButtonPosition: {x: 0, y: 0}
   - ButtonData: {fileID: 11400000, guid: be317d5903b8baf4fa60812b492ab4a9, type: 2}
     ButtonPosition: {x: 1, y: 0}
+  - ButtonData: {fileID: 11400000, guid: 737c63a2a8a4ba545a15fa03755665b4, type: 2}
+    ButtonPosition: {x: 2, y: 0}
+  - ButtonData: {fileID: 11400000, guid: 0219a9761ee5a4b43bd17cf31c9e1d3e, type: 2}
+    ButtonPosition: {x: 3, y: 0}
   - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
     ButtonPosition: {x: 4, y: 2}
   CanSpawnUnits: 1
