@@ -32,6 +32,8 @@ public class Attack : Action
 
         _posToAttack = target.transform.position;
         _charaTransform = character.transform;
+
+        character.SetTarget(target);
     }
     public Attack(Character character, TickedBehaviour target,Vector2 posToAttack, bool isOrder = true) : base(character)
     {
@@ -45,9 +47,11 @@ public class Attack : Action
         _attackSpeed = character.Data.AttackSpeed;
         _isOrder = isOrder;
 
-        
+
         _posToAttack = posToAttack;
         _charaTransform = character.transform;
+
+        character.SetTarget(target);
     }
 
     protected override bool Update()
@@ -66,7 +70,10 @@ public class Attack : Action
 
         if(_attackSpeedTimer == 0)
         {
-            _character.Animator.Play("Attack");
+            if (_character.Data.Type is Character.Type.Bowman)
+                GameEventsManager.PlayEvent("ShootArrow",_character.gameObject);
+            else
+                GameEventsManager.PlayEvent("AttackSword", _character.gameObject);
 
             if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
             {
