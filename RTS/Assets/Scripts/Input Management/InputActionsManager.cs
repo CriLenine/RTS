@@ -7,7 +7,8 @@ public enum GameState
     Guard,
     CharacterSelection,
     BuildingSelection,
-    Blueprint
+    Blueprint,
+    Attack
 }
 
 public class InputActionsManager : MonoBehaviour
@@ -86,6 +87,10 @@ public class InputActionsManager : MonoBehaviour
                 SelectionManager.InitSelection();
                 _selectionInitiated = true;
                 break;
+
+            case GameState.Attack:
+                ActionsManager.GuardPosition();
+                break;
         }
     }
 
@@ -119,6 +124,10 @@ public class InputActionsManager : MonoBehaviour
 
             case GameState.Blueprint:
                 Blueprint.CancelBuildingBlueprint();
+                break;
+
+            case GameState.Attack:
+                ActionsManager.CancelActions();
                 break;
         }
     }

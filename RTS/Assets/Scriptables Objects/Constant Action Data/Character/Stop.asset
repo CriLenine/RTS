@@ -17,7 +17,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1340314902019757624, guid: 35c5d689ab54d084788c40ac80704c47, type: 3}
         m_TargetAssemblyTypeName: ActionsManager, Assembly-CSharp
-        m_MethodName: Stop
+        m_MethodName: StopTrigger
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -28,6 +28,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   ButtonType: 0
+  IsTogglable: 0
   HoldTime: 0
   Icon: {fileID: 21300000, guid: 0bb3693961bb2804a9429a7980246ab3, type: 3}
   Color: {r: 1, g: 1, b: 1, a: 1}

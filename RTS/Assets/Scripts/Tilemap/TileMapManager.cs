@@ -192,6 +192,7 @@ public class TileMapManager : MonoBehaviour
 
                 if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || /*!tile.IsFree(NetworkManager.Me)*/ !(tile.State == TileState.Free))
                     return (_instance._hoveredTilePos, _instance._previousAvailability);
+
             }
 
         // Else the building can be placed at this location.
@@ -224,7 +225,7 @@ public class TileMapManager : MonoBehaviour
     public static void RemoveBuilding(Building building)
     {
         Vector2Int bottomLeftCorner = building.Coords;
-        int size = building.Data.Size;
+        int size = DataManager.GetBuildingData(building.Data.Type).Size;
 
         //Set building tiles
         Vector2Int buildingMin = bottomLeftCorner;

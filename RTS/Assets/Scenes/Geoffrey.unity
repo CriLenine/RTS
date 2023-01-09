@@ -2461,7 +2461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _debug: 0
-  lerp: 0.2
+  lerp: 0.5
   from: {x: 0, y: 0}
   directions: []
   results: 
@@ -2861,6 +2861,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fd169743d7f6eba429d54a6f75773a32, type: 2}
   - {fileID: 11400000, guid: b13ad1673a560b846afcfd130adaf585, type: 2}
   - {fileID: 11400000, guid: a9ac352e61130cd4f8a06a9882e975d0, type: 2}
+  - {fileID: 11400000, guid: 1bc072c420de4b0469305e58b30ec639, type: 2}
+  - {fileID: 11400000, guid: da9504068a7d3944dbf93de210f45bcc, type: 2}
   _eventEmitter: {fileID: 1977431072}
 --- !u!4 &852083073 stripped
 Transform:
@@ -4641,6 +4643,10 @@ PrefabInstance:
       propertyPath: _time
       value: 
       objectReference: {fileID: 1833737296}
+    - target: {fileID: 7456065522055592041, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _minimap
+      value: 
+      objectReference: {fileID: 1833737307}
     - target: {fileID: 7456065522055592041, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: _selection
       value: 
@@ -6487,6 +6493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96c6d192a525ff4abf8d4661b430ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _tree: {fileID: 11400000, guid: 363dafcd4586ced42a519759217fe820, type: 2}
 --- !u!114 &1103859243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39160,6 +39167,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HUDSection: {fileID: 953656766}
   _time: {fileID: 467694306}
+--- !u!114 &1833737307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891726787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1c76a14504f2d7419927b81500b3d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HUDSection: {fileID: 2082196492}
 --- !u!224 &1849778838 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4292545948167460168, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}

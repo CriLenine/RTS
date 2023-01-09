@@ -231,26 +231,25 @@ public class GameManager : MonoBehaviour
             _instance._entities.Remove(ID);
             _instance._myEntities.Remove(ID);
 
-            if (entity is Character)
+            if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
                 _instance._myCharacters.Remove(ID);
                 QuadTreeNode.RemoveCharacter(ID);
-            }
 
-            if (entity is Building building)
+                GameEventsManager.PlayEvent("CharacterDeath", character.gameObject);
+            }
+            else if (entity is Building building)
             {
                 _instance._buildings.Remove(ID);
                 _instance._myBuildings.Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
 
-                if (building.Data.Type == Building.Type.HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
-                    _instance.GameOver();
+                GameEventsManager.PlayEvent("BuildingDestruction", building.gameObject);
             }
 
             Destroy(entity);
-            Destroy(entity.gameObject, 2);
 
             VictoryManager.CheckVictoryStatus();
         }

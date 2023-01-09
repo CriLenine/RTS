@@ -201,4 +201,9 @@ public class HUDManager : MonoBehaviour
         _instance._time.StartTimer();
         _instance._time.Show();
     }
+
+    public static void UpdateActionButtons()
+    {
+        _instance._actions.UnToggleActionButtons();
+    }
 }

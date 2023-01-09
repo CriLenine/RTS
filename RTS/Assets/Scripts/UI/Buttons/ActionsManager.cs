@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,7 +7,7 @@ public class ActionsManager : MonoBehaviour
 {
     private static ActionsManager _instance;
 
-    private ActionButton _currentButton;
+    private bool _isAttackToggled = false;
 
     private void Awake()
     {
@@ -20,13 +21,20 @@ public class ActionsManager : MonoBehaviour
     {
         GameEventsManager.PlayEvent("UIClick");
     }
-    public static void OnClickAttack(/*ActionButton button*/)
+    public static void AttackToggle()
     {
         OnClickCommon();
 
-        //if (!button.ToogleButton()) return;
-
-        //_instance._currentButton = button;
+        if(_instance._isAttackToggled)
+        {
+            CancelActions();
+            _instance._isAttackToggled = false;
+        }
+        else
+        {
+            InputActionsManager.UpdateGameState(GameState.Attack);
+            _instance._isAttackToggled = true;
+        }
     }
 
     public void Stop()
@@ -69,9 +77,34 @@ public class ActionsManager : MonoBehaviour
 
 
     #region Attack
-    public void GuardPosition()
+    public static void GuardPosition()
     {
-        InputActionsManager.UpdateGameState(GameState.Guard);
+        Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Collider2D collider = Physics2D.OverlapPoint(worldPoint);
+
+        if (collider == null)
+            return;
+
+        GameEventsManager.PlayEvent("UIConfirm");
+        if (collider.TryGetComponent(out TickedBehaviour entity) && entity.TryGetComponent(out IDamageable damageable)) //hit a tickedbehaviour damageable
+        {
+            if (SelectionManager.SelectedCharacters.Count > 0 && !GameManager.MyEntities.Contains(entity)) //selected characters && not my entity
+                NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds()));
+        }
+        else  // sinon hit le sol on y vas et on surveille (target id = -1)
+        {
+            if (SelectionManager.SelectedCharacters.Count > 0) //selected characters
+                NetworkManager.Input(TickInput.GuardPosition(worldPoint, SelectionManager.GetSelectedIds()));
+        }
+
+        CancelActions();
+        _instance._isAttackToggled = false;
+    }
+
+    internal static void CancelActions()
+    {
+        HUDManager.UpdateActionButtons();
+        InputActionsManager.UpdateGameState(GameState.None);
     }
     #endregion
 
