@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public enum ActionType
@@ -7,7 +9,7 @@ public enum ActionType
     Toogle
 }
 
-public class ActionButton : MonoBehaviour
+public class ActionButton : MonoBehaviour,IPointerClickHandler
 {
     [SerializeField]
     private Image _image;
@@ -22,6 +24,8 @@ public class ActionButton : MonoBehaviour
 
     private CharacterData _data;
 
+
+    private bool _isTogglable=false;
     private bool _isToggle = false;
 
     public void SetupButton(ButtonData data)
@@ -30,9 +34,10 @@ public class ActionButton : MonoBehaviour
         {
             _image.color = constantButtonData.Color;
             _image.sprite = constantButtonData.Icon;
-
             if (constantButtonData.ButtonType == ButtonType.Regular)
             {
+                _isTogglable = constantButtonData.IsTogglable;
+
                 if(_button == null)
                     _button = gameObject.AddComponent<Button>();
 
@@ -126,22 +131,27 @@ public class ActionButton : MonoBehaviour
         return true;
     }
 
-    public bool ToogleButton()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        //if (_isToogle)
-        //{
-        //    _isToogle = false;
-        //    _image.sprite = _custom.Sprite;
-        //}
-        //else
-        //{
-        //    _isToogle = true;
-        //    _image.sprite = _custom.ToogledSprite;
-        //}
+        if (!_isTogglable) return;
 
-        //return _isToogle;
-
-        return _isToggle;
+        if (_isToggle)
+        {
+            _isToggle = false;
+            _image.color = Color.white;
+        }
+        else
+        {
+            _isToggle = true;
+            _image.color = Color.gray;
+        }
     }
 
+    internal void UntoggleButton()
+    {
+        if (!_isToggle) return;
+
+        _isToggle = false;
+        _image.color = Color.white;
+    }
 }

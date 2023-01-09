@@ -103,4 +103,12 @@ public class Harvest : Action
         }
         return closestBuilding;
     }
+
+    public string GetHarvestAnimationName()
+    {
+        if (_resource.Data.Type == ResourceType.Stone || _resource.Data.Type == ResourceType.Gold)
+            return "Mine";
+        else
+            return "Chop";
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,7 +7,7 @@ public class ActionsManager : MonoBehaviour
 {
     private static ActionsManager _instance;
 
-    private ActionButton _currentButton;
+    private bool _isAttackToggled = false;
 
     private void Awake()
     {
@@ -20,18 +21,26 @@ public class ActionsManager : MonoBehaviour
     {
         GameEventsManager.PlayEvent("UIClick");
     }
-    public static void OnClickAttack(/*ActionButton button*/)
+    public static void AttackToggle()
     {
         OnClickCommon();
 
-        //if (!button.ToogleButton()) return;
-
-        //_instance._currentButton = button;
+        if(_instance._isAttackToggled)
+        {
+            CancelActions();
+            _instance._isAttackToggled = false;
+        }
+        else
+        {
+            InputActionsManager.UpdateGameState(GameState.Attack);
+            _instance._isAttackToggled = true;
+        }
     }
 
     public void Stop()
     {
-        // TODO
+        OnClickCommon();
+
     }
 
     public void MoveToggle()
@@ -70,8 +79,8 @@ public class ActionsManager : MonoBehaviour
     }
 
 
-    #region Attack
-    private static void Attack(InputAction.CallbackContext ctx)
+    #region Actions Logic
+    public static void Attack()
     {
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Collider2D collider = Physics2D.OverlapPoint(worldPoint);
@@ -91,7 +100,14 @@ public class ActionsManager : MonoBehaviour
                 NetworkManager.Input(TickInput.GuardPosition(worldPoint, SelectionManager.GetSelectedIds()));
         }
 
-        _instance._currentButton.ToogleButton();
+        CancelActions();
+        _instance._isAttackToggled = false;
+    }
+
+    internal static void CancelActions()
+    {
+        HUDManager.UpdateActionButtons();
+        InputActionsManager.UpdateGameState(GameState.None);
     }
     #endregion
 

@@ -114,7 +114,6 @@ public class Character : TickedBehaviour, IDamageable
             else
                 _isAgressed = _isAgressed && CheckSurrounding();
         }
-
         else if (CurrentAction.Perform())
         {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
@@ -125,12 +124,21 @@ public class Character : TickedBehaviour, IDamageable
 
     private void UpdateAnimation()
     {
+        if(Data.Type == Type.Peon)
+        {
+            if (CurrentAction is Build)
+                _animator.Play("Build");
+            else if (CurrentAction is Harvest harvest)
+                _animator.Play(harvest.GetHarvestAnimationName());
+        }
+
         if (CurrentAction is Move)
             _animator.Play("Walk");
-        else if (_currentHealth > 0 || CurrentAction is null)
+        else if (_currentHealth > 0 && CurrentAction is null)
             _animator.Play("Idle");
 
-        if (_isShooting) //shootingAnimation
+        //shootingAnimation
+        if (_isShooting)
         {
             if (_currentTarget == null || (_currentTarget.transform.position-_projectile.transform.position).magnitude < 0.1f)
             {

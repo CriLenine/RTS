@@ -171,4 +171,9 @@ public class HUDManager : MonoBehaviour
     {
         _instance._spawnPreview.UpdateSpawnPreview();
     }
+
+    public static void UpdateActionButtons()
+    {
+        _instance._actions.UnToggleActionButtons();
+    }
 }

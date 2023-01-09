@@ -219,14 +219,15 @@ public class GameManager : MonoBehaviour
             _instance._entities.Remove(ID);
             _instance._myEntities.Remove(ID);
 
-            if (entity is Character)
+            if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
                 _instance._myCharacters.Remove(ID);
                 QuadTreeNode.RemoveCharacter(ID);
-            }
 
-            if (entity is Building building)
+                GameEventsManager.PlayEvent("CharacterDeath", character.gameObject);
+            }
+            else if (entity is Building building)
             {
                 _instance._buildings.Remove(ID);
                 _instance._myBuildings.Remove(ID);
@@ -235,10 +236,11 @@ public class GameManager : MonoBehaviour
 
                 if (building.Data.Type == Building.Type.HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
                     _instance.GameOver();
+
+                GameEventsManager.PlayEvent("BuildingDestruction", building.gameObject);
             }
 
             Destroy(entity);
-            Destroy(entity.gameObject, 2);
         }
 
         if (_instance._entitiesToDestroy.Count > 0)
@@ -599,6 +601,7 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i+1, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
 
             CreateBuilding(i, (int)Building.Type.HeadQuarters, spawnPoint , true);
+            CreateBuilding(i, (int)Building.Type.Housing, spawnPoint + new Vector2(2f, 2f), true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);

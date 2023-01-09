@@ -6,7 +6,8 @@ public enum GameState
     None,
     CharacterSelection,
     BuildingSelection,
-    Blueprint
+    Blueprint,
+    Attack
 }
 
 public class InputActionsManager : MonoBehaviour
@@ -90,6 +91,10 @@ public class InputActionsManager : MonoBehaviour
             case GameState.Blueprint:
                 Blueprint.TryPlaceBuilding();
                 break;
+
+            case GameState.Attack:
+                ActionsManager.Attack();
+                break;
         }
     }
 
@@ -119,6 +124,10 @@ public class InputActionsManager : MonoBehaviour
 
             case GameState.Blueprint:
                 Blueprint.CancelBuildingBlueprint();
+                break;
+
+            case GameState.Attack:
+                ActionsManager.CancelActions();
                 break;
         }
     }
