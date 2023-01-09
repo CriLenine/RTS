@@ -33,4 +33,12 @@ public class HUDActions : HUD
         foreach (ActionButton buttonToReset in toReset)
             buttonToReset.ResetButton();
     }
+
+    public void UnToggleActionButtons()
+    {
+        foreach (ActionButton button in _actionButtons)
+        {
+            button.UntoggleButton();
+        }
+    }
 }

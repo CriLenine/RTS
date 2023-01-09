@@ -20,7 +20,7 @@ namespace RTS.Feedback
             Vector3 position = gameObject.transform.position;
 
 
-            ParticleSystem particleSystem = GameObject.Instantiate(_particleSystemPrefab, position, Quaternion.identity, gameObject.transform);
+            ParticleSystem particleSystem = GameObject.Instantiate(_particleSystemPrefab, position, Quaternion.identity);
 
             particleSystem.Play();
         }

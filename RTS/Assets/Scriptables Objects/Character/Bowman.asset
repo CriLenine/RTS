@@ -44,7 +44,7 @@ MonoBehaviour:
   _maxHealth: 125
   _attackDamage: 40
   _attackRange: 6
-  _attackSpeed: 0.5
+  _attackSpeed: 1
   _meleeArmor: 5
   _rangeArmor: 10
   _weapon: {fileID: 21300000, guid: 26c17d25d53f1f64ba94fbc2bb08fb33, type: 3}

@@ -192,6 +192,7 @@ public class TileMapManager : MonoBehaviour
 
                 if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || /*!tile.IsFree(NetworkManager.Me)*/ !(tile.State == TileState.Free))
                     return (_instance._hoveredTilePos, _instance._previousAvailability);
+
             }
 
         // Else the building can be placed at this location.

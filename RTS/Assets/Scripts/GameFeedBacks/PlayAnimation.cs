@@ -1,3 +1,4 @@
+using MyBox;
 using RTS.Feedback;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,11 +9,11 @@ using UnityEngine;
 public class PlayAnimation : GameFeedback
 {
     public bool isCharaAnimation = true;
-    [DrawIf("isCharaAnimation",true)]
+    [ConditionalField("isCharaAnimation",false,true)]
     [SerializeField] private string _charaAnimationName;
-    [DrawIf("isCharaAnimation", false)]
+    [ConditionalField("isCharaAnimation", false, false)]
     [SerializeField] private Animator _animator;
-    [DrawIf("isCharaAnimation", false)]
+    [ConditionalField("isCharaAnimation", false, false)]
     [SerializeField] private string _animationName;
     protected override void Execute(GameObject gameObject)
     {

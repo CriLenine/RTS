@@ -17,6 +17,9 @@ public class ConstantButtonData : ButtonData
 
     public ButtonType ButtonType;
 
+    [ConditionalField(nameof(ButtonType), false, ButtonType.Regular)]
+    public bool IsTogglable=false;
+
     [ConditionalField(nameof(ButtonType), false, ButtonType.LongClick)]
     public float HoldTime;
 
