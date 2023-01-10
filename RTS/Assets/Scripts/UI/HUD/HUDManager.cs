@@ -199,5 +199,6 @@ public class HUDManager : MonoBehaviour
     public static void StartTimer()
     {
         _instance._time.StartTimer();
+        _instance._time.Show();
     }
 }
