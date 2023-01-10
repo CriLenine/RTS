@@ -601,7 +601,6 @@ public class GameManager : MonoBehaviour
             CreateCharacter(i+1, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
 
             CreateBuilding(i, (int)Building.Type.HeadQuarters, spawnPoint , true);
-            CreateBuilding(i, (int)Building.Type.Housing, spawnPoint + new Vector2(2f, 2f), true);
 
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(spawnPoint);
