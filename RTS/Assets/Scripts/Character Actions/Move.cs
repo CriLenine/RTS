@@ -15,24 +15,32 @@ public class Move : Action
     private float thresholdIncrement = .05f;
     public float CompletionThreshold => defaultThreshold += thresholdIncrement;
 
+    public Vector2 LastDir;
+    public HashSet<float> TestedAngles = new HashSet<float>();
+    public float? LastAngle = null;
+
     #endregion
 
     public Vector2 Position => Positions[Index];
 
+    public Vector2 CharacterPosition => (Vector2)_character.transform.position;
     private Animator _animator;
+
+    public Vector2 Direction => Position - CharacterPosition;
 
     public Move(Character character, List<Vector2> positions) : base(character)
     {
         Positions = positions;
+
+        LastDir = Direction.normalized;
         _animator = character.Animator;
     }
 
     public Move(Character character, Vector2 position) : base(character)
     {
-        Positions = new List<Vector2>
-        {
-            position
-        };
+        Positions = new List<Vector2> { position };
+
+        LastDir = Direction.normalized;
         _animator = character.Animator;
     }
 
