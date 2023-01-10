@@ -403,7 +403,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < targets.Length; ++i)
         {
-            Character harvester = _instance._myEntities[targets[i]] as Character;
+            Character harvester = _instance._characters[targets[i]];
 
             Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, performer);
             if (harvestingCoords == null)
