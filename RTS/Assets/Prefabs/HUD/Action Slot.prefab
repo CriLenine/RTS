@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7758146038501096532}
   - component: {fileID: 979017454962203647}
   - component: {fileID: -2783067952345955918}
+  - component: {fileID: 6264965933391101559}
   m_Layer: 5
   m_Name: Action Slot
   m_TagString: Untagged
@@ -135,6 +136,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 0}
-  _button: {fileID: 0}
-  _longClickButton: {fileID: 0}
-  _buttonFill: {fileID: 0}
+--- !u!114 &6264965933391101559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3388052777063812353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab03be1b7794ed4f82307b61448b1f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elementType: 1
+  _pulsatingSprite: {fileID: 0}
+  _pulsatingImage: {fileID: 7758146038501096532}
+  _pulsatingLine: {fileID: 0}
+  _pulsePeriod: 1.5
+  _alphaRange:
+    Min: 0.2965642
+    Max: 1

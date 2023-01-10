@@ -30,6 +30,22 @@ public partial class NetworkManager : MonoBehaviour
     public static bool IsPlaying => Hosted && _instance._isPlaying;
     public static bool IsRunning => Hosted && _instance._isRunning;
 
+    public string[] Names
+    {
+        get
+        {
+            if (_room is null)
+                return null;
+
+            string[] names = new string[_room.Players.Count];
+
+            for (int i = 0; i < _room.Players.Count; ++i)
+                names[i] = _room.Players[i].Name;
+
+            return names;
+        }
+    }
+
     #endregion
 
     #region GUI
@@ -274,7 +290,10 @@ public partial class NetworkManager : MonoBehaviour
                     _id = message.GetInt(1);
                     _roomSize = message.GetInt(0);
 
-                    GameManager.Prepare();
+                    SetupManager.CompleteReset();
+                    SetupManager.SetupGame();
+
+                    VictoryManager.Init(_roomSize);
 
                     StartCoroutine(Loop());
 
@@ -321,6 +340,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.Stop:
+                Spread(message, input.Targets);
+
+                break;
+
             case InputType.Kill:
                 Spread(message, input.Targets);
 
@@ -353,8 +377,20 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.CancelConstruction:
+                message.Add(input.ID);
+
+                break;
+
             case InputType.Attack:
                 message.Add(input.ID, input.Position.x, input.Position.y);
+
+                Spread(message, input.Targets);
+
+                break;
+
+            case InputType.GuardPosition:
+                message.Add(input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);
 

@@ -128,6 +128,14 @@ public class SelectionManager : MonoBehaviour
         InputActionsManager.UpdateGameState(GameState.BuildingSelection);
     }
 
+    public static void UnselectBuilding()
+    {
+        SelectedBuilding?.Unselect();
+        SelectedBuilding = null;
+
+        InputActionsManager.UpdateGameState(GameState.None);
+    }
+
     public static void TestEntitySelection(TickedBehaviour entity)
     {
         if (entity is Character character)
@@ -143,10 +151,7 @@ public class SelectionManager : MonoBehaviour
     }
     public static void DeselectAll()
     {
-        if (SelectedBuilding != null)
-            SelectedBuilding.Unselect();
-
-        SelectedBuilding = null;
+        UnselectBuilding();
 
         foreach (Character character in _instance._allSelectedCharacters)
             character.Unselect();

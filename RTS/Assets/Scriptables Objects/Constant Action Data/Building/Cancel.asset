@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e60059c22e74b6f42b5dbce9126ab9ac, type: 3}
-  m_Name: Attack
+  m_Name: Cancel
   m_EditorClassIdentifier: 
   OnClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1340314902019757624, guid: 35c5d689ab54d084788c40ac80704c47, type: 3}
         m_TargetAssemblyTypeName: ActionsManager, Assembly-CSharp
-        m_MethodName: GuardPosition
+        m_MethodName: CancelBuildingConstruction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -28,7 +28,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   ButtonType: 0
-  HoldTime: 0
-  Icon: {fileID: 21300000, guid: 38d483c27e3ec17429685ff8b5a6eebc, type: 3}
+  HoldTime: 0.75
+  Icon: {fileID: 21300000, guid: 0bb3693961bb2804a9429a7980246ab3, type: 3}
   Color: {r: 1, g: 1, b: 1, a: 1}
-  ToolTip: {fileID: 11400000, guid: b23aaf46a1a2dee428bdb2060122385b, type: 2}
+  ToolTip: {fileID: 11400000, guid: 15eee45acd92e2a4aae6a0272c7af7ac, type: 2}

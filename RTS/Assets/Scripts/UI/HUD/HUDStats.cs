@@ -31,6 +31,15 @@ public class HUDStats : HUD
     [SerializeField]
     private GameObject _bottomSeparator;
 
+    [Space]
+    [Separator("Colors")]
+
+    [SerializeField]
+    private Color _allyColor;
+
+    [SerializeField]
+    private Color _enemyColor;
+
     private Character _character;
     private Building _building;
 
@@ -44,6 +53,7 @@ public class HUDStats : HUD
         CharacterData data = character.Data;
 
         _name.text = character.Data.Type.ToString();
+        _name.color = character.Performer == NetworkManager.Me ? _allyColor : _enemyColor;
 
         if (character.Data.SubType == SubType.Economy)
         {
@@ -67,17 +77,6 @@ public class HUDStats : HUD
 
         _weapon.sprite = character.Data.Weapon;
 
-        if (character.Data.CanHarvestResources)
-        {
-            if (character.HarvestedResource.Value > 0)
-            {
-                _bottomSeparator.SetActive(true);
-                _resourceCollected.text = $"{character.HarvestedResource.Value}";
-                _resource.gameObject.SetActive(true);
-                return;
-            }
-        }
-
         _bottomSeparator.SetActive(false);
         _resource.gameObject.SetActive(false);
         _resourceCollected.text = string.Empty;
@@ -93,6 +92,7 @@ public class HUDStats : HUD
         BuildingData data = _building.Data;
 
         _name.text = _building.Data.Type.ToString();
+        _name.color = _building.Performer == NetworkManager.Me ? _allyColor : _enemyColor;
 
         if (building.Data.SubType == SubType.Economy)
         {
@@ -129,6 +129,17 @@ public class HUDStats : HUD
                 _healthBar.value = 1 - healthLossPercentage;
 
                 _hp.text = $"{_character.CurrentHealth}/{_character.Data.MaxHealth}";
+
+                if (_character.Data.CanHarvestResources)
+                {
+                    if (_character.HarvestedResource.Value > 0)
+                    {
+                        _bottomSeparator.SetActive(true);
+                        _resourceCollected.text = $"{_character.HarvestedResource.Value}";
+                        _resource.gameObject.SetActive(true);
+                        return;
+                    }
+                }
             }
             else if (_building != null)
             {
