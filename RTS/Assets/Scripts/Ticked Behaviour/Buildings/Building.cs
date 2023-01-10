@@ -317,6 +317,9 @@ public class Building : TickedBehaviour, IDamageable
     {
         _isSelected = true;
 
+        AudioSource.clip = Data.OnSelectionAudios[(int) Random.value * (Data.OnSelectionAudios.Count - 1)];
+        AudioSource.Play();
+
         HoverMarker.SetActive(false);
         SelectionMarker.SetActive(true);
         HealthBar.gameObject.SetActive(true);

@@ -10,6 +10,9 @@ public class CharacterData : TickedBehaviorData
     [SerializeField]
     private AudioClip _attackOrderAudio;
 
+    public AudioClip GenericOrderAudio => _genericOrderAudio;
+    public AudioClip AttackOrderAudio => _attackOrderAudio;
+
     [Separator("Spawn Data")]
     [Space]
 

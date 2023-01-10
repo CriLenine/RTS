@@ -35,13 +35,16 @@ public class OrderManager : MonoBehaviour
             if (!rallyTile.IsFree(NetworkManager.Me))
             {
                 if (ResourcesManager.Harvestable(rallyPointCoords))
+                {
+                    Character ch = (Character)GameManager.Entities[ids[0]];
+
+                    ch.AudioSource.clip = ch.Data.GenericOrderAudio;
+                    ch.AudioSource.Play();
+
                     NetworkManager.Input(TickInput.Harvest(rallyPointCoords, SelectionManager.GetSelectedIds()));
+                }
                 return;
             }
-
-            NetworkManager.Input(TickInput.Move(SelectionManager.GetSelectedIds(), worldMousePos));
-        }
-    }
 
     private static bool IsMouseOnTickedBehavior(Vector3 worldMousePos)
     {
@@ -68,6 +71,11 @@ public class OrderManager : MonoBehaviour
 
     public static void OrderBuild(Building building)
     {
+
+        Character builder = (Character)GameManager.Entities[builderIDs[0]];
+
+        builder.AudioSource.clip = builder.Data.GenericOrderAudio;
+        builder.AudioSource.Play();
         NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();

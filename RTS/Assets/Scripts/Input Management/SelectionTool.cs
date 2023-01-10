@@ -1,5 +1,6 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class SelectionTool : MonoBehaviour
 {
@@ -135,6 +136,13 @@ public class SelectionTool : MonoBehaviour
                 if (_selectionBox.Contains(_camera.WorldToScreenPoint(character.transform.position)))
                     if (!(InputActionsManager.IsShifting && SelectionManager.SelectedCharacters.Contains(character)))
                         SelectionManager.AddCharacterToSelection(character);
+        }
+
+        if (SelectionManager.SelectedCharacters.Count > 0)
+        {
+            SelectionManager.SelectedCharacters[0].AudioSource.clip =
+                SelectionManager.SelectedCharacters[0].Data.OnSelectionAudios[(int)Random.value * (SelectionManager.SelectedCharacters[0].Data.OnSelectionAudios.Count - 1)];
+            SelectionManager.SelectedCharacters[0].AudioSource.Play();
         }
 
         _startpos = Vector2.zero;

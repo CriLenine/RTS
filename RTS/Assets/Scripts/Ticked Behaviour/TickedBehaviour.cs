@@ -38,6 +38,11 @@ public abstract class TickedBehaviour : MonoBehaviour
     public Vector2 Position { get; protected set; }
     public Vector2Int Coords { get; protected set; }
 
+    [SerializeField]
+    private AudioSource _audioSource;
+
+    public AudioSource AudioSource => _audioSource;
+
     [Separator("View Specs")]
 
     [SerializeField]
@@ -66,6 +71,7 @@ public abstract class TickedBehaviour : MonoBehaviour
     protected virtual void Awake()
     {
         ApplyViewRadius();
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void ApplyViewRadius()

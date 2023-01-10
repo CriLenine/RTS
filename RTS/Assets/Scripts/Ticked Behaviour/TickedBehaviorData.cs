@@ -22,5 +22,9 @@ public abstract class TickedBehaviorData : ButtonData
     [SerializeField]
     private AudioClip _onSpawnAudio;
     [SerializeField]
-    private List<AudioClip> _onSelectionAudio;
+    private List<AudioClip> _onSelectionAudios;
+
+    public AudioClip OnSpawnAudio => _onSpawnAudio;
+
+    public List<AudioClip> OnSelectionAudios => _onSelectionAudios;
 }
