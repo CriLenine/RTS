@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TheKiwiCoder;
 
 public class GameManager : MonoBehaviour
 {
@@ -53,6 +54,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        UnityEngine.Random.InitState(0);
+
         _instance = this;
 
         DontDestroyOnLoad(this);
@@ -62,6 +65,10 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    [SerializeField]
+    BehaviourTree _tree;
+    BehaviourTreeRunner _runner;
 
     public static void AddResource(ResourceType type, int amount, int performer)
     {
@@ -499,7 +506,6 @@ public class GameManager : MonoBehaviour
 
     public static void Prepare()
     {
-
         DestroyAllEntities();
 
         FogOfWarManager.ResetFog();

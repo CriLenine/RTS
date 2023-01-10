@@ -241,6 +241,7 @@ public class Character : TickedBehaviour, IDamageable
     {
         transform.position = position;
 
+        Position = position;
         Coords = TileMapManager.WorldToTilemapCoords(position);
     }
 

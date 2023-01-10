@@ -34,6 +34,7 @@ public abstract class TickedBehaviour : MonoBehaviour
     public int ID { get; private set; }
     public int Performer { get; private set; }
 
+    public Vector2 Position { get; protected set; }
     public Vector2Int Coords { get; protected set; }
 
     [Separator("View Specs")]

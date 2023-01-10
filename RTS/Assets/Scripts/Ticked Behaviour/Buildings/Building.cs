@@ -289,6 +289,7 @@ public class Building : TickedBehaviour, IDamageable
 
         transform.position = centerPos;
 
+        Position = position;
         Coords = TileMapManager.WorldToTilemapCoords(position);
     }
 
