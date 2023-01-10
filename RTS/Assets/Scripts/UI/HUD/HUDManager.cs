@@ -40,6 +40,12 @@ public class HUDManager : MonoBehaviour
     [SerializeField]
     private HUDBuildings _buildings;
 
+    [SerializeField]
+    private HUDTime _time;
+
+    [SerializeField]
+    private HUDMinimap _minimap;
+
     [Space]
     [Separator("Art")]
 
@@ -93,7 +99,7 @@ public class HUDManager : MonoBehaviour
         _instance._resources.Show();
         _instance._population.Show();
 
-        foreach(ResourceSpecs spec in _resourcesSpecs)
+        foreach (ResourceSpecs spec in _resourcesSpecs)
         {
             _resourceSprites.Add(spec.Type, spec.Sprite);
             _resourceColors.Add(spec.Type, spec.Color);
@@ -103,6 +109,24 @@ public class HUDManager : MonoBehaviour
     public static void DisplayStats(Character character)
     {
         _instance._stats.DisplayStats(character);
+    }
+
+    public static void DisplayStats(Building building)
+    {
+        _instance._stats.DisplayStats(building);
+    }
+
+    public static void HideAll()
+    {
+        _instance._time.Hide();
+        _instance._stats.Hide();
+        _instance._actions.Hide();
+        _instance._minimap.Hide();
+        _instance._buildings.Hide();
+        _instance._selection.Hide();
+        _instance._resources.Hide();
+        _instance._population.Hide();
+        _instance._spawnPreview.Hide();
     }
 
     public static void UpdateHUD()
@@ -130,12 +154,12 @@ public class HUDManager : MonoBehaviour
             _instance._stats.DisplayStats(building);
             _instance._spawnPreview.Show();
             _instance._spawnPreview.UpdateSpawnPreview();
-            _instance._actions.ShowBuildingActions(building.Data);
+            _instance._actions.ShowBuildingActions(building);
             return;
         }
 
         _instance._actions.ShowCharacterActions();
-        
+
         if (charactersCount == 1)
         {
             _instance._stats.DisplayStats(characters[0]);
@@ -150,13 +174,13 @@ public class HUDManager : MonoBehaviour
         _instance._selection.SetupSelection();
 
         for (int i = 0; i < charactersCount; ++i)
-            if(!characters[i].Data.CanBuild)
+            if (!characters[i].Data.CanBuild)
             {
                 _instance._buildings.Hide();
                 return;
             }
     }
-    
+
     public static void UpdateHousing()
     {
         _instance._population.UpdateHousing();
@@ -170,5 +194,10 @@ public class HUDManager : MonoBehaviour
     public static void UpdateSpawnPreview()
     {
         _instance._spawnPreview.UpdateSpawnPreview();
+    }
+
+    public static void StartTimer()
+    {
+        _instance._time.StartTimer();
     }
 }

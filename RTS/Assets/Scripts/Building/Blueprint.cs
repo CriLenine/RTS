@@ -78,7 +78,7 @@ public class Blueprint : MonoBehaviour
             _instance._holder.SetActive(false);
             _instance._inBlueprintMode = false;
 
-            InputActionsManager.UpdateGameState(GameState.None);
+            InputActionsManager.UpdateGameState(GameState.CharacterSelection);
         }
     }
 

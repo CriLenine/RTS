@@ -10,9 +10,11 @@ public enum InputType
     Hunt,
     Attack,
     GameOver,
+    Stop,
     Kill,
     GuardPosition,
-    Destroy
+    Destroy,
+    CancelConstruction
 }
 
 public class TickInput
@@ -41,6 +43,18 @@ public class TickInput
             Performer = performer
         };
     }
+    public static TickInput Stop(int[] targets, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Stop,
+
+            Targets = targets,
+
+            Performer = performer
+        };
+    }
+
     public static TickInput Kill(int[] targets,  int performer = 0)
     {
         return new TickInput()
@@ -93,6 +107,18 @@ public class TickInput
         };
     }
 
+    public static TickInput CancelConstruction(int buildingID, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.CancelConstruction,
+
+            ID = buildingID,
+
+            Performer = performer
+        };
+    }
+
     public static TickInput Build(int buildingID, int[] targets, int performer = 0)
     {
         return new TickInput()
@@ -119,19 +145,6 @@ public class TickInput
         };
     }
 
-    //public static TickInput Hunt(int id, int[] targets, int performer = 0)
-    //{
-    //    return new TickInput()
-    //    {
-    //        Type = InputType.Build,
-
-    //        Targets = targets,
-
-    //        ID = id,
-
-    //        Performer = performer
-    //    };
-    //}
     public static TickInput Attack(int targetID, Vector2 targetpos, int[] attackers, int performer = 0)
     {
         return new TickInput()

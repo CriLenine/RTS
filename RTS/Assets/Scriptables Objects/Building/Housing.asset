@@ -29,7 +29,7 @@ MonoBehaviour:
         m_CallState: 2
   _type: 1
   _subType: 0
-  _size: 4
+  _size: 2
   _requiredBuildTicks: 500
   _cost:
   - _type: 1

@@ -274,7 +274,10 @@ public partial class NetworkManager : MonoBehaviour
                     _id = message.GetInt(1);
                     _roomSize = message.GetInt(0);
 
-                    GameManager.Prepare();
+                    SetupManager.CompleteReset();
+                    SetupManager.SetupGame();
+
+                    VictoryManager.Init(_roomSize);
 
                     StartCoroutine(Loop());
 
@@ -321,6 +324,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.Stop:
+                Spread(message, input.Targets);
+
+                break;
+
             case InputType.Kill:
                 Spread(message, input.Targets);
 
@@ -353,8 +361,20 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.CancelConstruction:
+                message.Add(input.ID);
+
+                break;
+
             case InputType.Attack:
                 message.Add(input.ID, input.Position.x, input.Position.y);
+
+                Spread(message, input.Targets);
+
+                break;
+
+            case InputType.GuardPosition:
+                message.Add(input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);
 

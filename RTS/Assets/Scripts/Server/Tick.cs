@@ -35,6 +35,15 @@ public partial class NetworkManager
                             break;
                         }
 
+                    case InputType.Stop:
+                        {
+                            int[] targets = Extract<int>(message, i, out i);
+
+                            inputs.Add(TickInput.Stop(targets, performer));
+
+                            break;
+                        }
+
                     case InputType.Kill:
                         {
                             int[] targets = Extract<int>(message, i, out i);
@@ -86,6 +95,15 @@ public partial class NetworkManager
                             break;
                         }
 
+                    case InputType.CancelConstruction:
+                        {
+                            int ID = message.GetInt(i++);
+
+                            inputs.Add(TickInput.CancelConstruction(ID, performer));
+
+                            break;
+                        }
+
                     case InputType.Harvest:
                         {
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
@@ -111,7 +129,6 @@ public partial class NetworkManager
                             inputs.Add(TickInput.GameOver(performer));
                             break;
                         }
-
                     case InputType.GuardPosition:
                         {
                             Vector2 position = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
