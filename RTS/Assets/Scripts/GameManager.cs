@@ -398,6 +398,8 @@ public class GameManager : MonoBehaviour
         {
             resource = ResourcesManager.GetNearestAggregate(inputCoords);
         }
+        else
+            return;
 
         for (int i = 0; i < targets.Length; ++i)
         {

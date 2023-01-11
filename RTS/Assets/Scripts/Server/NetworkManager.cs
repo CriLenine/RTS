@@ -79,7 +79,7 @@ public partial class NetworkManager : MonoBehaviour
             {
                 lineCount += _room.Players != null ? _room.Players.Count : 1;
 
-                if (Me == 0)
+                if (AmIHost)
                     lineCount += 2;
             }
 
@@ -116,7 +116,7 @@ public partial class NetworkManager : MonoBehaviour
                 foreach (Player player in _room.Players)
                     GUILayout.Label($"{player.Name} - {(player.IsReady ? "O" : "N")}");
 
-                if (Me == 0)
+                if (AmIHost)
                 {
                     GUILayout.FlexibleSpace();
 
@@ -195,6 +195,8 @@ public partial class NetworkManager : MonoBehaviour
                         _room = room;
 
                         _rooms = null;
+
+                        AmIHost = false;
                     });
                 }
             }
@@ -217,6 +219,8 @@ public partial class NetworkManager : MonoBehaviour
                 JoinRoom(_me.Name, delegate (bool success)
                 {
                     _loading = false;
+
+                    AmIHost = true;
                 });
             }
 
@@ -248,6 +252,8 @@ public partial class NetworkManager : MonoBehaviour
     public static int Me => _instance._id;
     public static int RoomSize => _instance._roomSize;
     public static int CurrentTick => _instance._tick;
+
+    public bool AmIHost { get; private set; } = false;
 
     private float _tickPeriod;
 
