@@ -68,6 +68,9 @@ public abstract class TickedBehaviour : MonoBehaviour
         }
     }
 
+    protected const int AUDIO_COOLDOWN = 120; // In ticks
+    protected int _nTicksFromLastAudio = 121;
+
     protected virtual void Awake()
     {
         ApplyViewRadius();
@@ -85,7 +88,11 @@ public abstract class TickedBehaviour : MonoBehaviour
         _currentView.gameObject.SetActive(false);
     }
 
-    public abstract void Tick();
+    public abstract void PlayOnSelectedAudio();
+    public virtual void Tick()
+    {
+        ++_nTicksFromLastAudio;
+    }
 
     public virtual Hash128 GetHash128()
     {

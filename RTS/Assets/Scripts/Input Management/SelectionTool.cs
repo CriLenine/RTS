@@ -140,9 +140,7 @@ public class SelectionTool : MonoBehaviour
 
         if (SelectionManager.SelectedCharacters.Count > 0)
         {
-            SelectionManager.SelectedCharacters[0].AudioSource.clip =
-                SelectionManager.SelectedCharacters[0].Data.OnSelectionAudios[(int)Random.value * (SelectionManager.SelectedCharacters[0].Data.OnSelectionAudios.Count - 1)];
-            SelectionManager.SelectedCharacters[0].AudioSource.Play();
+            SelectionManager.SelectedCharacters[0].PlayOnSelectedAudio();
         }
 
         _startpos = Vector2.zero;
