@@ -8,10 +8,12 @@ public partial class NetworkManager
         public string Name;
 
         public bool IsReady;
+        public bool IsAI;
 
-        public Player(string name)
+        public Player(string name, bool isAI)
         {
             Name = name;
+            IsAI = isAI;
         }
     }
 
@@ -23,10 +25,9 @@ public partial class NetworkManager
 
         private int _count;
 
-        public int Count
-        {
-            get => Players != null ? Players.Count : _count;
-        }
+        public int Count => Players != null ? Players.Count : _count;
+
+        public int AiCount { get; private set; } = 0;
 
         public Room(string name, int count = 0)
         {
@@ -41,11 +42,16 @@ public partial class NetworkManager
         {
             Players.Clear();
 
+            AiCount = 0;
+
             uint i = 1;
 
             while (i < message.Count)
             {
-                Player player = new Player(message.GetString(i++));
+                Player player = new Player(message.GetString(i++), message.GetBoolean(i++));
+
+                if (player.IsAI)
+                    ++AiCount;
 
                 player.IsReady = message.GetBoolean(i++);
 
