@@ -6646,8 +6646,8 @@ RectTransform:
   m_Father: {fileID: 2082196493}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.093}
-  m_AnchorMin: {x: 0.82135415, y: 0.010185185}
-  m_AnchorMax: {x: 0.99010414, y: 0.3101852}
+  m_AnchorMin: {x: 0.76328975, y: -0.42708018}
+  m_AnchorMax: {x: 0.9793028, y: -0.12708017}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -39997,10 +39997,10 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10000
   m_Positions:
-  - {x: -8.888889, y: -5, z: 0}
-  - {x: 8.888889, y: -5, z: 0}
-  - {x: 8.888889, y: 5, z: 0}
-  - {x: -8.888889, y: 5, z: 0}
+  - {x: -6.9440246, y: -5, z: 0}
+  - {x: 6.9440246, y: -5, z: 0}
+  - {x: 6.9440246, y: 5, z: 0}
+  - {x: -6.9440246, y: 5, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
