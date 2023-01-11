@@ -286,7 +286,7 @@ public class Character : TickedBehaviour, IDamageable
 
     public void SetTarget(TickedBehaviour target) => _currentTarget = target;
 
-    public void BeginWatch() => _isWatching = true;
+    public void BeginWatch() => _isGuardingPosition = true;
     public void Shoot(GameObject projectile, float projectileSpeed)
     {
         _isShooting = true;
