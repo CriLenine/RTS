@@ -53,6 +53,7 @@ public class SetupManager : MonoBehaviour
         }
 
         HUDManager.StartTimer();
+        HUDManager.ShowDefaultHUD();
     }
 }
 

@@ -96,8 +96,6 @@ public class HUDManager : MonoBehaviour
         else
             Destroy(this);
 
-        ShowDefaultHUD();
-
         foreach (ResourceSpecs spec in _resourcesSpecs)
         {
             _resourceSprites.Add(spec.Type, spec.Sprite);
