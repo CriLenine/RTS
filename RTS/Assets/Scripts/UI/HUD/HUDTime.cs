@@ -20,6 +20,11 @@ public class HUDTime : HUD
         _text = new StringBuilder();
     }
 
+    public void StopTimer()
+    {
+        _timerStarted = false;
+    }
+
     private void Update()
     {
         if (!_timerStarted)
@@ -45,5 +50,17 @@ public class HUDTime : HUD
         _text.AppendFormat(_seconds >= 10 ? "{0}" : "0{0}", _seconds);
 
         _time.text = _text.ToString();
+    }
+
+    public string GetTimer()
+    {
+        _text.Clear();
+
+        _text.AppendFormat(_minutes >= 10 ? "{0}" : "0{0}", _minutes);
+        _text.Append("m");
+        _text.AppendFormat(_seconds >= 10 ? "{0}" : "0{0}", _seconds);
+        _text.Append("s");
+
+        return _text.ToString();
     }
 }

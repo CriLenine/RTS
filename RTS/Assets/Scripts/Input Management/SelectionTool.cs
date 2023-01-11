@@ -106,10 +106,13 @@ public class SelectionTool : MonoBehaviour
                     }
                 }
                 else if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
-                    if (GameManager.MyEntities.Contains(selectedBuilding) && SelectionManager.SelectedBuilding != selectedBuilding) //Test if building owner
+                    if (GameManager.MyEntities.Contains(selectedBuilding)) //Test if building owner
                     {
-                        SelectionManager.DeselectAll();
-                        SelectionManager.SetSelectedBuilding(selectedBuilding);
+                        if (selectedBuilding != SelectionManager.SelectedBuilding)
+                        {
+                            SelectionManager.DeselectAll();
+                            SelectionManager.SetSelectedBuilding(selectedBuilding);
+                        }
                     }
                     else
                     {

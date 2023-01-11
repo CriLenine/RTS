@@ -28,6 +28,8 @@ public class ActionButton : MonoBehaviour
     {
         if (data is ConstantButtonData constantButtonData)
         {
+            _data = null;
+
             _image.color = constantButtonData.Color;
             _image.sprite = constantButtonData.Icon;
 
@@ -60,6 +62,8 @@ public class ActionButton : MonoBehaviour
         }
         else if(data is CharacterData characterData)
         {
+            _data = characterData;
+
             if (_button == null)
                 _button = gameObject.AddComponent<Button>();
 
