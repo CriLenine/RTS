@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using UnityEngine;
 using TheKiwiCoder;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour
                     break;
 
                 case InputType.Kill:
-                    Kill(input.Targets);
+                    Kill(input.Performer, input.Targets);
                     break;
 
                 case InputType.NewBuild:
@@ -222,7 +222,7 @@ public class GameManager : MonoBehaviour
             Destroy(entity);
             Destroy(entity.gameObject, 2);
 
-            VictoryManager.CheckVictoryStatus();
+            EliminationManager.CheckForElimination();
         }
 
         if (_instance._entitiesToDestroy.Count > 0)
@@ -453,10 +453,13 @@ public class GameManager : MonoBehaviour
             MoveCharacters(performer, rallyPoint, -1, new int[1] { character.ID }, MoveType.ToPosition);
     }
 
-    private static void Kill(int[] targets)
+    private static void Kill(int performer, int[] targets)
     {
-        foreach(int ID in targets)
+        foreach (int ID in targets)
+        {
             DestroyEntity(ID);
+            StatsManager.IncreaseUnitsLost(performer);
+        }
     }
 
     public static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
@@ -487,6 +490,8 @@ public class GameManager : MonoBehaviour
     private static void DestroyBuilding(int performer, int buildingID)
     {
         Building building = _instance._buildings[buildingID];
+
+        StatsManager.IncreaseBuildingsLost(performer);
 
         if (performer == NetworkManager.Me)
             _instance._housing -= building.Data.HousingProvided;

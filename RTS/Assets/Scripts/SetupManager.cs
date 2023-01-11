@@ -34,6 +34,8 @@ public class SetupManager : MonoBehaviour
     public static void SetupGame()
     {
         QuadTreeNode.Init(3, 25, 25);
+        StatsManager.Init();
+        EliminationManager.Init();
 
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {
