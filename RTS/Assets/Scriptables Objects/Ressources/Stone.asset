@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad1fe046a1be828439277a073d68d0fb, type: 3}
+  m_Name: Stone
+  m_EditorClassIdentifier: 
+  _type: 1
+  _harvestingTime: 1
+  _amountPerHarvest: 5
+  _nMaxHarvestPerTile: 10
+  _tileAspects:
+  - {fileID: 11400000, guid: e6315441b78b90646ba84ba3221b5426, type: 2}
+  - {fileID: 11400000, guid: 98176bf1b9698384c918f092eaf78bff, type: 2}
+  - {fileID: 11400000, guid: e0c5a25879a79fb4fb14c69b6255094b, type: 2}

@@ -33,9 +33,13 @@ public class SetupManager : MonoBehaviour
 
     public static void SetupGame()
     {
+<<<<<<< HEAD
         QuadTreeNode.Init(3, 25, 25);
         StatsManager.Init();
         EliminationManager.Init();
+=======
+        QuadTreeNode.Init(3, 50, 50);
+>>>>>>> e522ba6 (Added new resources, edited new map & added tile update on harvest)
 
         for (int i = 0; i < NetworkManager.RoomSize; ++i)
         {
