@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
-using System;
 using TheKiwiCoder;
 
 public class GameManager : MonoBehaviour
@@ -66,7 +65,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     BehaviourTree _tree;
-    BehaviourTreeRunner _runner;
 
     public static void AddResource(ResourceType type, int amount, int performer)
     {
@@ -400,6 +398,8 @@ public class GameManager : MonoBehaviour
         {
             resource = ResourcesManager.GetNearestAggregate(inputCoords);
         }
+        else
+            return;
 
         for (int i = 0; i < targets.Length; ++i)
         {
@@ -409,13 +409,16 @@ public class GameManager : MonoBehaviour
             if (harvestingCoords == null)
                 break;
 
-            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
+            List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
+
+            if (!(waypoints?.Count != 0))
+                continue;
 
             Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);
             if (coordsToHarvest == null)
                 break;
 
-            harvester.SetAction(new Move(harvester, wayPoints));
+            harvester.SetAction(new Move(harvester, waypoints));
             harvester.AddAction(new Harvest(harvester, inputCoords, resource));
         }
     }

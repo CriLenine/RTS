@@ -3,6 +3,8 @@ using System.Collections;
 using PlayerIOClient;
 using UnityEngine;
 using System;
+using static NetworkManager;
+using System.Linq;
 
 public partial class NetworkManager : MonoBehaviour
 {
@@ -74,7 +76,12 @@ public partial class NetworkManager : MonoBehaviour
             if (IsPlaying)
                 lineCount += 4;
             else
+            {
                 lineCount += _room.Players != null ? _room.Players.Count : 1;
+
+                if (AmIHost)
+                    lineCount += 2;
+            }
 
             lineCount += 2;
         }
@@ -108,6 +115,33 @@ public partial class NetworkManager : MonoBehaviour
             {
                 foreach (Player player in _room.Players)
                     GUILayout.Label($"{player.Name} - {(player.IsReady ? "O" : "N")}");
+
+                if (AmIHost)
+                {
+                    GUILayout.FlexibleSpace();
+
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.Label("Nombre d'IA : ");
+
+                    int maxAICount = MaxPlayerCount - (_room.Players.Count - _room.AiCount);
+
+                    for (int i = 0; i <= maxAICount; ++i)
+                    {
+                        GUIStyle style = GUI.skin.button;
+
+                        Color color = style.normal.textColor;
+
+                        style.normal.textColor = _room.AiCount == i ? Color.green : Color.red;
+
+                        if (GUILayout.Button($"{i}", style))
+                            _server.Send("AICount", i);
+
+                        style.normal.textColor = color;
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
             }
 
             GUILayout.FlexibleSpace();
@@ -161,6 +195,8 @@ public partial class NetworkManager : MonoBehaviour
                         _room = room;
 
                         _rooms = null;
+
+                        AmIHost = false;
                     });
                 }
             }
@@ -183,6 +219,8 @@ public partial class NetworkManager : MonoBehaviour
                 JoinRoom(_me.Name, delegate (bool success)
                 {
                     _loading = false;
+
+                    AmIHost = true;
                 });
             }
 
@@ -215,6 +253,8 @@ public partial class NetworkManager : MonoBehaviour
     public static int RoomSize => _instance._roomSize;
     public static int CurrentTick => _instance._tick;
 
+    public bool AmIHost { get; private set; } = false;
+
     private float _tickPeriod;
 
     private int _lateness = 0;
@@ -242,7 +282,7 @@ public partial class NetworkManager : MonoBehaviour
         _messages = new Queue<Message>();
         _ticks = new Dictionary<int, Tick>();
 
-        _me = new Player(SystemInfo.deviceName);
+        _me = new Player(SystemInfo.deviceName, false);
 
         Connect();
     }
@@ -288,7 +328,7 @@ public partial class NetworkManager : MonoBehaviour
                     _ticks.Clear();
 
                     _id = message.GetInt(1);
-                    _roomSize = message.GetInt(0);
+                    _roomSize = message.GetInt(0) + message.GetInt(2);
 
                     SetupManager.CompleteReset();
                     SetupManager.SetupGame();
@@ -466,7 +506,7 @@ public partial class NetworkManager : MonoBehaviour
             {
                 _instance._loading = false;
 
-                //client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
+                client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
 
                 _instance._multiplayer = client.Multiplayer;
             },

@@ -4638,6 +4638,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1833737296}
     - target: {fileID: 7456065522055592041, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _minimap
+      value: 
+      objectReference: {fileID: 1833737307}
+    - target: {fileID: 7456065522055592041, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: _selection
       value: 
       objectReference: {fileID: 876748793}
@@ -6483,6 +6487,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96c6d192a525ff4abf8d4661b430ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _tree: {fileID: 0}
 --- !u!114 &1103859243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39156,6 +39161,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HUDSection: {fileID: 953656766}
   _time: {fileID: 467694306}
+--- !u!114 &1833737307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891726787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1c76a14504f2d7419927b81500b3d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HUDSection: {fileID: 2082196492}
 --- !u!224 &1849778838 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4292545948167460168, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
