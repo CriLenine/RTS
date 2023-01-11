@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using MyBox;
 
-public enum VictoryCondition
+public enum EliminationCondition
 {
     AllBuildingsDestroyed,
     AllUnitsKilled,
     CertainBuildingDestroyed
 }
 
-public class VictoryManager : MonoBehaviour
+public class EliminationManager : MonoBehaviour
 {
-    private static VictoryManager _instance;
+    private static EliminationManager _instance;
 
     private void Awake()
     {
@@ -26,41 +26,41 @@ public class VictoryManager : MonoBehaviour
     private PostGameScreen _postGameScreen;
 
     [SerializeField]
-    private VictoryCondition _victoryCondition;
+    private EliminationCondition _eliminationCondition;
 
-    [SerializeField, ConditionalField(nameof(_victoryCondition), false, VictoryCondition.CertainBuildingDestroyed)]
+    [SerializeField, ConditionalField(nameof(_eliminationCondition), false, EliminationCondition.CertainBuildingDestroyed)]
     private Building.Type _buildingType;
 
-    private List<int> _remainingPlayersID = new List<int>();
+    public static List<int> RemainingPlayersID { get; private set; } = new List<int>();
     private HashSet<int> _testing = new HashSet<int>();
 
-    public static void Init(int roomSize)
+    public static void Init()
     {
-        for (int i = 0; i < roomSize; i++)
-            _instance._remainingPlayersID.Add(i);
+        for (int i = 0; i < NetworkManager.RoomSize; i++)
+            RemainingPlayersID.Add(i);
     }
 
-    public static void CheckVictoryStatus()
+    public static void CheckForElimination()
     {
         _instance._testing.Clear();
 
-        switch (_instance._victoryCondition)
+        switch (_instance._eliminationCondition)
         {
-            case VictoryCondition.AllBuildingsDestroyed:
+            case EliminationCondition.AllBuildingsDestroyed:
 
                 foreach (Building building in GameManager.Buildings)
                     _instance._testing.Add(building.Performer);
 
                 break;
 
-            case VictoryCondition.AllUnitsKilled:
+            case EliminationCondition.AllUnitsKilled:
 
                 foreach (Character character in GameManager.Characters)
                     _instance._testing.Add(character.Performer);
 
                 break;
 
-            case VictoryCondition.CertainBuildingDestroyed:
+            case EliminationCondition.CertainBuildingDestroyed:
 
                 foreach (Building building in GameManager.Buildings)
                     if (building.Data.Type == _instance._buildingType)
@@ -69,7 +69,7 @@ public class VictoryManager : MonoBehaviour
                 break;
         }
 
-        if (_instance._testing.Count < _instance._remainingPlayersID.Count)
+        if (_instance._testing.Count < RemainingPlayersID.Count)
             _instance.EliminatePlayer();
     }
 
@@ -77,25 +77,26 @@ public class VictoryManager : MonoBehaviour
     {
         int playerToEliminate = 0;
 
-        foreach (int playerID in _instance._remainingPlayersID)
+        foreach (int playerID in RemainingPlayersID)
             if (!_instance._testing.Contains(playerID))
             {
                 playerToEliminate = playerID;
                 break;
             }
 
-        _remainingPlayersID.Remove(playerToEliminate);
+        RemainingPlayersID.Remove(playerToEliminate);
 
         if (playerToEliminate == NetworkManager.Me)
-            _instance.DisplayPostGameScreen(false);
+            _instance.SetGameOver(false);
 
-        else if (_remainingPlayersID.Count == 1)
-            _instance.DisplayPostGameScreen(true);
+        else if (RemainingPlayersID.Count == 1)
+            _instance.SetGameOver(true);
     }
 
-    private void DisplayPostGameScreen(bool gameWon)
+    private void SetGameOver(bool gameWon)
     {
         HUDManager.HideAll();
+        HUDManager.StopTimer();
         InputActionsManager.DisableInputs();
 
         _instance._postGameScreen.Show(gameWon);

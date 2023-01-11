@@ -96,8 +96,7 @@ public class HUDManager : MonoBehaviour
         else
             Destroy(this);
 
-        _instance._resources.Show();
-        _instance._population.Show();
+        ShowDefaultHUD();
 
         foreach (ResourceSpecs spec in _resourcesSpecs)
         {
@@ -127,6 +126,14 @@ public class HUDManager : MonoBehaviour
         _instance._resources.Hide();
         _instance._population.Hide();
         _instance._spawnPreview.Hide();
+    }
+
+    public static void ShowDefaultHUD()
+    {
+        _instance._time.Show();
+        _instance._minimap.Show();
+        _instance._resources.Show();
+        _instance._population.Show();
     }
 
     public static void UpdateHUD()
@@ -200,5 +207,15 @@ public class HUDManager : MonoBehaviour
     {
         _instance._time.StartTimer();
         _instance._time.Show();
+    }
+
+    public static void StopTimer()
+    {
+        _instance._time.StopTimer();
+    }
+
+    public static string GetTimer()
+    {
+        return _instance._time.GetTimer();
     }
 }

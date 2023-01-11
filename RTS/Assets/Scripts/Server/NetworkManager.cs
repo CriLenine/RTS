@@ -32,17 +32,17 @@ public partial class NetworkManager : MonoBehaviour
     public static bool IsPlaying => Hosted && _instance._isPlaying;
     public static bool IsRunning => Hosted && _instance._isRunning;
 
-    public string[] Names
+    public static string[] Names
     {
         get
         {
-            if (_room is null)
+            if (_instance._room is null)
                 return null;
 
-            string[] names = new string[_room.Players.Count];
+            string[] names = new string[_instance._room.Players.Count];
 
-            for (int i = 0; i < _room.Players.Count; ++i)
-                names[i] = _room.Players[i].Name;
+            for (int i = 0; i < _instance._room.Players.Count; ++i)
+                names[i] = _instance._room.Players[i].Name;
 
             return names;
         }
@@ -332,8 +332,6 @@ public partial class NetworkManager : MonoBehaviour
 
                     SetupManager.CompleteReset();
                     SetupManager.SetupGame();
-
-                    VictoryManager.Init(_roomSize);
 
                     StartCoroutine(Loop());
 
