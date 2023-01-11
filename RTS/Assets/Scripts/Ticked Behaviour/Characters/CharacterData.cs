@@ -1,7 +1,5 @@
 using UnityEngine;
 using MyBox;
-using UnityEditor.Animations;
-using UnityEditorInternal;
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "CharacterData", order = 1)]
 
@@ -18,8 +16,7 @@ public class CharacterData : TickedBehaviorData
     private SubType _subType;
     public SubType SubType => _subType;
 
-    [SerializeField]
-    [Min(1)]
+    [SerializeField, Min(1)]
     private int _spawnTicks;
     public float SpawnTicks => _spawnTicks;
 
@@ -63,37 +60,31 @@ public class CharacterData : TickedBehaviorData
     [Separator("Game Specs")]
     [Space]
 
-    [SerializeField]
-    [Min(0)]
+    [SerializeField, Min(0)]
     private int _maxHealth;
     public int MaxHealth => _maxHealth;
 
     [Space]
 
-    [SerializeField]
-    [Min(0)]
+    [SerializeField, Min(0)]
     private int _attackDamage;
     public int AttackDamage => _attackDamage;
 
-    [SerializeField]
-    [Min(0.1f)]
+    [SerializeField, Min(0.1f)]
     private float _attackRange;
     public float AttackRange => _attackRange;
 
-    [SerializeField]
-    [Min(0.1f)]
+    [SerializeField, Min(0.1f)]
     private float _attackSpeed;
     public float AttackSpeed => _attackSpeed;
 
     [Space]
 
-    [SerializeField]
-    [Min(0)]
+    [SerializeField, Min(0.1f)]
     private int _meleeArmor;
     public int MeleeArmor => _meleeArmor;
 
-    [SerializeField]
-    [Min(0)] 
+    [SerializeField, Min(0)]
     private int _rangeArmor;
     public int RangeArmor => _rangeArmor;   
     
@@ -110,19 +101,11 @@ public class CharacterData : TickedBehaviorData
     private bool _canHarvestResources;
     public bool CanHarvestResources => _canHarvestResources;
 
-    [ConditionalField(nameof(_canHarvestResources))]
-    [SerializeField]
-    private int _maxCarriedResources;
+    [SerializeField, ConditionalField(nameof(_canHarvestResources))]
+
+    private int _maxCarriedResources, _amountGetPerHarvest, _harvestingSpeed;
     public int MaxCarriedResources => _maxCarriedResources;
-
-    [ConditionalField(nameof(_canHarvestResources))]
-    [SerializeField]
-    private int _amountGetPerHarvest;
     public int AmountGetPerHarvest => _amountGetPerHarvest;
-
-    [ConditionalField(nameof(_canHarvestResources))]
-    [SerializeField]
-    private int _harvestingSpeed;
     public int HarvestingSpeed => _harvestingSpeed;
 
     [Space]
@@ -131,8 +114,7 @@ public class CharacterData : TickedBehaviorData
     private bool _canBuild;
     public bool CanBuild => _canBuild;
 
-    [ConditionalField(nameof(_canBuild))]
-    [SerializeField]
+    [SerializeField, ConditionalField(nameof(_canBuild))]
     private int _buildEfficiencyMultiplier;
     public int BuildEfficiencyMultiplier => _buildEfficiencyMultiplier;
 }

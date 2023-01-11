@@ -1,8 +1,6 @@
+using MyBox;
 using System.Collections.Generic;
 using UnityEngine;
-using MyBox;
-using UnityEngine.Windows;
-using System;
 
 public class Building : TickedBehaviour, IDamageable
 {
@@ -68,7 +66,9 @@ public class Building : TickedBehaviour, IDamageable
     [SerializeField]
     private Color _completionStartColor;
     [SerializeField]
-    private Color _completionEndColor, _iconSpriteStartColor, _iconSpriteEndColor;
+    private Color _completionEndColor, _enemyCompletionStartColor, _enemyCompletionEndColor, _iconSpriteStartColor, _iconSpriteEndColor;
+    [SerializeField]
+    private Color _backgroundColor, _enemyBackgroundColor;
 
 
     private bool _buildComplete;
@@ -118,7 +118,7 @@ public class Building : TickedBehaviour, IDamageable
 
         _structureTransform.localScale = new Vector3(0, 0, 1);
 
-        _structureSprite.color = _completionStartColor;
+        _structureSprite.color = Performer == NetworkManager.Me ? _completionStartColor : _enemyCompletionStartColor;
         _iconSprite.sprite = Data.HUDIcon;
         _minimapIconSprite.sprite = Data.HUDIcon;
         _iconSprite.color = _iconSpriteStartColor;
@@ -204,20 +204,25 @@ public class Building : TickedBehaviour, IDamageable
             _completedBuildTicks = _data.RequiredBuildTicks;
             _iconSprite.color = _iconSpriteEndColor;
 
-            Color tmp = _backgroundSprite.color;
-            tmp.a = 1f;
-            _backgroundSprite.color = tmp;
+            _backgroundSprite.color = Performer == NetworkManager.Me ? _backgroundColor : _enemyBackgroundColor;
 
             if (GameManager.MyBuildings.Contains(ID))
                 GameManager.UpdateHousing(Data.HousingProvided);
 
+            if(Data.CanSpawnUnits)
+                _rallyPoint = (Vector2)transform.position + new Vector2(1.1f * TileMapManager.TileSize * Data.Size / 2, 0);
+
             _buildComplete = true;
+
+            if (SelectionManager.SelectedBuilding == this)
+                HUDManager.UpdateHUD();
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
         _structureTransform.localScale = new Vector3(completionValue, completionValue, 1);
 
-        _structureSprite.color = Color.Lerp(_completionStartColor, _completionEndColor, BuildCompletionRatio);
+        _structureSprite.color = Color.Lerp(Performer == NetworkManager.Me ? _completionStartColor : _enemyCompletionStartColor,
+            Performer == NetworkManager.Me ? _completionEndColor : _enemyCompletionEndColor, BuildCompletionRatio);
 
         return _buildComplete;
     }
@@ -235,7 +240,9 @@ public class Building : TickedBehaviour, IDamageable
     {
         _isSelected = false;
         SelectionMarker.SetActive(false);
-        HealthBar.gameObject.SetActive(false);
+
+        if (CurrentHealth == Data.MaxHealth)
+            HealthBar.gameObject.SetActive(false);
 
         if (_data.CanSpawnUnits)
             _pathRenderer.gameObject.SetActive(false);
@@ -294,6 +301,7 @@ public class Building : TickedBehaviour, IDamageable
 
         transform.position = centerPos;
 
+        Position = position;
         Coords = TileMapManager.WorldToTilemapCoords(position);
     }
 

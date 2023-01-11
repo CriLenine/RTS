@@ -39,7 +39,12 @@ public class MoveHarvest : Move
 
             if (harvestingPosition != null)
             {
-                harvester.SetAction(new Move(_character, LocomotionManager.RetrieveWayPoints(_character.Performer, _character, harvestingPosition.Value)));
+                List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, harvestingPosition.Value);
+
+                if (!(waypoints?.Count != 0))
+                    return true;
+
+                harvester.SetAction(new Move(_character, waypoints));
                 harvester.AddAction(new Harvest(_character, harvestingPosition.Value, _resource));
             }
 

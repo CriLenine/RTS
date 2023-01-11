@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MyBox;
-using UnityEditor.Animations;
-using static UnityEngine.GraphicsBuffer;
 
 public class Character : TickedBehaviour, IDamageable
 {
@@ -60,7 +58,7 @@ public class Character : TickedBehaviour, IDamageable
     public bool Idle => _actions.Count == 0;
 
     private bool _isAgressed = false;
-    private bool _isWatching = false;
+    private bool _isGuardingPosition = false;
 
     private bool _isShooting = false;
     private GameObject _projectile;
@@ -108,16 +106,12 @@ public class Character : TickedBehaviour, IDamageable
     public sealed override void Tick()
     {
         if (CurrentAction is null)
-        {
-            if (_isWatching)
+            if (_isGuardingPosition)
                 CheckSurrounding();
             else
                 _isAgressed = _isAgressed && CheckSurrounding();
-        }
         else if (CurrentAction.Perform())
-        {
             CurrentAction = _actions.Count > 0 ? _actions.Dequeue() : null;
-        }
 
         UpdateAnimation();
     }
@@ -170,7 +164,9 @@ public class Character : TickedBehaviour, IDamageable
         _isSelected = false;
 
         SelectionMarker.SetActive(false);
-        HealthBar.gameObject.SetActive(false);
+
+        if(CurrentHealth == Data.MaxHealth)
+            HealthBar.gameObject.SetActive(false);
     }
 
     private void OnDrawGizmosSelected()
@@ -194,18 +190,23 @@ public class Character : TickedBehaviour, IDamageable
 
     public void AddAction(Action action)
     {
-        _isWatching = false; //stop watching if action added
+        _isGuardingPosition = false; //stop watching if action added
 
         _actions.Enqueue(action);
 
         CurrentAction ??= _actions.Dequeue();
     }
 
-    public void SetAction(Action action)
+    public void ClearActions()
     {
         CurrentAction = null;
 
         _actions.Clear();
+    }
+
+    public void SetAction(Action action)
+    {
+        ClearActions();
 
         AddAction(action);
     }
@@ -273,6 +274,7 @@ public class Character : TickedBehaviour, IDamageable
     {
         transform.position = position;
 
+        Position = position;
         Coords = TileMapManager.WorldToTilemapCoords(position);
     }
 

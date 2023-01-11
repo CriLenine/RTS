@@ -35,11 +35,11 @@ public class Attack : Action
 
         character.SetTarget(target);
     }
-    public Attack(Character character, TickedBehaviour target,Vector2 posToAttack, bool isOrder = true) : base(character)
+    public Attack(Character character, TickedBehaviour target, Vector2 posToAttack, bool isOrder = true) : base(character)
     {
         _target = target;
 
-        if(!target.TryGetComponent(out Itarget))
+        if (!target.TryGetComponent(out Itarget))
             throw new NotImplementedException("the attack target is not damageable");
 
         _attackDamage = character.Data.AttackDamage;
@@ -58,17 +58,21 @@ public class Attack : Action
     {
         if (_target == null) return true;//target already dead no point 
 
+        if (_target is Character character && character.CurrentHealth == 0)
+            return true;
+
+        if (_target is Building building && building.CurrentHealth == 0)
+            return true;
+
         if ((_posToAttack - (Vector2)_charaTransform.position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
         {
             if (_isOrder)//Si on a cliquer a la mano sur lennemie on le suit jusqua la mort
-            {
                 SetAction(new MoveAttack(_character, _target.transform.position, _target));
-            }
 
             return true;
         }
 
-        if(_attackSpeedTimer == 0)
+        if (_attackSpeedTimer == 0)
         {
             if (_character.Data.Type is Character.Type.Bowman)
                 GameEventsManager.PlayEvent("ShootArrow",_character.gameObject);
@@ -77,11 +81,21 @@ public class Attack : Action
 
             if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
             {
-                if (_target is Building building && _target.Performer == NetworkManager.Me)
-                    GameManager.UpdateHousing(-building.Data.HousingProvided);
+                if (_target is Building build)
+                {
+                    StatsManager.IncreaseBuildingsDestroyed(_character.Performer);
+                    StatsManager.IncreaseBuildingsLost(build.Performer);
 
-                if(_target is Character chara)
+                    if (_target.Performer == NetworkManager.Me)
+                        GameManager.UpdateHousing(-build.Data.HousingProvided);
+                }
+
+                if (_target is Character chara)
+                {
+                    StatsManager.IncreaseUnitsKilled(_character.Performer);
+                    StatsManager.IncreaseUnitsLost(chara.Performer);
                     chara.Animator.Play("Die");
+                }
 
                 GameManager.DestroyEntity(_target.ID);
                 return true;
@@ -90,7 +104,7 @@ public class Attack : Action
 
 
         var newTime = _attackSpeedTimer + NetworkManager.NormalTickPeriod;
-        _attackSpeedTimer = newTime  >= _attackSpeed ? 0 : newTime;
+        _attackSpeedTimer = newTime >= _attackSpeed ? 0 : newTime;
 
         return false;
     }

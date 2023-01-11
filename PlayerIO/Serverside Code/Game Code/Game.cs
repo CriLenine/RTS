@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using PlayerIO.GameLibrary;
+using System;
 
 [RoomType("Game")]
 public partial class GameRoom : Game<Player>
@@ -20,6 +21,7 @@ public partial class GameRoom : Game<Player>
 
     private State _state;
 
+    private bool IsHosting => _state == State.Hosting;
     private bool IsPaused => _state == State.Pause;
     private bool IsRunning => _state == State.Playing;
 
@@ -27,6 +29,14 @@ public partial class GameRoom : Game<Player>
 
     private Timer _timer;
     private int _tick;
+
+    private int __iaCount = 0;
+    private int _iaCount
+    {
+        get => Math.Min(__iaCount, MaxPlayerCount - _players.Count);
+
+        set => __iaCount = Math.Max(0, Math.Min(value, 3));
+    }
 
     private Dictionary<int, TickHash> _hashes;
     private Dictionary<int, Message> _ticks;
@@ -146,10 +156,13 @@ public partial class GameRoom : Game<Player>
     {
         Message message = Message.Create("Players");
 
-        message.Add(_players.Count);
+        message.Add(_players.Count + _iaCount);
 
         foreach (Player player in _players)
-            message.Add(player.ConnectUserId, player.IsReady);
+            message.Add(player.ConnectUserId, false, player.IsReady);
+
+        for (int i = 0; i < _iaCount; ++i)
+            message.Add($"Bot {i + 1}", true, true);
 
         Broadcast(message);
     }
@@ -170,7 +183,9 @@ public partial class GameRoom : Game<Player>
             Reset();
 
             foreach (Player player in _players)
-                player.Send("Start", _players.Count, player.Index);
+                player.Send("Start", _players.Count, player.Index, _iaCount);
+
+            _iaCount = 0;
         }
 
         _state = State.Playing;
@@ -206,6 +221,16 @@ public partial class GameRoom : Game<Player>
 
                 if (_state == State.Hosting && IsReady())
                     Start();
+
+                break;
+
+            case "AICount":
+                if (IsHosting && sender == _players[0])
+                {
+                    _iaCount = message.GetInt(0);
+
+                    BroadcastPlayers();
+                }
 
                 break;
 

@@ -105,6 +105,6 @@ public class Minimap : MonoBehaviour, IPointerDownHandler, IDragHandler
         if (_frustrumRenderer is null || _rectTransform is null || _minimapCamera is null)
             return;
 
-        UpdateViewport();
+        //UpdateViewport();
     }
 }

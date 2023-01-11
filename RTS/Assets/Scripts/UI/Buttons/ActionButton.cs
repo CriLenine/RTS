@@ -32,6 +32,8 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
     {
         if (data is ConstantButtonData constantButtonData)
         {
+            _data = null;
+
             _image.color = constantButtonData.Color;
             _image.sprite = constantButtonData.Icon;
             if (constantButtonData.ButtonType == ButtonType.Regular)
@@ -65,6 +67,8 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
         }
         else if(data is CharacterData characterData)
         {
+            _data = characterData;
+
             if (_button == null)
                 _button = gameObject.AddComponent<Button>();
 

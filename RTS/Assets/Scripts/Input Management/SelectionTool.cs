@@ -7,6 +7,7 @@ public class SelectionTool : MonoBehaviour
     private Camera _camera;
 
     private bool _clicking = false;
+    private bool _requiresHUDUpdate;
 
     private float _minimumSelectionArea;
 
@@ -63,6 +64,8 @@ public class SelectionTool : MonoBehaviour
     {
         if (!_clicking) return;
 
+        _requiresHUDUpdate = true;
+
         if (_selectionBox.size.sqrMagnitude < _minimumSelectionArea) // Selection Box is too small : click select
         {
             GameEventsManager.PlayEvent("Click", _camera.ScreenToWorldPoint(_mouse.position.ReadValue()));
@@ -83,18 +86,40 @@ public class SelectionTool : MonoBehaviour
                         }
                         else // Shift click
                         {
+                            SelectionManager.UnselectBuilding();
+
                             if (!SelectionManager.SelectedCharacters.Contains(selectedCharacter)) // If the character is not already selected
                                 SelectionManager.AddCharacterToSelection(selectedCharacter);
                             else
+                            {
                                 SelectionManager.RemoveCharacterFromSelection(selectedCharacter);
+                                selectedCharacter.Unselect();
+                            }
                         }
+                    }
+                    else
+                    {
+                        SelectionManager.DeselectAll();
+                        HUDManager.UpdateHUD();
+                        HUDManager.DisplayStats(selectedCharacter);
+                        _requiresHUDUpdate = false;
                     }
                 }
                 else if (hit.collider.gameObject.TryGetComponent(out Building selectedBuilding))// Collider = building
-                    if (GameManager.MyEntities.Contains(selectedBuilding) && SelectionManager.SelectedBuilding != selectedBuilding) //Test if building owner
+                    if (GameManager.MyEntities.Contains(selectedBuilding)) //Test if building owner
+                    {
+                        if (selectedBuilding != SelectionManager.SelectedBuilding)
+                        {
+                            SelectionManager.DeselectAll();
+                            SelectionManager.SetSelectedBuilding(selectedBuilding);
+                        }
+                    }
+                    else
                     {
                         SelectionManager.DeselectAll();
-                        SelectionManager.SetSelectedBuilding(selectedBuilding);
+                        HUDManager.UpdateHUD();
+                        HUDManager.DisplayStats(selectedBuilding);
+                        _requiresHUDUpdate = false;
                     }
             }
             else
@@ -119,6 +144,7 @@ public class SelectionTool : MonoBehaviour
 
         _clicking = false;
 
-        HUDManager.UpdateHUD();
+        if(_requiresHUDUpdate)
+            HUDManager.UpdateHUD();
     }
 }

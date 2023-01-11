@@ -3,6 +3,8 @@ using System.Collections;
 using PlayerIOClient;
 using UnityEngine;
 using System;
+using static NetworkManager;
+using System.Linq;
 
 public partial class NetworkManager : MonoBehaviour
 {
@@ -29,6 +31,22 @@ public partial class NetworkManager : MonoBehaviour
     public static bool IsReady => _instance._me.IsReady;
     public static bool IsPlaying => Hosted && _instance._isPlaying;
     public static bool IsRunning => Hosted && _instance._isRunning;
+
+    public static string[] Names
+    {
+        get
+        {
+            if (_instance._room is null)
+                return null;
+
+            string[] names = new string[_instance._room.Players.Count];
+
+            for (int i = 0; i < _instance._room.Players.Count; ++i)
+                names[i] = _instance._room.Players[i].Name;
+
+            return names;
+        }
+    }
 
     #endregion
 
@@ -58,7 +76,12 @@ public partial class NetworkManager : MonoBehaviour
             if (IsPlaying)
                 lineCount += 4;
             else
+            {
                 lineCount += _room.Players != null ? _room.Players.Count : 1;
+
+                if (AmIHost)
+                    lineCount += 2;
+            }
 
             lineCount += 2;
         }
@@ -92,6 +115,33 @@ public partial class NetworkManager : MonoBehaviour
             {
                 foreach (Player player in _room.Players)
                     GUILayout.Label($"{player.Name} - {(player.IsReady ? "O" : "N")}");
+
+                if (AmIHost)
+                {
+                    GUILayout.FlexibleSpace();
+
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.Label("Nombre d'IA : ");
+
+                    int maxAICount = MaxPlayerCount - (_room.Players.Count - _room.AiCount);
+
+                    for (int i = 0; i <= maxAICount; ++i)
+                    {
+                        GUIStyle style = GUI.skin.button;
+
+                        Color color = style.normal.textColor;
+
+                        style.normal.textColor = _room.AiCount == i ? Color.green : Color.red;
+
+                        if (GUILayout.Button($"{i}", style))
+                            _server.Send("AICount", i);
+
+                        style.normal.textColor = color;
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
             }
 
             GUILayout.FlexibleSpace();
@@ -145,6 +195,8 @@ public partial class NetworkManager : MonoBehaviour
                         _room = room;
 
                         _rooms = null;
+
+                        AmIHost = false;
                     });
                 }
             }
@@ -167,6 +219,8 @@ public partial class NetworkManager : MonoBehaviour
                 JoinRoom(_me.Name, delegate (bool success)
                 {
                     _loading = false;
+
+                    AmIHost = true;
                 });
             }
 
@@ -199,6 +253,8 @@ public partial class NetworkManager : MonoBehaviour
     public static int RoomSize => _instance._roomSize;
     public static int CurrentTick => _instance._tick;
 
+    public bool AmIHost { get; private set; } = false;
+
     private float _tickPeriod;
 
     private int _lateness = 0;
@@ -226,7 +282,7 @@ public partial class NetworkManager : MonoBehaviour
         _messages = new Queue<Message>();
         _ticks = new Dictionary<int, Tick>();
 
-        _me = new Player(SystemInfo.deviceName);
+        _me = new Player(SystemInfo.deviceName, false);
 
         Connect();
     }
@@ -272,9 +328,10 @@ public partial class NetworkManager : MonoBehaviour
                     _ticks.Clear();
 
                     _id = message.GetInt(1);
-                    _roomSize = message.GetInt(0);
+                    _roomSize = message.GetInt(0) + message.GetInt(2);
 
-                    GameManager.Prepare();
+                    SetupManager.CompleteReset();
+                    SetupManager.SetupGame();
 
                     StartCoroutine(Loop());
 
@@ -325,6 +382,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.Stop:
+                Spread(message, input.Targets);
+
+                break;
+
             case InputType.Kill:
                 Spread(message, input.Targets);
 
@@ -357,6 +419,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.CancelConstruction:
+                message.Add(input.ID);
+
+                break;
+
             case InputType.Attack:
                 message.Add(input.ID, input.Position.x, input.Position.y);
 
@@ -364,10 +431,11 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
-                case InputType.GuardPosition:
+            case InputType.GuardPosition:
                 message.Add(input.Position.x, input.Position.y);
 
                 Spread(message, input.Targets);
+
                 break;
 
             case InputType.Harvest:

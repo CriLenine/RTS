@@ -23,24 +23,7 @@ public class OrderManager : MonoBehaviour
     {
         Vector3 worldMousePos = _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue());
 
-        RaycastHit2D hit = Physics2D.Raycast(worldMousePos, Vector2.zero, Mathf.Infinity, SelectionManager.Clickable);
-
-        if (hit.collider != null)
-        {
-            if (hit.collider.gameObject.TryGetComponent(out Building building))
-            {
-                if (GameManager.MyBuildings.Contains(building))
-                    if (building.BuildCompletionRatio < 1)
-                        OrderBuild(building);
-                    else
-                        Debug.Log("Right click on a built ally building not yet implemented.");
-                else
-                    OrderAttack(building);
-            }
-            else if (hit.collider.gameObject.TryGetComponent(out Character character) && !GameManager.MyCharacters.Contains(character))
-                OrderAttack(character);
-        }
-        else
+        if (!IsMouseOnTickedBehavior(worldMousePos))
         {
             Vector2Int rallyPointCoords = TileMapManager.WorldToTilemapCoords(worldMousePos);
 
@@ -52,39 +35,57 @@ public class OrderManager : MonoBehaviour
             if (!rallyTile.IsFree(NetworkManager.Me))
             {
                 if (ResourcesManager.Harvestable(rallyPointCoords))
-                {
-                    int[] ids = new int[SelectionManager.SelectedCharacters.Count];
-
-                    for (int i = 0; i < SelectionManager.SelectedCharacters.Count; ++i)
-                        ids[i] = SelectionManager.SelectedCharacters[i].ID;
-
-                    NetworkManager.Input(TickInput.Harvest(rallyPointCoords, ids));
-                }
+                    NetworkManager.Input(TickInput.Harvest(rallyPointCoords, SelectionManager.GetSelectedIds()));
                 return;
             }
 
-            int[] IDs = SelectionManager.GetSelectedIds();
-
-            NetworkManager.Input(TickInput.Move(IDs, worldMousePos));
+            NetworkManager.Input(TickInput.Move(SelectionManager.GetSelectedIds(), worldMousePos));
         }
+    }
+
+    private static bool IsMouseOnTickedBehavior(Vector3 worldMousePos)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(worldMousePos, Vector2.zero, Mathf.Infinity, SelectionManager.Clickable);
+
+        if (hit.collider == null)
+            return false;
+
+        if (hit.collider.gameObject.TryGetComponent(out Building building))
+        {
+            if (GameManager.MyBuildings.Contains(building))
+                if (building.BuildCompletionRatio < 1)
+                    OrderBuild(building);
+                else
+                    Debug.Log("Right click on a built ally building not yet implemented.");
+            else
+                OrderAttack(building);
+        }
+        else if (hit.collider.gameObject.TryGetComponent(out Character character) && !GameManager.MyCharacters.Contains(character))
+            OrderAttack(character);
+
+        return true;
     }
 
     public static void OrderBuild(Building building)
     {
-        int[] builderIDs = SelectionManager.GetSelectedIds();
-
-        NetworkManager.Input(TickInput.Build(building.ID, builderIDs));
+        NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();
     }
 
     public static void OrderAttack(TickedBehaviour entity)
     {
-        int[] attackerIDs = SelectionManager.GetSelectedIds();
-
-        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, attackerIDs));
+        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();
+    }
+
+    public static void OrderGuard()
+    {
+        Vector3 worldMousePos = _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue());
+
+        if (!IsMouseOnTickedBehavior(worldMousePos))
+            NetworkManager.Input(TickInput.GuardPosition(worldMousePos, SelectionManager.GetSelectedIds()));
     }
 
     public static void TrySetBuildingRallyPoint()

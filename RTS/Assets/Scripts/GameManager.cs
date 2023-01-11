@@ -1,15 +1,12 @@
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using TheKiwiCoder;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
-
-    [SerializeField]
-    private Transform _spawnPoints;
 
     #region Init & Variables
 
@@ -55,6 +52,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        UnityEngine.Random.InitState(0);
+
         _instance = this;
 
         DontDestroyOnLoad(this);
@@ -64,6 +63,9 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    [SerializeField]
+    BehaviourTree _tree;
 
     public static void AddResource(ResourceType type, int amount, int performer)
     {
@@ -127,6 +129,10 @@ public class GameManager : MonoBehaviour
 
                     break;
 
+                case InputType.Stop:
+                    Stop(input.Targets);
+                    break;
+
                 case InputType.Kill:
                     Kill(input.Performer, input.Targets);
                     break;
@@ -148,6 +154,10 @@ public class GameManager : MonoBehaviour
                     DestroyBuilding(input.Performer, input.ID);
                     break;
 
+                case InputType.CancelConstruction:
+                    CancelConstruction(input.Performer, input.ID);
+                    break;
+
                 case InputType.Move:
                     MoveCharacters(input.Performer, input.Position, -1, input.Targets, MoveType.ToPosition);
                     break;
@@ -165,7 +175,7 @@ public class GameManager : MonoBehaviour
                     MoveAndWatch(input.Performer, input.Position, input.Targets);
                     break;
                 case InputType.GameOver:
-                    if(input.Performer != NetworkManager.Me)
+                    if (input.Performer != NetworkManager.Me)
                     {
                         Debug.Log("Player " + input.Performer + " is bad and loses. GameOver");
                         NetworkManager.QuitRoom();
@@ -195,19 +205,6 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
-        #region Compute Hash
-
-        Hash128 hash = new Hash128();
-
-        foreach (TickedBehaviour entity in _instance._entities)
-        {
-            entity.Tick();
-
-            hash.Append(entity.GetHash128().GetHashCode());
-        }
-
-        #endregion
-
         #region Destroy Pending Entities
 
         foreach (TickedBehaviour entity in _instance._entitiesToDestroy)
@@ -219,7 +216,7 @@ public class GameManager : MonoBehaviour
             _instance._entities.Remove(ID);
             _instance._myEntities.Remove(ID);
 
-            if (entity is Character character)
+            if (entity is Character)
             {
                 _instance._characters.Remove(ID);
                 _instance._myCharacters.Remove(ID);
@@ -227,20 +224,20 @@ public class GameManager : MonoBehaviour
 
                 GameEventsManager.PlayEvent("CharacterDeath", character.gameObject);
             }
-            else if (entity is Building building)
+
+            if (entity is Building building)
             {
                 _instance._buildings.Remove(ID);
                 _instance._myBuildings.Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
 
-                if (building.Data.Type == Building.Type.HeadQuarters && building.Performer == NetworkManager.Me) //WIN CONDITION
-                    _instance.GameOver();
-
                 GameEventsManager.PlayEvent("BuildingDestruction", building.gameObject);
             }
 
             Destroy(entity);
+
+            EliminationManager.CheckForElimination();
         }
 
         if (_instance._entitiesToDestroy.Count > 0)
@@ -251,6 +248,19 @@ public class GameManager : MonoBehaviour
         }
 
         _instance._entitiesToDestroy.Clear();
+
+        #endregion
+
+        #region Compute Hash
+
+        Hash128 hash = new Hash128();
+
+        foreach (TickedBehaviour entity in _instance._entities)
+        {
+            entity.Tick();
+
+            hash.Append(entity.GetHash128().GetHashCode());
+        }
 
         #endregion
 
@@ -428,6 +438,12 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    private static void Stop(int[] targets)
+    {
+        foreach(int ID in targets)
+            _instance._characters[ID].ClearActions();
+    }
+
     private static void AssignBuild(int buildingID, int[] targets)
     {
         foreach (int ID in targets)
@@ -453,27 +469,32 @@ public class GameManager : MonoBehaviour
         {
             resource = ResourcesManager.GetNearestAggregate(inputCoords);
         }
+        else
+            return;
 
         for (int i = 0; i < targets.Length; ++i)
         {
-            Character harvester = _instance._myEntities[targets[i]] as Character;
+            Character harvester = _instance._characters[targets[i]];
 
             Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, performer);
             if (harvestingCoords == null)
                 break;
 
-            List<Vector2> wayPoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
+            List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
+
+            if (!(waypoints?.Count != 0))
+                continue;
 
             Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);
             if (coordsToHarvest == null)
                 break;
 
-            harvester.SetAction(new Move(harvester, wayPoints));
+            harvester.SetAction(new Move(harvester, waypoints));
             harvester.AddAction(new Harvest(harvester, inputCoords, resource));
         }
     }
 
-#endregion
+    #endregion
 
     #region Create & Destroy TickedBehaviours
 
@@ -505,10 +526,14 @@ public class GameManager : MonoBehaviour
 
     private static void Kill(int performer, int[] targets)
     {
-        for (int i = 0; i < targets.Length; i++)
-            DestroyEntity(targets[i]);
+        foreach (int ID in targets)
+        {
+            DestroyEntity(ID);
+            StatsManager.IncreaseUnitsLost(performer);
+        }
     }
-    private static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
+
+    public static int CreateBuilding(int performer, int buildingType, Vector2 position, bool autoComplete = false)
     {
         BuildingData data = DataManager.GetBuildingData((Building.Type)buildingType);
 
@@ -538,15 +563,24 @@ public class GameManager : MonoBehaviour
 
     private static void DestroyBuilding(int performer, int buildingID)
     {
+        Building building = _instance._buildings[buildingID];
+
+        StatsManager.IncreaseBuildingsLost(performer);
+
+        if (performer == NetworkManager.Me)
+            _instance._housing -= building.Data.HousingProvided;
+
+        DestroyEntity(buildingID);
+    }
+
+    private static void CancelConstruction(int performer, int buildingID)
+    {
         if (performer == NetworkManager.Me)
         {
             Building building = _instance._buildings[buildingID];
 
-            if (!building.BuildComplete)
-                foreach (Resource.Amount cost in building.Data.Cost)
-                    _instance._playerResources[cost.Type][performer] += cost.Value;
-            else
-                _instance._housing -= building.Data.HousingProvided;
+            foreach (Resource.Amount cost in building.Data.Cost)
+                _instance._playerResources[cost.Type][performer] += cost.Value;
         }
 
         DestroyEntity(buildingID);
@@ -577,37 +611,7 @@ public class GameManager : MonoBehaviour
         _instance._characterToSpawn.Add((performer,spawnerID,type,rallyPoint));
     }
     #endregion
-
-    public static void Prepare()
-    {
-
-        DestroyAllEntities();
-
-        FogOfWarManager.ResetFog();
-        FogOfWarManager.UpdateFog();
-        FogOfWarManager.SetFogActive(true);
-
-        TileMapManager.ResetViews();
-
-        QuadTreeNode.Init(3, 25, 25);
-
-        for (int i = 0; i < NetworkManager.RoomSize; ++i)
-        {
-            Vector2 spawnPoint = _instance._spawnPoints.GetChild(i).position;
-
-            CreateCharacter(i,-1, (int)Character.Type.Bowman, Vector2.zero, true, spawnPoint + new Vector2(2f, 0));
-            CreateCharacter(i, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-2f, 0));
-            CreateCharacter(i, -1, (int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(-1f, -2f));
-            CreateCharacter(i+1, -1,(int)Character.Type.Peon, Vector2.zero, true, spawnPoint + new Vector2(1f, -2f));
-
-            CreateBuilding(i, (int)Building.Type.HeadQuarters, spawnPoint , true);
-
-            if (i == NetworkManager.Me)
-                CameraMovement.SetPosition(spawnPoint);
-        }
-    }
-
-    public static void UpdateHousing(int delta)
+     public static void UpdateHousing(int delta)
     {
         _instance._housing += delta;
         HUDManager.UpdateHousing();

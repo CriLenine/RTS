@@ -40,7 +40,7 @@ public class ActionsManager : MonoBehaviour
     public void Stop()
     {
         OnClickCommon();
-
+        NetworkManager.Input(TickInput.Stop(SelectionManager.GetSelectedIds()));
     }
 
     public void MoveToggle()
@@ -55,14 +55,7 @@ public class ActionsManager : MonoBehaviour
 
     public void KillUnits()
     {
-        List<Character> selectedCharacters = SelectionManager.SelectedCharacters;
-
-        int[] IDs = new int[selectedCharacters.Count];
-
-        for (int i = 0; i < selectedCharacters.Count; ++i)
-            IDs[i] = selectedCharacters[i].ID;
-
-        NetworkManager.Input(TickInput.Kill(IDs));
+        NetworkManager.Input(TickInput.Kill(SelectionManager.GetSelectedIds()));
     }
 
     public void DestroyBuilding()
@@ -70,7 +63,12 @@ public class ActionsManager : MonoBehaviour
         NetworkManager.Input(TickInput.Destroy(SelectionManager.SelectedBuilding.ID));
     }
 
-    public static void QueueUnitSpawn(CharacterData data)
+    public void CancelBuildingConstruction()
+    {
+        NetworkManager.Input(TickInput.CancelConstruction(SelectionManager.SelectedBuilding.ID));
+    }
+
+    public void QueueUnitSpawn(CharacterData data)
     {
         foreach (Resource.Amount cost in data.Cost)
             GameManager.Pay(cost.Type, cost.Value, NetworkManager.Me);
@@ -108,6 +106,12 @@ public class ActionsManager : MonoBehaviour
     {
         HUDManager.UpdateActionButtons();
         InputActionsManager.UpdateGameState(GameState.None);
+    }
+    
+    #region Attack
+    public void GuardPosition()
+    {
+        InputActionsManager.UpdateGameState(GameState.Guard);
     }
     #endregion
 

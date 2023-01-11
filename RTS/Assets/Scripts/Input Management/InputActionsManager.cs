@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public enum GameState
 {
     None,
+    Guard,
     CharacterSelection,
     BuildingSelection,
     Blueprint,
@@ -53,6 +54,11 @@ public class InputActionsManager : MonoBehaviour
         _inputActions.Enable();
     }
 
+    public static void DisableInputs()
+    {
+        _instance._inputActions.Disable();
+    }
+
     private bool TryHUDRaycast()
     {
         RaycastHit2D hit = Physics2D.Raycast(_mouse.position.ReadValue(), Vector2.zero, Mathf.Infinity, _HUDLayerMask);
@@ -73,27 +79,15 @@ public class InputActionsManager : MonoBehaviour
 
         switch (_currentGameState)
         {
-            case GameState.None:
-                SelectionManager.InitSelection();
-                _selectionInitiated = true;
-                break;
-
-            case GameState.CharacterSelection:
-                SelectionManager.InitSelection();
-                _selectionInitiated = true;
-                break;
-
-            case GameState.BuildingSelection:
-                SelectionManager.InitSelection();
-                _selectionInitiated = true;
-                break;
-
             case GameState.Blueprint:
                 Blueprint.TryPlaceBuilding();
                 break;
 
             case GameState.Attack:
                 ActionsManager.Attack();
+            default:
+                SelectionManager.InitSelection();
+                _selectionInitiated = true;
                 break;
         }
     }
@@ -113,6 +107,10 @@ public class InputActionsManager : MonoBehaviour
         {
             case GameState.None:
                 return;
+
+            case GameState.Guard:
+                OrderManager.OrderGuard();
+                break;
 
             case GameState.CharacterSelection:
                 OrderManager.GiveOrder();
