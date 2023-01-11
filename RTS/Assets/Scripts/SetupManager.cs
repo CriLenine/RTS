@@ -33,7 +33,7 @@ public class SetupManager : MonoBehaviour
 
     public static void SetupGame()
     {
-        QuadTreeNode.Init(3, 25, 25);
+        QuadTreeNode.Init(3, 50, 50);
         StatsManager.Init();
         EliminationManager.Init();
 

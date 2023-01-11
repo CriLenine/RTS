@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad1fe046a1be828439277a073d68d0fb, type: 3}
+  m_Name: Crystal
+  m_EditorClassIdentifier: 
+  _type: 3
+  _harvestingTime: 2
+  _amountPerHarvest: 5
+  _nMaxHarvestPerTile: 5
+  _tileAspects:
+  - {fileID: 11400000, guid: 1a68554d407e6f34dbbb8d0bb48f054f, type: 2}
+  - {fileID: 11400000, guid: 0f1ba6689e5d9384ab463943736d656c, type: 2}
+  - {fileID: 11400000, guid: 48e27a9ebc604b64992d8c2363bdefe9, type: 2}

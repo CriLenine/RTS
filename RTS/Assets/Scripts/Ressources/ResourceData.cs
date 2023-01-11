@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 [CreateAssetMenu(fileName = "Resource", menuName = "Resource", order = 1)]
 public class ResourceData : ScriptableObject
@@ -15,7 +16,9 @@ public class ResourceData : ScriptableObject
     [SerializeField]
     private int _nMaxHarvestPerTile;
 
-    private int _amount;
+    [SerializeField]
+    private TileBase[] _tileAspects;
+
     public ResourceType Type => _type;
 
     public float HarvestingTime => _harvestingTime;
@@ -23,4 +26,6 @@ public class ResourceData : ScriptableObject
     public int AmountPerHarvest => _amountPerHarvest;
 
     public int NMaxHarvestPerTile => _nMaxHarvestPerTile;
+
+    public TileBase[] TileAspects => _tileAspects;
 }
