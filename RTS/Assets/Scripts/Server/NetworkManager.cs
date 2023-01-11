@@ -504,7 +504,7 @@ public partial class NetworkManager : MonoBehaviour
             {
                 _instance._loading = false;
 
-                client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
+                //client.Multiplayer.DevelopmentServer = new ServerEndpoint("localhost", 8184);
 
                 _instance._multiplayer = client.Multiplayer;
             },

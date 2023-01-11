@@ -390,15 +390,14 @@ public class GameManager : MonoBehaviour
     {
         Resource resource = null;
         Vector2Int inputCoords = new Vector2Int((int)position.x, (int)position.y);
-
         if (ResourcesManager.HasTree(position))
-            resource = ResourcesManager.GetNearestForest(inputCoords, ResourceType.Wood);
+        {
+            resource = ResourcesManager.GetNearestForest(inputCoords);
+        }
         else if (ResourcesManager.HasRock(position))
-            resource = ResourcesManager.GetNearestForest(inputCoords, ResourceType.Stone);
-        else if (ResourcesManager.HasGold(position))
-            resource = ResourcesManager.GetNearestAggregate(inputCoords, ResourceType.Gold);
-        else if (ResourcesManager.HasCrystal(position))
-            resource = ResourcesManager.GetNearestAggregate(inputCoords, ResourceType.Crystal);
+        {
+            resource = ResourcesManager.GetNearestAggregate(inputCoords);
+        }
         else
             return;
 

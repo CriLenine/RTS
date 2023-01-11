@@ -11,9 +11,7 @@ public enum TileTag
 {
     None,
     Tree,
-    Rock,
-    Gold,
-    Crystal
+    Rock
 }
 
 public class LogicalTile

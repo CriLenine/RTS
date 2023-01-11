@@ -5,10 +5,10 @@ using UnityEngine;
 
 public enum ResourceType
 {
+    Crystal,
     Wood,
-    Stone,
     Gold,
-    Crystal
+    Stone
 }
 
 public abstract class Resource : MonoBehaviour
@@ -74,16 +74,11 @@ public abstract class Resource : MonoBehaviour
     /// Called when a tile is harvested. Executes the needed operations on the tile.
     /// </summary>
     /// <param name="coords">The coords of the harvested tile</param>
-    public abstract void OnHarvestedTile(Vector2Int coords, bool tileDepleted);
+    public abstract void OnHarvestedTile(Vector2Int coords, int harvestedAmount, bool tileDepleted);
 
     public void Init()
     {
-        CurrentAmount = new Amount(Data.Type);
-        foreach (Vector2Int item in _itemsNHarvested.Keys)
-        {
-            if (this is Forest || !IsSurrounded(item))
-                CurrentAmount = CurrentAmount.AddQuantity(Data.AmountPerHarvest * Data.NMaxHarvestPerTile);
-        }
+        CurrentAmount = new Amount(Data.Type, _itemsNHarvested.Count);
     }
 
     public Vector2Int GetClosest(Vector2Int characterCoords)
@@ -96,14 +91,7 @@ public abstract class Resource : MonoBehaviour
     /// If no suitable tile is found, returns <see langword="null"/>.</returns>
     public virtual Vector2Int? GetHarvestingPosition(Vector2Int resourceCoords, Vector2Int harvesterCoords, int performer)
     {
-        TileTag tag = TileTag.None;   //(TileTag)((int)Data.Type + 1); //Works only by current definition of the enums
-
-        if (Data.Type == ResourceType.Wood) tag = TileTag.Tree;
-        else if (Data.Type == ResourceType.Stone) tag = TileTag.Rock;
-        else if (Data.Type == ResourceType.Gold) tag = TileTag.Gold;
-        else if (Data.Type == ResourceType.Crystal) tag = TileTag.Crystal;
-
-        LogicalTile destinationTile = TileMapManager.FindPathWithTag(performer, harvesterCoords, resourceCoords, tag, 10);
+        LogicalTile destinationTile = TileMapManager.FindPathWithTag(performer, harvesterCoords, resourceCoords, this is Forest ? TileTag.Tree : TileTag.Rock, 10);
         if (destinationTile == null)
             Debug.Log("The pathfinding to the next tile failed.");
 
@@ -157,8 +145,9 @@ public abstract class Resource : MonoBehaviour
     {
         if (_itemsNHarvested.ContainsKey(lastHarvested))
         {
+            int trueHarvestedAmount = Mathf.Min(harvestedAmount, Data.NMaxHarvestPerTile - _itemsNHarvested[lastHarvested]);
             _itemsNHarvested[lastHarvested] += harvestedAmount;
-            OnHarvestedTile(lastHarvested, _itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile);
+            OnHarvestedTile(lastHarvested, trueHarvestedAmount, _itemsNHarvested[lastHarvested] >= Data.NMaxHarvestPerTile);
         }
     }
 
@@ -199,11 +188,10 @@ public abstract class Resource : MonoBehaviour
     /// <summary>
     /// Checks if the tile at <paramref name="coords"/> is completely surrounded by obstacles.
     /// </summary>
-    private bool IsSurrounded(Vector2Int coords, int performer = -1)
+    private bool IsSurrounded(Vector2Int coords, int performer)
     {
         foreach (Vector2Int dir in _dirs)
-            if (performer > -1 && TileMapManager.GetLogicalTile(coords + dir)?.IsFree(performer) == true
-                || performer == -1 && TileMapManager.GetLogicalTile(coords + dir)?.State == TileState.Free)
+            if (TileMapManager.GetLogicalTile(coords + dir)?.IsFree(performer) == true)
                 return false;
 
         return true;
