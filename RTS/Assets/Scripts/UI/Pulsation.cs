@@ -46,12 +46,15 @@ public class Pulsation : MonoBehaviour
         switch (elementType)
         {
             case pulsatingElementType.SpriteRenderer:
+                _pulsatingSprite.DOFade(_alphaRange.Max, 0.1f);
                 _pulsatingSprite.DOFade(_alphaRange.Min, _halfPeriod).SetLoops(-1, LoopType.Yoyo);
                 break;
             case pulsatingElementType.Image:
+                _pulsatingImage.DOFade(_alphaRange.Max, 0.1f);
                 _pulsatingImage.DOFade(_alphaRange.Min, _halfPeriod).SetLoops(-1, LoopType.Yoyo);
                 break;
             case pulsatingElementType.Text:
+                _pulsatingText.DOFade(_alphaRange.Max, 0.1f);
                 _pulsatingText.DOFade(_alphaRange.Min, _halfPeriod).SetLoops(-1, LoopType.Yoyo);
                 break;
         }

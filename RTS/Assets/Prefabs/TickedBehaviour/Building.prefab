@@ -232,7 +232,7 @@ MonoBehaviour:
   elementType: 2
   _pulsatingSprite: {fileID: 0}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 8656913595432050322}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 1
   _alphaRange:
     Min: 0.25050506
@@ -337,7 +337,7 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 1606223701922937047}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 2
   _alphaRange:
     Min: 0.4048892
@@ -442,10 +442,10 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 6732310629641516016}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 1.5
   _alphaRange:
-    Min: 0.4025297
+    Min: 0
     Max: 1
 --- !u!1 &5348491757811676431
 GameObject:
@@ -548,7 +548,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3751911221500607498
 Transform:
   m_ObjectHideFlags: 0
@@ -606,7 +606,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 8
   m_Sprite: {fileID: 21300000, guid: 9e9fa17f9ef7a6444af783a2277e8afe, type: 3}
-  m_Color: {r: 0.99215686, g: 1, b: 0.7764706, a: 0.5882353}
+  m_Color: {r: 0.99215686, g: 1, b: 0.7764706, a: 0.8627451}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -631,10 +631,10 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 6699875959428370091}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
-  _pulsePeriod: 0.7
+  _pulsatingText: {fileID: 0}
+  _pulsePeriod: 2
   _alphaRange:
-    Min: 0.29596737
+    Min: 0
     Max: 1
 --- !u!1 &7459758155509815140
 GameObject:
@@ -1027,10 +1027,10 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 391842509444656212}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 1.5
   _alphaRange:
-    Min: 0.40202022
+    Min: 0.5004568
     Max: 1
 --- !u!4 &1510140775029635323 stripped
 Transform:
