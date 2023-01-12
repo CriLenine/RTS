@@ -35,8 +35,8 @@ MonoBehaviour:
     _value: 60
   - _type: 2
     _value: 75
-  _icon: {fileID: 21300000, guid: d04ea81f94a6358428eb423dfc3a1f94, type: 3}
-  _color: {r: 0, g: 0.49056602, b: 0.039178107, a: 1}
+  _icon: {fileID: 21300000, guid: ff40b0b52c5e4704ea9f194ecb0cd6d5, type: 3}
+  _color: {r: 0.65882355, g: 0.15686275, b: 0.12156863, a: 1}
   _toolTip: {fileID: 11400000, guid: afea60d3ae1a9844587d15ad246e17af, type: 2}
   _selectionToolTip: {fileID: 11400000, guid: e0d66d76c3bf6e24ea6826ac83ccb3b4, type: 2}
   _animator: {fileID: 9100000, guid: ea53f888ac576674a9c523704a579b46, type: 2}

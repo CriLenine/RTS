@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using System.Collections;
 using PlayerIOClient;
-using UnityEngine;
 using System;
-using static NetworkManager;
-using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public partial class NetworkManager : MonoBehaviour
 {
@@ -14,6 +12,9 @@ public partial class NetworkManager : MonoBehaviour
     private const float MinTickPeriod = 0.005f;
 
     private static NetworkManager _instance;
+
+    [SerializeField]
+    private MenuManager _menuManager;
 
     #region State
 
@@ -283,8 +284,6 @@ public partial class NetworkManager : MonoBehaviour
         _ticks = new Dictionary<int, Tick>();
 
         _me = new Player(SystemInfo.deviceName, false);
-
-        Connect();
     }
 
     #endregion
@@ -492,7 +491,7 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Connection & Host
 
-    private static void Connect()
+    public static void Connect()
     {
         _instance._loading = true;
 
@@ -519,11 +518,43 @@ public partial class NetworkManager : MonoBehaviour
         );
     }
 
-    private static void GetRooms(Action<RoomInfo[]> callback)
+    public static void GetRooms(Action<RoomInfo[]> callback)
     {
         _instance._multiplayer.ListRooms("Game", null, 0, 0,
             delegate (RoomInfo[] rooms) { callback(rooms); }
         );
+    }
+
+    public static void JoinRoom()
+    {
+        JoinRoom(_instance._me.Name, delegate (bool success)
+        {
+            _instance._loading = false;
+
+            _instance.AmIHost = true;
+        });
+    }
+
+    public static void JoinRoom(Room room)
+    {
+        JoinRoom(room.Name, delegate (bool success)
+        {
+            _instance._loading = false;
+
+            _instance._room = room;
+
+            _instance._rooms = null;
+
+            _instance.AmIHost = false;
+        });
+    }
+
+    public static void RetrieveRooms()
+    {
+        GetRooms(delegate (RoomInfo[] rooms)
+        {
+            _instance._menuManager.LoadRooms(Room.FromRoomInfos(rooms));
+        });
     }
 
     private static void JoinRoom(string id, Action<bool> callback)
