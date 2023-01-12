@@ -50,8 +50,11 @@ public class InputActionsManager : MonoBehaviour
 
         _inputActions.KeyboardControls.Shift.started += _ => IsShifting = true;
         _inputActions.KeyboardControls.Shift.canceled += _ => IsShifting = false;
+    }
 
-        _inputActions.Enable();
+    public static void EnableInputs()
+    {
+        _instance._inputActions.Enable();
     }
 
     public static void DisableInputs()

@@ -184,7 +184,7 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 3402028436356339524}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 2
   _alphaRange:
     Min: 0.3959596
@@ -289,10 +289,10 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 4233526514595389219}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 0.7
   _alphaRange:
-    Min: 0.35064948
+    Min: 0
     Max: 1
 --- !u!1 &4637137328536817941
 GameObject:
@@ -631,10 +631,10 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 5290075923001771086}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 1.5
   _alphaRange:
-    Min: 0.39988133
+    Min: 0
     Max: 1
 --- !u!1001 &2781204030026741218
 PrefabInstance:
@@ -878,11 +878,11 @@ MonoBehaviour:
   elementType: 0
   _pulsatingSprite: {fileID: 5860510913181105245}
   _pulsatingImage: {fileID: 0}
-  _pulsatingLine: {fileID: 0}
+  _pulsatingText: {fileID: 0}
   _pulsePeriod: 1.5
   _alphaRange:
-    Min: 0.4048892
-    Max: 1
+    Min: 0.49753538
+    Max: 0.9999999
 --- !u!4 &4670712230874212594 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7370534773866142992, guid: 86d310209c9e1e2498f39f2488cbf86d, type: 3}

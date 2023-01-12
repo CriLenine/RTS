@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Geoffrey.unity
-    guid: 8a7a28dab938875488ddfff84aa20c66
+    path: Assets/Scenes/Remi.unity
+    guid: 1990728c1d463be4a81aa69ccf48be0b
   m_configObjects: {}
