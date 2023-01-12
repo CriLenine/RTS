@@ -15,7 +15,7 @@ public class MoveAttack : Move
         _finalDistanceToDest = character.Data.AttackRange;
 
         _target = target;
-        _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
+        _lastPos = _target.Coords;
     }
 
     public MoveAttack(Character character, Vector2 position, TickedBehaviour target) : base(character, position) // Move and attack target
@@ -23,7 +23,7 @@ public class MoveAttack : Move
         _finalDistanceToDest =character.Data.AttackRange;
 
         _target = target;
-        _lastPos = TileMapManager.WorldToTilemapCoords(target.transform.position);
+        _lastPos = _target.Coords;
     }
 
     protected override bool Update()
@@ -36,13 +36,14 @@ public class MoveAttack : Move
         }
 
 
-        Vector2Int postToTest = TileMapManager.WorldToTilemapCoords(_target.transform.position);
+        Vector2Int postToTest =_target.Coords;
         if (postToTest != _lastPos)
         {
             if (TileMapManager.LineOfSight(_character.Performer, _character.Coords, postToTest))
             {
                 Positions.Clear();
-                Positions.Add(postToTest);
+                Index = 0;
+                Positions.Add(TileMapManager.TilemapCoordsToWorld(postToTest));
             }
             else
                 Positions.Add(postToTest);

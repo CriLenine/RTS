@@ -406,7 +406,7 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < group.Count; ++i)
                 {
                     group[i].SetAction(new MoveAttack(group[i], groupsAndPathfindings[group], target));
-                    group[i].AddAction(new Attack(group[i], target, groupsAndPathfindings[group][^1]));
+                    group[i].AddAction(new Attack(group[i], target,target is Building));
                 }
             }
             else

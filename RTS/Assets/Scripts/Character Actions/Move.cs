@@ -49,14 +49,14 @@ public class Move : Action
         if (Positions.Count == 0)
             return true;
 
-        Vector2 lastpos = _character.transform.position;
+        Vector2 lastpos = _character.Position;
 
         if (LocomotionManager.Move(_character, Position))
         {
             ++Index;
         }
 
-        var diff = (Vector2)_character.transform.position - lastpos;
+        var diff = _character.Position - lastpos;
 
         _animator.SetFloat("MoveX", diff.x);
         _animator.SetFloat("MoveY", diff.y);
