@@ -7665,6 +7665,18 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -35.13
       objectReference: {fileID: 0}
+    - target: {fileID: 1162021813906856827, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2265087199565666120, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2265087199565666122, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4342173038338590069, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
       propertyPath: m_Name
       value: Map_template 2
