@@ -187,6 +187,9 @@ public class MenuManager : MonoBehaviour
 
     private void DisplayRooms()
     {
+        foreach (Transform child in _roomLayout.transform) 
+            Destroy(child.gameObject);
+
         foreach (NetworkManager.Room room in _serverRooms)
         {
             GameObject newRoom = Instantiate(_roomTemplatePrefab);
