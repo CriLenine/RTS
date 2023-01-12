@@ -7,17 +7,17 @@ public class Attack : Action
 {
     private TickedBehaviour _target;
     private IDamageable Itarget;
+
+    //Attackers data
     private int _attackDamage;
     private float _attackRange;
     private float _attackSpeed;
 
-    private Vector2 _posToAttack;
-    private UnityEngine.Transform _charaTransform;
-
-    private bool _isOrder;
-
+    //Variable
     private float _attackSpeedTimer = 0;
-    public Attack(Character character, TickedBehaviour target, bool isOrder = true) : base(character)
+    private bool _isbuilding = false;
+    private bool _isOrder;
+    public Attack(Character character, TickedBehaviour target,bool targetIsBuilding, bool isOrder = true) : base(character)
     {
         _target = target;
 
@@ -29,28 +29,7 @@ public class Attack : Action
         _attackSpeed = character.Data.AttackSpeed;
         _isOrder = isOrder;
 
-
-        _posToAttack = target.transform.position;
-        _charaTransform = character.transform;
-
-        character.SetTarget(target);
-    }
-    public Attack(Character character, TickedBehaviour target, Vector2 posToAttack, bool isOrder = true) : base(character)
-    {
-        _target = target;
-
-        if (!target.TryGetComponent(out Itarget))
-            throw new NotImplementedException("the attack target is not damageable");
-
-        _attackDamage = character.Data.AttackDamage;
-        _attackRange = character.Data.AttackRange;
-        _attackSpeed = character.Data.AttackSpeed;
-        _isOrder = isOrder;
-
-
-        _posToAttack = posToAttack;
-        _charaTransform = character.transform;
-
+        _isbuilding = targetIsBuilding;
         character.SetTarget(target);
     }
 
@@ -64,10 +43,13 @@ public class Attack : Action
         if (_target is Building building && building.CurrentHealth == 0)
             return true;
 
-        if ((_posToAttack - (Vector2)_charaTransform.position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
+        if (_isbuilding && (_target.Position - _character.Position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
         {
             if (_isOrder)//Si on a cliquer a la mano sur lennemie on le suit jusqua la mort
+            {
                 SetAction(new MoveAttack(_character, _target.transform.position, _target));
+                AddAction(new Attack(_character, _target, _isbuilding));
+            }
 
             return true;
         }
