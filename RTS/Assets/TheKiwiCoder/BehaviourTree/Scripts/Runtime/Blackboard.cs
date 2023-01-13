@@ -10,6 +10,12 @@ namespace TheKiwiCoder {
     [System.Serializable]
     public class Blackboard {
 
-        public Vector3 moveToPosition;
+        public int Performer;
+
+        public List<TickInput> Inputs = new List<TickInput>();
+
+        public GameManager.TickedList<TickedBehaviour> Entities => GameManager.GetAIEntities(Performer);
+        public GameManager.TickedList<Character> Characters => GameManager.GetAICharacters(Performer);
+        public GameManager.TickedList<Building> Buildings => GameManager.GetAIBuildings(Performer);
     }
 }
