@@ -1,5 +1,6 @@
 ﻿using PlayerIOClient;
 using System.Collections.Generic;
+using static NetworkManager;
 
 public partial class NetworkManager
 {
@@ -67,6 +68,24 @@ public partial class NetworkManager
                 rooms[i] = new Room(infos[i].Id, infos[i].OnlineUsers);
 
             return rooms;
+        }
+
+        public Room Clone()
+        {
+            Room clone = new Room(Name);
+
+            clone.AiCount = AiCount;
+
+            foreach (Player player in Players)
+            {
+                Player copy = new Player(player.Name, player.IsAI);
+
+                copy.IsReady = player.IsReady;
+
+                clone.Players.Add(player);
+            }
+
+            return clone;
         }
     }
 }

@@ -60,6 +60,11 @@ public class MenuManager : MonoBehaviour
     private bool _loadingRooms = false;
     private bool _roomsLoaded = false;
 
+    private void Start()
+    {
+        NetworkManager.OnRoomUpdate += OnRoomUpdate;
+    }
+
     private void Update()
     {
         if (_awaitingInteraction)
@@ -79,13 +84,13 @@ public class MenuManager : MonoBehaviour
                 GameEventsManager.PlayEvent("Enter");
             }
         }
-        else if (_attemptingToConnect && NetworkManager.Connected)
+        else if (_attemptingToConnect && NetworkManager.IsConnected)
         {
             HideLoading();
             DisplayGameCreation();
             _attemptingToConnect = false;
         }
-        else if (_attemptingToJoin && NetworkManager.Hosted)
+        else if (_attemptingToJoin && NetworkManager.IsHosted)
         {
             HideLoading();
             DisplayPreGameButtons();
@@ -99,11 +104,16 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void OnRoomUpdate(NetworkManager.Room room)
+    {
+
+    }
+
     public void OnClickPlayGame()
     {
         _mainMenuButtons.DOFade(0f, .1f).OnComplete(() => _mainMenuButtons.gameObject.SetActive(false));
 
-        if (!NetworkManager.Connected)
+        if (!NetworkManager.IsConnected)
         {
             DisplayLoading();
             NetworkManager.Connect();
@@ -174,15 +184,14 @@ public class MenuManager : MonoBehaviour
 
     private void RetrieveRooms()
     {
-        NetworkManager.RetrieveRooms();
+        NetworkManager.GetRooms(delegate (PlayerIOClient.RoomInfo[] rooms)
+        {
+            _serverRooms = NetworkManager.Room.FromRoomInfos(rooms);
+            _roomsLoaded = true;
+        });
+
         _loadingRooms = true;
         _roomsLoaded = false;
-    }
-
-    public void LoadRooms(NetworkManager.Room[] rooms)
-    {
-        _serverRooms = rooms;
-        _roomsLoaded = true;
     }
 
     private void DisplayRooms()

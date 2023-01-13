@@ -95,6 +95,8 @@ public partial class GameRoom : Game<Player>
             _players.Remove(player);
 
             UpdateIndexes();
+
+            BroadcastPlayers();
         }
         else
             DisconnectAll("User left");
