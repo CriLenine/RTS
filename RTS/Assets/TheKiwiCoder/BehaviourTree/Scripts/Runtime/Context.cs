@@ -9,34 +9,24 @@ namespace TheKiwiCoder {
     // Commonly used components and subsytems should be stored here
     // It will be somewhat specfic to your game exactly what to add here.
     // Feel free to extend this class 
-    public class Context {
-        public GameObject gameObject;
-        public Transform transform;
-        public Animator animator;
-        public Rigidbody physics;
-        public NavMeshAgent agent;
-        public SphereCollider sphereCollider;
-        public BoxCollider boxCollider;
-        public CapsuleCollider capsuleCollider;
-        public CharacterController characterController;
-        // Add other game specific systems here
+    public class Context
+    {
+        public int Performer { get; private set; }
 
-        public static Context CreateFromGameObject(GameObject gameObject) {
-            // Fetch all commonly used components
-            Context context = new Context();
-            context.gameObject = gameObject;
-            context.transform = gameObject.transform;
-            context.animator = gameObject.GetComponent<Animator>();
-            context.physics = gameObject.GetComponent<Rigidbody>();
-            context.agent = gameObject.GetComponent<NavMeshAgent>();
-            context.sphereCollider = gameObject.GetComponent<SphereCollider>();
-            context.boxCollider = gameObject.GetComponent<BoxCollider>();
-            context.capsuleCollider = gameObject.GetComponent<CapsuleCollider>();
-            context.characterController = gameObject.GetComponent<CharacterController>();
-            
-            // Add whatever else you need here...
+        public List<TickInput> Inputs = new List<TickInput>();
 
-            return context;
+        public GameManager.TickedList<TickedBehaviour> Entities => GameManager.GetAIEntities(Performer);
+        public GameManager.TickedList<Character> Characters => GameManager.GetAICharacters(Performer);
+        public GameManager.TickedList<Building> Buildings => GameManager.GetAIBuildings(Performer);
+
+        public int[] AllyIds = new int[0];
+        public int[] EnemyIds = new int[0];
+
+        public List<Character> Enemies = new List<Character>();
+
+        public Context(int performer)
+        {
+            Performer = performer;
         }
     }
 }

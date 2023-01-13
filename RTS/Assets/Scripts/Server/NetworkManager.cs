@@ -338,9 +338,10 @@ public partial class NetworkManager : MonoBehaviour
 
                     _roomSize = _playerCount + _aiCount;
 
+                    SetupManager.CompleteReset();
+
                     AIManager.InitAI(_playerCount, _aiCount);
 
-                    SetupManager.CompleteReset();
                     SetupManager.SetupGame();
 
                     StartCoroutine(Loop());

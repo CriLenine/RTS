@@ -454,6 +454,56 @@ public class TileMapManager : MonoBehaviour
 
     #endregion
 
+    #region AI
+
+    public static Vector2Int? GetNearestFogCoords(int performer, Vector2 startPosition)
+    {
+        LogicalTile startTile = GetLogicalTile(WorldToTilemapCoords(startPosition));
+
+        if (startTile is null)
+            return null;
+
+        int distance = 1;
+        LogicalTile currentTile = null;
+
+        List<Vector2Int> wayDirections = new List<Vector2Int>
+        {
+            new Vector2Int(-1, 1), // Top left
+            new Vector2Int(0, 1), // Top
+            new Vector2Int(1, 1), // Top right
+            new Vector2Int(1, 0), // Right
+            new Vector2Int(1, -1), // Bottom RIght
+            new Vector2Int(0, -1), // Bottom
+            new Vector2Int(-1, -1), // Bottom left
+            new Vector2Int(-1, 0) // Left
+        };
+
+        bool[] areFreeWays = new bool[8];
+
+        for (int i = 0; i < areFreeWays.Length; ++i)
+            areFreeWays[i] = true;
+
+        do
+        {
+            for (int i = 0; i < wayDirections.Count; ++i)
+            {
+                currentTile = GetLogicalTile(startTile.Coords + wayDirections[i] * distance);
+
+                if (currentTile is null)
+                    wayDirections.RemoveAt(i--);
+                else if (currentTile.IsFog(performer))
+                    break;
+            }
+        } while (++distance < 100);
+
+        if (currentTile?.IsFog(performer) != true)
+            return null;
+
+        return currentTile.Coords;
+    }
+
+    #endregion
+
     #region Tools
 
     /// <summary>

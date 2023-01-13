@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TheKiwiCoder;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class GameManager : MonoBehaviour
 {
@@ -77,9 +75,6 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
-
-    [SerializeField]
-    BehaviourTree _tree;
 
     public static void AddResource(ResourceType type, int amount, int performer)
     {
@@ -250,13 +245,18 @@ public class GameManager : MonoBehaviour
 
             _instance._entities.Remove(ID);
             _instance._myEntities.Remove(ID);
-            _instance._aiEntities[aiId].Remove(ID);
+
+            if (aiId >= 0)
+                _instance._aiEntities[aiId].Remove(ID);
 
             if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
                 _instance._myCharacters.Remove(ID);
-                _instance._aiCharacters[aiId].Remove(ID);
+
+                if (aiId >= 0)
+                    _instance._aiCharacters[aiId].Remove(ID);
+
                 QuadTreeNode.RemoveCharacter(ID);
 
                 GameEventsManager.PlayEvent("CharacterDeath", character.gameObject);
@@ -265,7 +265,9 @@ public class GameManager : MonoBehaviour
             {
                 _instance._buildings.Remove(ID);
                 _instance._myBuildings.Remove(ID);
-                _instance._aiBuildings[aiId].Remove(ID);
+
+                if (aiId >= 0)
+                    _instance._aiBuildings[aiId].Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
 
@@ -312,8 +314,19 @@ public class GameManager : MonoBehaviour
     public static void Init(int aiCount)
     {
         _instance._aiEntities = new TickedList<TickedBehaviour>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiEntities[i] = new TickedList<TickedBehaviour>();
+
         _instance._aiCharacters = new TickedList<Character>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiCharacters[i] = new TickedList<Character>();
+
         _instance._aiBuildings = new TickedList<Building>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiBuildings[i] = new TickedList<Building>();
     }
 
     private static bool IsPerformerAbleToBuild(int performer, int buildType)

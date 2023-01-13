@@ -21,16 +21,21 @@ public class LogicalTile
     public TileState State = TileState.Obstacle;
     public TileTag Tag = TileTag.None;
 
-    public readonly bool[] LastState = new bool[4];
+    public readonly bool?[] LastState = new bool?[4] { null, null, null, null };
 
     public bool IsFree(int performer)
     {
-        return !LastState[performer];
+        return LastState[performer] != true;
     }
 
     public bool IsObstacle(int performer)
     {
-        return LastState[performer];
+        return LastState[performer] == true;
+    }
+
+    public bool IsFog(int performer)
+    {
+        return LastState[performer] == null;
     }
 
     public void Update()
@@ -47,7 +52,7 @@ public class LogicalTile
     public void Reset()
     {
         for (int i = 0; i < LastState.Length; ++i)
-            LastState[i] = false;
+            LastState[i] = null;
     }
 
     public LogicalTile(Vector2Int coords, TileState state, TileTag tag)

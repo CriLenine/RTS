@@ -123,25 +123,10 @@ namespace TheKiwiCoder {
 
         private void OnPlayModeStateChanged(PlayModeStateChange obj) {
             switch (obj) {
-                case PlayModeStateChange.EnteredEditMode:
-                    EditorApplication.delayCall += OnSelectionChange;
-                    break;
                 case PlayModeStateChange.ExitingEditMode:
-                    break;
-                case PlayModeStateChange.EnteredPlayMode:
-                    EditorApplication.delayCall += OnSelectionChange;
                     break;
                 case PlayModeStateChange.ExitingPlayMode:
                     break;
-            }
-        }
-
-        private void OnSelectionChange() {
-            if (Selection.activeGameObject) {
-                BehaviourTreeRunner runner = Selection.activeGameObject.GetComponent<BehaviourTreeRunner>();
-                if (runner) {
-                    SelectTree(runner.tree);
-                }
             }
         }
 

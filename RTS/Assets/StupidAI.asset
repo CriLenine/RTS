@@ -13,83 +13,121 @@ MonoBehaviour:
   m_Name: StupidAI
   m_EditorClassIdentifier: 
   rootNode:
-    rid: 1133590122606624768
+    rid: 1133590195510968327
   nodes:
-  - rid: 1133590122606624768
-  - rid: 1133590122606624770
-  - rid: 1133590122606624772
-  - rid: 1133590122606624773
-  - rid: 1133590122606624774
+  - rid: 1133590195510968327
+  - rid: 1133590195510968343
+  - rid: 1133590195510968344
+  - rid: 1133590195510968345
+  - rid: 1133590195510968346
+  - rid: 1133590195510968347
+  - rid: 1133590195510968348
+  - rid: 1133590195510968349
   treeState: 0
-  blackboard:
-    moveToPosition: {x: 0, y: 0, z: 0}
-  viewPosition: {x: 464, y: 242, z: 0}
-  viewScale: {x: 0.7561437, y: 0.7561437, z: 1}
+  Blackboard:
+    Performer: 0
+  viewPosition: {x: 568.6667, y: 104.666664, z: 0}
+  viewScale: {x: 0.65751624, y: 0.65751624, z: 1}
   references:
     version: 2
     RefIds:
-    - rid: 1133590122606624768
+    - rid: 1133590195510968327
       type: {class: RootNode, ns: TheKiwiCoder, asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: 10b7008f-1733-45aa-b5ee-8f28e7144642
-        position: {x: 0, y: 0}
+        guid: 605daad9-2e25-4b55-a8cc-b2144fb0697d
+        position: {x: 4.2505455, y: 4.625578}
         blackboard:
-          moveToPosition: {x: 0, y: 0, z: 0}
+          Performer: 0
         description: 
         drawGizmos: 0
         child:
-          rid: 1133590122606624770
-    - rid: 1133590122606624770
+          rid: 1133590195510968343
+    - rid: 1133590195510968343
       type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: bf1c02bc319d6504483cde8e307e5eca
-        position: {x: 0, y: 149}
+        guid: b5430e2cc6623e045a6bda9676dd75d8
+        position: {x: 4.0000076, y: 130.29156}
         blackboard:
-          moveToPosition: {x: 0, y: 0, z: 0}
+          Performer: 0
         description: 
         drawGizmos: 0
         children:
-        - rid: 1133590122606624774
-        - rid: 1133590122606624772
-        - rid: 1133590122606624773
-    - rid: 1133590122606624772
-      type: {class: RandomPosition, ns: , asm: Assembly-CSharp}
+        - rid: 1133590195510968344
+        - rid: 1133590195510968348
+    - rid: 1133590195510968344
+      type: {class: LNeighbors, ns: , asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: d94998b5e13ef8a4fbdaa82892772ef8
-        position: {x: 0, y: 300}
+        guid: cce6ffdc40c187b41adc5f7311bc30f2
+        position: {x: -292.8841, y: 302.438}
         blackboard:
-          moveToPosition: {x: 0, y: 0, z: 0}
+          Performer: 0
         description: 
         drawGizmos: 0
-        min: {x: -10, y: -10}
-        max: {x: 10, y: 10}
-    - rid: 1133590122606624773
-      type: {class: Log, ns: TheKiwiCoder, asm: Assembly-CSharp}
+        child:
+          rid: 1133590195510968345
+    - rid: 1133590195510968345
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: 056f20ddb400d40469bf526819015d1e
-        position: {x: 185, y: 300}
+        guid: 5616e410534bc3f4dbb435fbaf130c1c
+        position: {x: -292.6667, y: 419.56064}
         blackboard:
-          moveToPosition: {x: 0, y: 0, z: 0}
+          Performer: 0
         description: 
         drawGizmos: 0
-        message: 
-    - rid: 1133590122606624774
-      type: {class: Wait, ns: TheKiwiCoder, asm: Assembly-CSharp}
+        children:
+        - rid: 1133590195510968346
+        - rid: 1133590195510968347
+    - rid: 1133590195510968346
+      type: {class: TNearbyEnemy, ns: , asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: 661be9998697bd8409992ae663730f8a
-        position: {x: -166, y: 300}
+        guid: bc750ec5f9e3dcb45ba96ec3c48230db
+        position: {x: -409.9835, y: 537.83167}
         blackboard:
-          moveToPosition: {x: 0, y: 0, z: 0}
+          Performer: 0
         description: 
         drawGizmos: 0
-        duration: 1
+    - rid: 1133590195510968347
+      type: {class: AAttackNearbyEnemies, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 43cd01654d2a1bd41a2638c5ccedc9a4
+        position: {x: -153.10144, y: 577.42554}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+    - rid: 1133590195510968348
+      type: {class: LEnvironment, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 93915699013a3d944af4314c4aae5206
+        position: {x: 183.01193, y: 382.75354}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        child:
+          rid: 1133590195510968349
+    - rid: 1133590195510968349
+      type: {class: AExplore, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 13f3e455d61de9f4bbd34fe8a881714d
+        position: {x: 259.05566, y: 540.92456}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
