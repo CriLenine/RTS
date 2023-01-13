@@ -16,38 +16,69 @@ public partial class NetworkManager : MonoBehaviour
     [SerializeField]
     private MenuManager _menuManager;
 
+    #region Public accessors
+
+    // Est connecté à PlayerIO ?
+    public static bool IsConnected => _instance._multiplayer != null;
+
+    // A lire uniquement si IsConnected est vrai
+
+    // Est connecté à une room ?
+    public static bool IsHosted => _instance._server != null;
+
+    // A lire uniquement si IsHosted est vrai
+    
+    // Est prêt dans la room ?
+    public static bool IsReady => _instance._me.IsReady;
+
+    // Suis-je le host de cette room ?
+    public bool AmIHost { get; private set; } = false;
+
+    // Evénement pour suivre l'évolution d'une room
+    public static event OnRoomUpdateHandler OnRoomUpdate
+    {
+        add => _instance._onRoomUpdate += value;
+        remove => _instance._onRoomUpdate -= value;
+    }
+
+    // Copie de la dernière version de Room
+    public static Room RoomData => _instance._roomData;
+
+    // Une partie est-elle en cours ?
+    public static bool IsPlaying => IsHosted && _instance._isPlaying;
+
+    //  A lire uniquement si IsPlaying est vrai //
+
+    // La partie est-elle en play ou en pause ?
+    public static bool IsRunning => IsHosted && _instance._isRunning;
+    
+    // Le temps entre deux lectures de tick
+    public static float TickPeriod => _instance._tickPeriod;
+
+    // Le temps par défaut entre deux lectures de tick
+    public static float NormalTickPeriod => BaseTickPeriod;
+
+    // Quel performer suis-je ?
+    public static int Me => _instance._id;
+
+    // La taille de la room (avec joueurs et ias)
+    public static int RoomSize => _instance._roomSize;
+    
+    // La taille de la room (avec joueurs et ias)
+    public static int CurrentTick => _instance._tick;
+
+    #endregion
+
     #region State
 
     private Player _me;
     private Room _room;
+    private Room _roomData;
     private Connection _server;
     private Multiplayer _multiplayer;
 
     private bool _isPlaying = false;
     private bool _isRunning = false;
-
-    public static bool Connected => _instance._multiplayer != null;
-    public static bool Hosted => _instance._server != null;
-
-    public static bool IsReady => _instance._me.IsReady;
-    public static bool IsPlaying => Hosted && _instance._isPlaying;
-    public static bool IsRunning => Hosted && _instance._isRunning;
-
-    public static string[] Names
-    {
-        get
-        {
-            if (_instance._room is null)
-                return null;
-
-            string[] names = new string[_instance._room.Players.Count];
-
-            for (int i = 0; i < _instance._room.Players.Count; ++i)
-                names[i] = _instance._room.Players[i].Name;
-
-            return names;
-        }
-    }
 
     #endregion
 
@@ -70,7 +101,7 @@ public partial class NetworkManager : MonoBehaviour
 
         if (_loading)
             lineCount = 1;
-        else if (Hosted)
+        else if (IsHosted)
         {
             lineCount = 2;
 
@@ -88,7 +119,7 @@ public partial class NetworkManager : MonoBehaviour
         }
         else if (_rooms != null)
             lineCount = 2 + _rooms.Length + 2;
-        else if (Connected)
+        else if (IsConnected)
             lineCount = 2;
 
         if (lineCount < 1)
@@ -98,9 +129,9 @@ public partial class NetworkManager : MonoBehaviour
 
         if (_loading)
         {
-            GUILayout.Label(Connected ? "Chargement..." : "Connection...");
+            GUILayout.Label(IsConnected ? "Chargement..." : "Connection...");
         }
-        else if (Hosted)
+        else if (IsHosted)
         {
             GUILayout.Label($"Room {_room.Name}");
 
@@ -207,7 +238,7 @@ public partial class NetworkManager : MonoBehaviour
             if (GUILayout.Button("Retour"))
                 _rooms = null;
         }
-        else if (Connected)
+        else if (IsConnected)
         {
             GUILayout.Label("Menu de connection");
 
@@ -247,15 +278,6 @@ public partial class NetworkManager : MonoBehaviour
 
     #region Init & Variables
 
-    public static float TickPeriod => _instance._tickPeriod;
-
-    public static float NormalTickPeriod => BaseTickPeriod;
-    public static int Me => _instance._id;
-    public static int RoomSize => _instance._roomSize;
-    public static int CurrentTick => _instance._tick;
-
-    public bool AmIHost { get; private set; } = false;
-
     private float _tickPeriod;
 
     private int _lateness = 0;
@@ -270,6 +292,10 @@ public partial class NetworkManager : MonoBehaviour
     private Dictionary<int, Tick> _ticks;
 
     private Queue<Message> _messages;
+
+    public delegate void OnRoomUpdateHandler(Room room);
+
+    private event OnRoomUpdateHandler _onRoomUpdate;
 
     private void Awake()
     {
@@ -310,6 +336,10 @@ public partial class NetworkManager : MonoBehaviour
 
                 case "Players":
                     _room.Update(message);
+
+                    _roomData = _room.Clone();
+
+                    _onRoomUpdate?.Invoke(_roomData);
 
                     _loading = false;
 
@@ -549,14 +579,6 @@ public partial class NetworkManager : MonoBehaviour
         });
     }
 
-    public static void RetrieveRooms()
-    {
-        GetRooms(delegate (RoomInfo[] rooms)
-        {
-            _instance._menuManager.LoadRooms(Room.FromRoomInfos(rooms));
-        });
-    }
-
     private static void JoinRoom(string id, Action<bool> callback)
     {
         _instance._multiplayer.CreateJoinRoom(id, "Game", true, null, null,
@@ -580,7 +602,7 @@ public partial class NetworkManager : MonoBehaviour
 
     public static void QuitRoom()
     {
-        if (Hosted)
+        if (IsHosted)
         {
             _instance._me.IsReady = false;
 

@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using System.Text;
 using MyBox;
+using System.Linq;
 
 public class PostGameScreen : MonoBehaviour
 {
@@ -71,7 +72,9 @@ public class PostGameScreen : MonoBehaviour
             _stringBuilder.Clear();
         }
 
-        SetupStat(NetworkManager.Names, _players);
+        string[] usernames = NetworkManager.RoomData.Players.Select(player => player.Name).ToArray();
+
+        SetupStat(usernames, _players);
         SetupStat(StatsManager.UnitsKilledCount, _unitsKilled);
         SetupStat(StatsManager.UnitsLostCount, _unitsLost);
         SetupStat(StatsManager.BuildingsDestroyedCount, _buildingsDestroyed);
