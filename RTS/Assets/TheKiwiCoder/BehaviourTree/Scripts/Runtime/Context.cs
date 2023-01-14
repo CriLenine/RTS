@@ -22,7 +22,20 @@ namespace TheKiwiCoder {
         public int[] AllyIds = new int[0];
         public int[] EnemyIds = new int[0];
 
+        public int PeonCount;
+        public int SoldierCount;
+
         public List<Character> Enemies = new List<Character>();
+
+        public Vector2 TargetMovePosition;
+        public Vector2? StartPosition = null;
+        public Vector2Int StartCoords;
+        public Vector2 BalancePosition;
+
+        public ResourceQueue<Vector2Int> Trees = new ResourceQueue<Vector2Int>();
+        public ResourceQueue<Vector2Int> Crystals = new ResourceQueue<Vector2Int>();
+
+        public Vector2Int? cuttedTree;
 
         public Context(int performer)
         {

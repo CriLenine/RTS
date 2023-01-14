@@ -19,13 +19,25 @@ public class LNeighbors : DecoratorNode
     {
         context.Enemies.Clear();
 
+        context.PeonCount = 0;
+        context.SoldierCount = 0;
+
         HashSet<int> neighbourIds = new HashSet<int>();
 
         List<int> allies = new List<int>();
         List<int> enemmies = new List<int>();
 
         foreach (Character character in context.Characters)
+        {
             neighbourIds.AddRange(QuadTreeNode.GetNeighbours(character.ID, character.Position));
+
+            allies.Add(character.ID);
+
+            if (character.Data.Type == Character.Type.Peon)
+                ++context.PeonCount;
+            else
+                ++context.SoldierCount;
+        }
 
         foreach (int id in neighbourIds)
         {
@@ -37,8 +49,6 @@ public class LNeighbors : DecoratorNode
 
                 context.Enemies.Add(neighbor);
             }
-            else
-                allies.Add(id);
         }
 
         context.AllyIds = allies.ToArray();

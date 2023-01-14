@@ -26,8 +26,8 @@ MonoBehaviour:
   treeState: 0
   Blackboard:
     Performer: 0
-  viewPosition: {x: 568.6667, y: 104.666664, z: 0}
-  viewScale: {x: 0.65751624, y: 0.65751624, z: 1}
+  viewPosition: {x: 488.66666, y: 138.66667, z: 0}
+  viewScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
     RefIds:
@@ -102,7 +102,7 @@ MonoBehaviour:
         state: 0
         started: 0
         guid: 43cd01654d2a1bd41a2638c5ccedc9a4
-        position: {x: -153.10144, y: 577.42554}
+        position: {x: -170.66663, y: 540.6666}
         blackboard:
           Performer: 0
         description: 

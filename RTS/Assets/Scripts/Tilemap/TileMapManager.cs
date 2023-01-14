@@ -267,8 +267,7 @@ public class TileMapManager : MonoBehaviour
 
         if (startTile is null || endTile is null)
         {
-            if (_instance._debug)
-                Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
+            //if (_instance._debug) Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
 
             return null;
         }
@@ -337,7 +336,7 @@ public class TileMapManager : MonoBehaviour
         {
             _instance._stopwatch.Stop();
 
-            Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+            //Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
         }
 
         return null;
@@ -351,10 +350,9 @@ public class TileMapManager : MonoBehaviour
         LogicalTile startTile = GetLogicalTile(startCoords);
         LogicalTile endTile = GetLogicalTile(endCoords);
 
-        if (startTile is null || endTile is null)
+        if (startTile is null || endTile is null || endTile.IsObstacle(performer))
         {
-            if (_instance._debug)
-                Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
+            //if (_instance._debug) Debug.Log($"Start tile is {startTile} ; EndTile is {endTile}");
 
             return null;
         }
@@ -407,7 +405,7 @@ public class TileMapManager : MonoBehaviour
                 {
                     _instance._stopwatch.Stop();
 
-                    Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+                    //Debug.Log($"path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
                 }
 
                 return path;
@@ -446,7 +444,7 @@ public class TileMapManager : MonoBehaviour
         {
             _instance._stopwatch.Stop();
 
-            Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
+            //Debug.Log($"no path found in {_instance._stopwatch.Elapsed.TotalMilliseconds} ms!");
         }
 
         return null;
@@ -463,7 +461,10 @@ public class TileMapManager : MonoBehaviour
         if (startTile is null)
             return null;
 
+        GameManager.startCoords = startTile.Coords;
+
         int distance = 1;
+        bool tileNotFound = true;
         LogicalTile currentTile = null;
 
         List<Vector2Int> wayDirections = new List<Vector2Int>
@@ -478,11 +479,6 @@ public class TileMapManager : MonoBehaviour
             new Vector2Int(-1, 0) // Left
         };
 
-        bool[] areFreeWays = new bool[8];
-
-        for (int i = 0; i < areFreeWays.Length; ++i)
-            areFreeWays[i] = true;
-
         do
         {
             for (int i = 0; i < wayDirections.Count; ++i)
@@ -492,11 +488,15 @@ public class TileMapManager : MonoBehaviour
                 if (currentTile is null)
                     wayDirections.RemoveAt(i--);
                 else if (currentTile.IsFog(performer))
-                    break;
-            }
-        } while (++distance < 100);
+                {
+                    tileNotFound = false;
 
-        if (currentTile?.IsFog(performer) != true)
+                    break;
+                }
+            }
+        } while (tileNotFound && ++distance < 100);
+
+        if (tileNotFound)
             return null;
 
         return currentTile.Coords;
@@ -584,10 +584,9 @@ public class TileMapManager : MonoBehaviour
 
         foreach (LogicalTile tile in _instance._tiles.Values)
         {
-            Gizmos.color = tile.IsFree(0) ? Color.green : Color.red;
+            Gizmos.color = tile.IsFog(1) ? Color.green : Color.red;
 
             //Gizmos.color = tile.Tag == TileTag.None ? Color.green : tile.Tag == TileTag.Tree ? Color.blue : Color.red;
-
 
             Gizmos.DrawWireSphere(TilemapCoordsToWorld(tile.Coords), TileSize / 3f);
         }

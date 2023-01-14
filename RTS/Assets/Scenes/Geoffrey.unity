@@ -2176,6 +2176,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 469623254}
   m_CullTransparentMesh: 1
+--- !u!4 &505146502 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 41683415, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+  m_PrefabInstance: {fileID: 1519259234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &517697582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 96880164, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
@@ -2228,18 +2233,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 225443ad4a6a6ae49af3e705dd8a2374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debug: 0
-  lerp: 0.2
-  from: {x: 0, y: 0}
-  directions: []
-  results: 
-  a: []
-  b: []
-  c: []
-  r: []
-  rs: 
-  ca: {x: 0, y: 0}
-  cb: {x: 0, y: 0}
 --- !u!114 &594557528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2476,6 +2469,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22f053ff309a4234495d23ac46e2a659, type: 3}
+--- !u!4 &781701550 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 186913639, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+  m_PrefabInstance: {fileID: 1519259234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &846342169
 GameObject:
   m_ObjectHideFlags: 0
@@ -6131,6 +6129,7 @@ GameObject:
   - component: {fileID: 1103859246}
   - component: {fileID: 1103859245}
   - component: {fileID: 1103859247}
+  - component: {fileID: 1103859248}
   m_Layer: 31
   m_Name: '_Scripts : Game Core'
   m_TagString: Untagged
@@ -6165,7 +6164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96c6d192a525ff4abf8d4661b430ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tree: {fileID: 11400000, guid: 363dafcd4586ced42a519759217fe820, type: 2}
 --- !u!114 &1103859243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6237,23 +6235,23 @@ MonoBehaviour:
     - Type: 0
       CharacterData: {fileID: 0}
       BuildingData: {fileID: 11400000, guid: a38b74e07f3507944833f3363e4dc786, type: 2}
-      SpawnPoint: {fileID: 0}
+      SpawnPoint: {fileID: 505146502}
     - Type: 1
       CharacterData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
       BuildingData: {fileID: 0}
-      SpawnPoint: {fileID: 0}
+      SpawnPoint: {fileID: 1799948869}
     - Type: 1
       CharacterData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
       BuildingData: {fileID: 0}
-      SpawnPoint: {fileID: 0}
+      SpawnPoint: {fileID: 781701550}
     - Type: 1
       CharacterData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
       BuildingData: {fileID: 0}
-      SpawnPoint: {fileID: 0}
+      SpawnPoint: {fileID: 1810908647}
     - Type: 1
       CharacterData: {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
       BuildingData: {fileID: 0}
-      SpawnPoint: {fileID: 0}
+      SpawnPoint: {fileID: 1455717493}
   - TickedBehaviorSpawnSetups:
     - Type: 0
       CharacterData: {fileID: 0}
@@ -6316,6 +6314,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pressAnyKey: {fileID: 1757990491}
   _strip: {fileID: 1757990492}
+--- !u!114 &1103859248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1103859240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4be2574379bbb27418200edd71af040b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _behaviourTree: {fileID: 11400000, guid: 363dafcd4586ced42a519759217fe820, type: 2}
 --- !u!4 &1134196542 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1800339666, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
@@ -6355,8 +6366,8 @@ RectTransform:
   m_Father: {fileID: 2082196493}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.093}
-  m_AnchorMin: {x: 0.8139847, y: -0.57568496}
-  m_AnchorMax: {x: 0.9818008, y: -0.27568495}
+  m_AnchorMin: {x: 0.82135415, y: 0.010185185}
+  m_AnchorMax: {x: 0.99010414, y: 0.3101852}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6606,6 +6617,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7966582682737179741, guid: 0657be7f630b26e42b7db202de9f5e6d, type: 3}
+      propertyPath: orthographic size
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8091767838903993553, guid: 0657be7f630b26e42b7db202de9f5e6d, type: 3}
       propertyPath: orthographic size
       value: 50
       objectReference: {fileID: 0}
@@ -7626,6 +7641,11 @@ MonoBehaviour:
   _HUDLayerMask:
     serializedVersion: 2
     m_Bits: 32768
+--- !u!4 &1455717493 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 165012445, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+  m_PrefabInstance: {fileID: 1519259234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1519259234
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9408,6 +9428,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1795856424}
   m_CullTransparentMesh: 1
+--- !u!4 &1799948869 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 605144460, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+  m_PrefabInstance: {fileID: 1519259234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1806194232
 GameObject:
   m_ObjectHideFlags: 0
@@ -9584,6 +9609,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1808876020}
   m_CullTransparentMesh: 1
+--- !u!4 &1810908647 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 687196483, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+  m_PrefabInstance: {fileID: 1519259234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1811929639
 GameObject:
   m_ObjectHideFlags: 0
@@ -10641,10 +10671,10 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10000
   m_Positions:
-  - {x: -8.938356, y: -5, z: 0}
-  - {x: 8.938356, y: -5, z: 0}
-  - {x: 8.938356, y: 5, z: 0}
-  - {x: -8.938356, y: 5, z: 0}
+  - {x: -8.888889, y: -5, z: 0}
+  - {x: 8.888889, y: -5, z: 0}
+  - {x: 8.888889, y: 5, z: 0}
+  - {x: -8.888889, y: 5, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
