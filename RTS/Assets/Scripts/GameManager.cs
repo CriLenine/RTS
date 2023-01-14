@@ -572,7 +572,7 @@ public class GameManager : MonoBehaviour
             _instance._aiCharacters[aiId].Add(character);
         }
 
-        HUDManager.UpdateHousing();
+        HUDManager.UpdateHousing(performer);
 
         character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
 
