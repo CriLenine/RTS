@@ -49,6 +49,8 @@ public class Move : Action
         if (Positions.Count == 0)
             return true;
 
+        _character.Animator.Play("Walk");
+
         Vector2 lastpos = _character.Position;
 
         if (LocomotionManager.Move(_character, Position))

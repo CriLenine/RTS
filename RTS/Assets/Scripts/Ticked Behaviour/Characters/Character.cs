@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using MyBox;
 
@@ -123,17 +122,7 @@ public class Character : TickedBehaviour, IDamageable
 
     private void UpdateAnimation()
     {
-        if(Data.Type == Type.Peon)
-        {
-            if (CurrentAction is Build)
-                _animator.Play("Build");
-            else if (CurrentAction is Harvest harvest)
-                _animator.Play(harvest.GetHarvestAnimationName());
-        }
-
-        if (CurrentAction is Move)
-            _animator.Play("Walk");
-        else if (_currentHealth > 0 && CurrentAction is null)
+        if (_currentHealth > 0 && CurrentAction is null)
             _animator.Play("Idle");
 
         //shootingAnimation
@@ -218,12 +207,11 @@ public class Character : TickedBehaviour, IDamageable
 
     private bool CheckSurrounding()
     {
-        List<Character> charas = GameManager.Characters.ToList();
         float attackRange = Data.AttackRange;
 
-        for (int i = 0; i < charas.Count; i++) //On regarde tous les charas du jeux
+        for (int i = 0; i < GameManager.Characters.Count; i++) //On regarde tous les charas du jeux
         {
-            Character chara = charas[i];
+            Character chara = GameManager.Characters.At(i);
             if (chara.Performer == Performer || (chara.transform.position - transform.position).sqrMagnitude >= attackRange) continue; //Si trop loin ou meme team => next
 
             //Sinon on renvois l'action d'attaque

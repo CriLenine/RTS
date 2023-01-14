@@ -16,7 +16,7 @@ public class HUDSpawnPreview : HUD
         foreach (PreviewSlot spawnPreviewSlot in _spawnPreviewSlots)
             spawnPreviewSlot.gameObject.SetActive(false);
 
-        if (SelectionManager.SelectedBuilding.Performer == NetworkManager.Me)
+        if (SelectionManager.SelectedBuilding?.Performer == NetworkManager.Me)
         {
             _currentBuilding = SelectionManager.SelectedBuilding;
             _spawnQueue = _currentBuilding.QueuedSpawnCharacters.ToArray();

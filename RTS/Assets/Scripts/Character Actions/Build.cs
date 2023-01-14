@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Build : Action
 {
     private Character _peon;
@@ -11,6 +13,7 @@ public class Build : Action
 
     protected override bool Update()
     {
+        _character.Animator.Play("Build");
         return !GameManager.Buildings.Contains(_building.ID) || _building.CompleteBuild(_peon.Data.BuildEfficiencyMultiplier);
     }
 }
