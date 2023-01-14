@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace TheKiwiCoder {
@@ -11,15 +12,17 @@ namespace TheKiwiCoder {
         [HideInInspector] 
         public Node child;
 
-        protected override void OnStart() {
+        protected override void OnStart()
+        {
+        }
+
+        protected override void OnStop()
+        {
 
         }
 
-        protected override void OnStop() {
-
-        }
-
-        protected override State OnUpdate() {
+        protected override State OnUpdate()
+        {
 
             return child.Update();
         }

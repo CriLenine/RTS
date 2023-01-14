@@ -251,6 +251,8 @@ public partial class NetworkManager : MonoBehaviour
     public static float NormalTickPeriod => BaseTickPeriod;
     public static int Me => _instance._id;
     public static int RoomSize => _instance._roomSize;
+    public static int PlayerCount => _instance._playerCount;
+    public static int AICount => _instance._aiCount;
     public static int CurrentTick => _instance._tick;
 
     public bool AmIHost { get; private set; } = false;
@@ -264,6 +266,8 @@ public partial class NetworkManager : MonoBehaviour
     private int _tick;
 
     private int _roomSize;
+    private int _playerCount;
+    private int _aiCount;
     private int _id;
 
     private Dictionary<int, Tick> _ticks;
@@ -328,9 +332,16 @@ public partial class NetworkManager : MonoBehaviour
                     _ticks.Clear();
 
                     _id = message.GetInt(1);
-                    _roomSize = message.GetInt(0) + message.GetInt(2);
+
+                    _playerCount = message.GetInt(0);
+                    _aiCount = message.GetInt(2);
+
+                    _roomSize = _playerCount + _aiCount;
 
                     SetupManager.CompleteReset();
+
+                    AIManager.InitAI(_playerCount, _aiCount);
+
                     SetupManager.SetupGame();
 
                     StartCoroutine(Loop());

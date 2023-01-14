@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TheKiwiCoder;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -12,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     public class TickedList<T> : KeyedCollection<int, T> where T : TickedBehaviour
     {
-        public TickedBehaviour At(int index)
+        public T At(int index)
         {
             return Items[index];
         }
@@ -26,20 +27,32 @@ public class GameManager : MonoBehaviour
     private TickedList<TickedBehaviour> _entities = new TickedList<TickedBehaviour>();
     private TickedList<TickedBehaviour> _myEntities = new TickedList<TickedBehaviour>();
 
+    public TickedList<TickedBehaviour>[] _aiEntities;
+
     public static TickedList<TickedBehaviour> Entities => _instance._entities;
     public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
+
+    public static TickedList<TickedBehaviour> GetAIEntities(int performer) => _instance._aiEntities[performer - NetworkManager.AICount];
 
     private TickedList<Character> _characters = new TickedList<Character>();
     private TickedList<Character> _myCharacters = new TickedList<Character>();
 
+    public TickedList<Character>[] _aiCharacters;
+
     public static TickedList<Character> Characters => _instance._characters;
     public static TickedList<Character> MyCharacters => _instance._myCharacters;
+
+    public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.AICount];
 
     private TickedList<Building> _buildings = new TickedList<Building>();
     private TickedList<Building> _myBuildings = new TickedList<Building>();
 
+    public TickedList<Building>[] _aiBuildings;
+
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
+
+    public static TickedList<Building> GetAIBuildings(int performer) => _instance._aiBuildings[performer - NetworkManager.AICount];
 
     private HashSet<TickedBehaviour> _entitiesToDestroy = new HashSet<TickedBehaviour>();
     private HashSet<(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)> _characterToSpawn = new HashSet<(int, int, Character.Type, Vector2)>();
@@ -64,9 +77,6 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    [SerializeField]
-    BehaviourTree _tree;
-
     public static void AddResource(ResourceType type, int amount, int performer)
     {
         _instance._playerResources[type][performer] += amount;
@@ -90,7 +100,14 @@ public class GameManager : MonoBehaviour
     {
         #region Apply Inputs
 
-        foreach (TickInput input in inputs)
+        TickInput[] aiInputs = AIManager.Tick();
+
+        List<TickInput> allInputs = new List<TickInput>();
+
+        allInputs.AddRange(inputs);
+        allInputs.AddRange(aiInputs);
+
+        foreach (TickInput input in allInputs)
         {
             //test of entity existances
             if (input.ID != -1 && !_instance._entities.Contains(input.ID))
@@ -225,14 +242,22 @@ public class GameManager : MonoBehaviour
             SelectionManager.TestEntitySelection(entity);
 
             int ID = entity.ID;
+            int aiId = entity.Performer - NetworkManager.PlayerCount;
 
             _instance._entities.Remove(ID);
             _instance._myEntities.Remove(ID);
+
+            if (aiId >= 0)
+                _instance._aiEntities[aiId].Remove(ID);
 
             if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
                 _instance._myCharacters.Remove(ID);
+
+                if (aiId >= 0)
+                    _instance._aiCharacters[aiId].Remove(ID);
+
                 QuadTreeNode.RemoveCharacter(ID);
 
                 GameEventsManager.PlayEvent("CharacterDeath", character.gameObject);
@@ -241,6 +266,9 @@ public class GameManager : MonoBehaviour
             {
                 _instance._buildings.Remove(ID);
                 _instance._myBuildings.Remove(ID);
+
+                if (aiId >= 0)
+                    _instance._aiBuildings[aiId].Remove(ID);
 
                 TileMapManager.RemoveBuilding(building);
 
@@ -282,6 +310,24 @@ public class GameManager : MonoBehaviour
         #endregion
 
         return _instance._simulateWrongHash ? 0 : hash.GetHashCode();
+    }
+
+    public static void Init(int aiCount)
+    {
+        _instance._aiEntities = new TickedList<TickedBehaviour>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiEntities[i] = new TickedList<TickedBehaviour>();
+
+        _instance._aiCharacters = new TickedList<Character>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiCharacters[i] = new TickedList<Character>();
+
+        _instance._aiBuildings = new TickedList<Building>[aiCount];
+
+        for (int i = 0; i < aiCount; ++i)
+            _instance._aiBuildings[i] = new TickedList<Building>();
     }
 
     private static bool IsPerformerAbleToBuild(int performer, int buildType)
@@ -350,8 +396,6 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < group.Count; ++i)
                     group[i].SetAction(new Move(group[i], wayPoints));
             }
-            else
-                Debug.Log("Path not found!");
         }
     }
 
@@ -514,6 +558,14 @@ public class GameManager : MonoBehaviour
             _instance._myCharacters.Add(character);
         }
 
+        int aiId = performer - NetworkManager.PlayerCount;
+
+        if (aiId >= 0)
+        {
+            _instance._aiEntities[aiId].Add(character);
+            _instance._aiCharacters[aiId].Add(character);
+        }
+
         HUDManager.UpdateHousing();
 
         character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
@@ -546,6 +598,14 @@ public class GameManager : MonoBehaviour
         {
             _instance._myEntities.Add(building);
             _instance._myBuildings.Add(building);
+        }
+
+        int aiId = performer - NetworkManager.PlayerCount;
+
+        if (aiId >= 0)
+        {
+            _instance._aiEntities[aiId].Add(building);
+            _instance._aiBuildings[aiId].Add(building);
         }
 
         TileMapManager.AddBuildingBlueprint(data.Size, position);
@@ -598,12 +658,15 @@ public class GameManager : MonoBehaviour
 
         _instance._entities.Clear();
         _instance._myEntities.Clear();
+        _instance._aiEntities = null;
 
         _instance._characters.Clear();
         _instance._myCharacters.Clear();
+        _instance._aiCharacters = null;
 
         _instance._buildings.Clear();
         _instance._myBuildings.Clear();
+        _instance._aiBuildings = null;
     }
 
     public static void AddEntity(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)
@@ -618,15 +681,24 @@ public class GameManager : MonoBehaviour
         HUDManager.UpdateHousing();
     }
 
+    public static Vector2Int startCoords;
+    public static Vector2Int targetCoords;
+
     #region Debug
 
     private bool _simulateWrongHash = false;
     public readonly static Color[] Colors = { new Color(1f, 0f, 0f), new Color(0f, 1f, 0f), new Color(0f, 0f, 1f), new Color(1f, 1f, 0f), new Color(1f, 0f, 1f), new Color(0f, 1f, 1f), new Color(0f, 0f, 0f), new Color(0.5019607843137255f, 0f, 0f), new Color(0f, 0.5019607843137255f, 0f), new Color(0f, 0f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0f), new Color(0.5019607843137255f, 0f, 0.5019607843137255f), new Color(0f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.5019607843137255f, 0.5019607843137255f, 0.5019607843137255f), new Color(0.7529411764705882f, 0f, 0f), new Color(0f, 0.7529411764705882f, 0f), new Color(0f, 0f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0f), new Color(0.7529411764705882f, 0f, 0.7529411764705882f), new Color(0f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.7529411764705882f, 0.7529411764705882f, 0.7529411764705882f), new Color(0.25098039215686274f, 0f, 0f), new Color(0f, 0.25098039215686274f, 0f), new Color(0f, 0f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0f), new Color(0.25098039215686274f, 0f, 0.25098039215686274f), new Color(0f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f), new Color(0.12549019607843137f, 0f, 0f), new Color(0f, 0.12549019607843137f, 0f), new Color(0f, 0f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0f), new Color(0.12549019607843137f, 0f, 0.12549019607843137f), new Color(0f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.12549019607843137f, 0.12549019607843137f, 0.12549019607843137f), new Color(0.3764705882352941f, 0f, 0f), new Color(0f, 0.3764705882352941f, 0f), new Color(0f, 0f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0f), new Color(0.3764705882352941f, 0f, 0.3764705882352941f), new Color(0f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.3764705882352941f, 0.3764705882352941f, 0.3764705882352941f), new Color(0.6274509803921569f, 0f, 0f), new Color(0f, 0.6274509803921569f, 0f), new Color(0f, 0f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0f), new Color(0.6274509803921569f, 0f, 0.6274509803921569f), new Color(0f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.6274509803921569f, 0.6274509803921569f, 0.6274509803921569f), new Color(0.8784313725490196f, 0f, 0f), new Color(0f, 0.8784313725490196f, 0f), new Color(0f, 0f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0f), new Color(0.8784313725490196f, 0f, 0.8784313725490196f), new Color(0f, 0.8784313725490196f, 0.8784313725490196f), new Color(0.8784313725490196f, 0.8784313725490196f, 0.8784313725490196f) };
 
+    public static Vector2Int dCoords;
+
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || !Application.isEditor)
             return;
+
+        Gizmos.color = Color.magenta;
+
+        Gizmos.DrawCube(TileMapManager.TilemapCoordsToWorld(dCoords), Vector3.one * TileMapManager.TileSize);
 
         // Debug Performers //
 

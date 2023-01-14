@@ -14,9 +14,6 @@ public class LocomotionManager : MonoBehaviour
         _instance = this;
     }
 
-    [SerializeField]
-    private bool _debug;
-
     public static List<Vector2> RetrieveWayPoints(int performer, Character leader, Vector2Int rallyPoint, bool smooth = true)
     {
         List<Vector2Int> wayPoints = TileMapManager.FindPath(performer, leader.Coords, rallyPoint);
@@ -49,8 +46,6 @@ public class LocomotionManager : MonoBehaviour
         return positionWayPoints;
     }
 
-    public float lerp = 0.5f;
-
     public static bool Move(Character character, Vector2 position)
     {
         Move characterMove = character.CurrentAction.SpecificAction as Move;
@@ -58,11 +53,7 @@ public class LocomotionManager : MonoBehaviour
         Vector2? projectedPosition = LocalAvoidance(character, position);
 
         if (projectedPosition is null)
-        {
-            Debug.Log($"{character.ID} va se prendre un mur donc il s'arrête");
-
             return false;
-        }
 
         if (Vector2.SqrMagnitude(position - character.Position) < characterMove.TestThreshold)
             if (MoveComplete(character, projectedPosition.Value, position))
@@ -70,7 +61,7 @@ public class LocomotionManager : MonoBehaviour
 
         Vector2 projectedDirection = (projectedPosition.Value - character.Position).normalized;
 
-        characterMove.LastDir = Vector2.Lerp(characterMove.LastDir, projectedDirection, _instance.lerp);
+        characterMove.LastDir = Vector2.Lerp(characterMove.LastDir, projectedDirection, 0.2f);
 
         projectedPosition = character.Position + characterMove.LastDir;
 
@@ -128,12 +119,6 @@ public class LocomotionManager : MonoBehaviour
             return -Mathf.Sign((end.x - character.Position.x) * (gravityCenter.y - character.Position.y) - (end.y - character.Position.y) * (gravityCenter.x - character.Position.x));
         }
 
-        _instance.a.Clear();
-        _instance.b.Clear();
-        _instance.c.Clear();
-        _instance.r.Clear();
-        _instance.rs.Clear();
-
         //Debug.Log(neighborIds.Count);
 
         if (neighborIds.Count > 0)
@@ -144,15 +129,8 @@ public class LocomotionManager : MonoBehaviour
             {
                 Character neighbor = GameManager.Entities[id] as Character;
 
-                _instance.a.Add(character.Position);
-                _instance.b.Add(characterMove.Direction);
-                _instance.c.Add(neighbor.Position);
-                _instance.r.Add(0.15f);
-                _instance.rs.Add(true);
-
                 if (IsRayIntersectingCircle(character.Position, characterMove.Direction * 1000f, neighbor.Position, 0.15f))
                 {
-                    _instance.rs[^1] = false;
                     isPathFree = false;
 
                     break;
@@ -218,9 +196,6 @@ public class LocomotionManager : MonoBehaviour
 
         Vector2 testPosition = character.Position + (finalPosition - character.Position).normalized * TileMapManager.TileSize;
 
-        _instance.ca = TileMapManager.TilemapCoordsToWorld(character.Coords);
-        _instance.cb = TileMapManager.TilemapCoordsToWorld(TileMapManager.WorldToTilemapCoords(testPosition));
-
         if (TileMapManager.LineOfSight(character.Performer, character.Coords, TileMapManager.WorldToTilemapCoords(testPosition)))
         {
             characterMove.TestedAngles.Clear();
@@ -285,41 +260,5 @@ public class LocomotionManager : MonoBehaviour
         float minSqrDistance = Mathf.Pow(origin.x + lambda * direction.x - circlePos.x, 2f) + Mathf.Pow(origin.y + lambda * direction.y - circlePos.y, 2f);
 
         return minSqrDistance < circleRadius * circleRadius;
-    }
-
-    public Vector2 from;
-    public List<Vector2> directions = new List<Vector2>();
-    public List<bool> results = new List<bool>();
-
-    public List<Vector2> a = new List<Vector2>(), b = new List<Vector2>(), c = new List<Vector2>();
-    public List<float> r = new List<float>();
-    public List<bool> rs = new List<bool>();
-
-    public Vector2 ca, cb;
-
-    private void OnDrawGizmos()
-    {
-        for (int i = 0; i < directions.Count; ++i)
-        {
-            Gizmos.color = results[i] ? Color.green : Color.red;
-
-            Gizmos.DrawRay(from, directions[i]);
-        }
-
-        for (int i = 0; i < a.Count; ++i)
-        {
-            Gizmos.color = rs[i] ? Color.cyan : Color.magenta;
-
-            Gizmos.DrawRay(a[i], b[i]);
-            Gizmos.DrawWireSphere(c[i], r[i]);
-        }
-
-        Gizmos.color = Color.blue;
-
-        Gizmos.DrawWireCube(ca, Vector2.one * TileMapManager.TileSize);
-
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawWireCube(cb, Vector2.one * TileMapManager.TileSize);
     }
 }

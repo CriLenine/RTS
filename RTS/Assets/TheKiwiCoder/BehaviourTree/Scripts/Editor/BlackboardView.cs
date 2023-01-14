@@ -19,6 +19,9 @@ namespace TheKiwiCoder {
 
             var blackboardProperty = serializer.Blackboard;
 
+            if (blackboardProperty is null)
+                return;
+
             blackboardProperty.isExpanded = true;
 
             // Property field

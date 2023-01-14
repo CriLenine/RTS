@@ -18,9 +18,10 @@ namespace TheKiwiCoder {
 
         public Node.State treeState = Node.State.Running;
 
-        public Blackboard blackboard = new Blackboard();
+        public Context Context;
+        public Blackboard Blackboard = new Blackboard();
 
-#region  EditorProperties 
+        #region  EditorProperties 
         public Vector3 viewPosition = new Vector3(600, 300);
         public Vector3 viewScale = Vector3.one;
 #endregion
@@ -31,10 +32,7 @@ namespace TheKiwiCoder {
         }
 
         public Node.State Update() {
-            if (rootNode.state == Node.State.Running) {
-                treeState = rootNode.Update();
-            }
-            return treeState;
+            return rootNode.Update();
         }
 
         public static List<Node> GetChildren(Node parent) {
@@ -69,9 +67,11 @@ namespace TheKiwiCoder {
         }
 
         public void Bind(Context context) {
+            Context = context;
+
             Traverse(rootNode, node => {
                 node.context = context;
-                node.blackboard = blackboard;
+                node.blackboard = Blackboard;
             });
         }
     }
