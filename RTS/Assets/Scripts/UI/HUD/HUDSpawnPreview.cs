@@ -9,7 +9,6 @@ public class HUDSpawnPreview : HUD
     private Building _currentBuilding;
 
     private CharacterData _spawningCharacterData;
-    private (CharacterData data,Vector2)[] _spawnQueue;
 
     public void UpdateSpawnPreview()
     {
@@ -19,13 +18,12 @@ public class HUDSpawnPreview : HUD
         if (SelectionManager.SelectedBuilding?.Performer == NetworkManager.Me)
         {
             _currentBuilding = SelectionManager.SelectedBuilding;
-            _spawnQueue = _currentBuilding.QueuedSpawnCharacters.ToArray();
 
             if (_currentBuilding.OnGoingSpawn)
             {
                 int index = 0;
 
-                foreach (var item in _spawnQueue)
+                foreach (var item in _currentBuilding.QueuedSpawnCharacters)
                 {
                     if (index >= _spawnPreviewSlots.Count)
                         break;
