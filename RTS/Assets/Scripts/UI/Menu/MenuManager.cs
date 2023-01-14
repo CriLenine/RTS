@@ -2,7 +2,6 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
 using UnityEngine.UI;
 
 
@@ -17,24 +16,37 @@ public class MenuManager : MonoBehaviour
     private TextMeshProUGUI _pressAnyKey;
 
     [SerializeField]
-    private Transform _pressAnyKeyTransform, _loadingCircleTransform, _roomLayout;
+    private TextMeshProUGUI _roomName, _roomPlayersCount, _roomMap;
+
+    [Space]
+
+    [SerializeField]
+    private Transform _pressAnyKeyTransform;
+
+    [SerializeField]
+    private Transform _loadingCircleTransform, _roomLayout, _playerLayout;
 
     [Space]
 
     [SerializeField]
     private CanvasGroup _strip;
     [SerializeField]
-    private CanvasGroup _roomSelectionBox, _settingsBox, _creditsBox, _quitBox;
+    private CanvasGroup _roomSelectionBox, _pregameBox, _settingsBox, _creditsBox, _quitBox;
 
     [Space]
 
     [SerializeField]
     private GameObject _roomTemplatePrefab;
-    
+    [SerializeField]
+    private GameObject _playerTemplatePrefab;
+
     [Space]
 
     [SerializeField]
     private Button _joinRoomButton;
+
+    [SerializeField]
+    private Button _readyButton, _addAIButton, _removeAIButton;
 
     [SerializeField]
     private MenuButton _joinRoomMenuButton;
@@ -47,7 +59,12 @@ public class MenuManager : MonoBehaviour
     [SerializeField]
     private CanvasGroup _mainMenuButtons;
     [SerializeField]
-    private CanvasGroup _gameCreationButtons, _roomSelectionButtons, _preGameButtons, _loading;
+    private CanvasGroup _gameCreationButtons, _roomSelectionButtons, _preGameButtons, _hostButtons, _loading;
+
+    [Space]
+
+    [SerializeField]
+    private SliderValue _volumeSliderValue;
 
     private CanvasGroup _currentCanvas;
 
@@ -59,9 +76,14 @@ public class MenuManager : MonoBehaviour
     private bool _attemptingToJoin = false;
     private bool _loadingRooms = false;
     private bool _roomsLoaded = false;
+    private bool _isFading = false;
+
+    private int _currentAICount = 0;
 
     private void Start()
     {
+        _volumeSliderValue.Setup();
+
         NetworkManager.OnRoomUpdate += OnRoomUpdate;
     }
 
@@ -93,7 +115,7 @@ public class MenuManager : MonoBehaviour
         else if (_attemptingToJoin && NetworkManager.IsHosted)
         {
             HideLoading();
-            DisplayPreGameButtons();
+            DisplayPreGameLobby();
             _attemptingToJoin = false;
         }
         else if (_loadingRooms && _roomsLoaded)
@@ -102,11 +124,17 @@ public class MenuManager : MonoBehaviour
             DisplayRooms();
             _loadingRooms = false;
         }
+        else if (NetworkManager.IsRunning && !_isFading)
+        {
+            _isFading = true;
+            gameObject.AddComponent<CanvasGroup>().DOFade(0f, 1f).OnComplete(() => gameObject.SetActive(false));
+        }
     }
 
     public void OnRoomUpdate(NetworkManager.Room room)
     {
-
+        _currentAICount = NetworkManager.RoomData.AiCount;
+        SetupLobby();
     }
 
     public void OnClickPlayGame()
@@ -128,7 +156,7 @@ public class MenuManager : MonoBehaviour
         _loading.gameObject.SetActive(true);
         _loading.DOFade(1f, 1f);
 
-        
+
         _loadingCircleTransform.DORotate(new Vector3(0, 0, -180), .4f).SetLoops(-1, LoopType.Incremental);
     }
 
@@ -171,7 +199,7 @@ public class MenuManager : MonoBehaviour
     {
         _roomSelectionBox.DOFade(0f, .2f).OnComplete(() => _roomSelectionBox.gameObject.SetActive(false)); ;
         _roomSelectionButtons.DOFade(0f, .2f).OnComplete(() => _roomSelectionButtons.gameObject.SetActive(false));
-        
+
         RetrieveRooms();
     }
 
@@ -196,7 +224,7 @@ public class MenuManager : MonoBehaviour
 
     private void DisplayRooms()
     {
-        foreach (Transform child in _roomLayout.transform) 
+        foreach (Transform child in _roomLayout.transform)
             Destroy(child.gameObject);
 
         foreach (NetworkManager.Room room in _serverRooms)
@@ -234,25 +262,86 @@ public class MenuManager : MonoBehaviour
         _attemptingToJoin = true;
     }
 
-    private void DisplayPreGameButtons()
+    private void DisplayPreGameLobby()
     {
+        if (NetworkManager.AmIHost)
+        {
+            _hostButtons.gameObject.SetActive(true);
+            _hostButtons.DOFade(1f, 1f);
+        }
+
         _preGameButtons.gameObject.SetActive(true);
         _preGameButtons.DOFade(1f, 1f);
 
+        _pregameBox.gameObject.SetActive(true);
+        _pregameBox.DOFade(1f, 1f);
+
         _currentCanvas = _preGameButtons;
+    }
+
+    private void SetupLobby()
+    {
+        foreach (Transform child in _playerLayout.transform)
+            Destroy(child.gameObject);
+
+        _roomName.text = $"<u>Room</u> : {NetworkManager.RoomData.Name}";
+        _roomPlayersCount.text = $"{NetworkManager.RoomData.Players.Count}/4";
+
+        foreach (NetworkManager.Player player in NetworkManager.RoomData.Players)
+        {
+            GameObject playerTemplate = Instantiate(_playerTemplatePrefab);
+            playerTemplate.transform.SetParent(_playerLayout);
+
+            playerTemplate.GetComponent<MenuPlayer>().Setup(player.Name, player.IsReady);
+        }
+
+        if (NetworkManager.AmIHost)
+        {
+            _addAIButton.interactable = NetworkManager.RoomData.Players.Count < 4;
+            _addAIButton.GetComponent<MenuButton>().UpdateDefaultColor(NetworkManager.RoomData.Players.Count < 4 ? _defaultColor : _defaultDisabledColor);
+
+            _removeAIButton.interactable = NetworkManager.RoomData.AiCount > 0;
+            _removeAIButton.GetComponent<MenuButton>().UpdateDefaultColor(NetworkManager.RoomData.AiCount > 0 ? _defaultColor : _defaultDisabledColor);
+        }
+    }
+
+    public void OnClickReady()
+    {
+        NetworkManager.Ready();
+        _readyButton.interactable = false;
+        _readyButton.GetComponent<MenuButton>().UpdateDefaultColor(_defaultDisabledColor);
+    }
+
+    public void OnClickAddAI()
+    {
+        NetworkManager.SendAICount(++_currentAICount);
+    }
+
+    public void OnClickRemoveAI()
+    {
+        NetworkManager.SendAICount(--_currentAICount);
     }
 
     public void OnClickCancel()
     {
         _currentCanvas.DOFade(0f, .1f).OnComplete(() => _currentCanvas.gameObject.SetActive(false));
 
-        if(_currentCanvas == _preGameButtons)
+        if (_currentCanvas == _preGameButtons)
+        {
+            if (NetworkManager.AmIHost)
+                _hostButtons.DOFade(0f, .1f).OnComplete(() => _hostButtons.gameObject.SetActive(false));
+
+            _pregameBox.DOFade(0f, .1f).OnComplete(() => _pregameBox.gameObject.SetActive(false));
             NetworkManager.QuitRoom();
+        }
         else
             _roomSelectionBox.DOFade(0f, .1f).OnComplete(() => _currentCanvas.gameObject.SetActive(false));
 
         _gameCreationButtons.gameObject.SetActive(true);
         _gameCreationButtons.DOFade(1f, 1f);
+
+        _readyButton.interactable = true;
+        _readyButton.GetComponent<MenuButton>().UpdateDefaultColor(_defaultColor);
     }
 
     public void OnClickQuit()
