@@ -51,8 +51,6 @@ public class TileMapManager : MonoBehaviour
     private Vector2 _previousMousePos;
     private Vector3 _hoveredTilePos;
     private Vector2Int _hoveredTileCoords;
-    private Vector2Int _previewMin;
-    private Vector2Int _previewMax;
 
     private void Awake()
     {
@@ -180,24 +178,31 @@ public class TileMapManager : MonoBehaviour
         _instance._hoveredTileCoords = WorldToTilemapCoords(currentMousePos);
         _instance._hoveredTilePos = TilemapCoordsToWorld(_instance._hoveredTileCoords);
 
-        // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
-        _instance._previewMin = _instance._hoveredTileCoords;
-        _instance._previewMax = new Vector2Int(_instance._hoveredTileCoords.x + size - 1, _instance._hoveredTileCoords.y + size - 1);
-
-        // If the building steps outside of the map.
-        for (int x = _instance._previewMin.x; x <= _instance._previewMax.x; ++x)
-            for (int y = _instance._previewMin.y; y <= _instance._previewMax.y; ++y)
-            {
-                LogicalTile tile;
-
-                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || /*!tile.IsFree(NetworkManager.Me)*/ !(tile.State == TileState.Free))
-                    return (_instance._hoveredTilePos, _instance._previousAvailability);
-
-            }
+        if (!TilesAvailableForBuild(size, _instance._hoveredTileCoords))
+            return (_instance._hoveredTilePos, _instance._previousAvailability);
 
         // Else the building can be placed at this location.
         _instance._previousAvailability = true;
         return (_instance._hoveredTilePos, _instance._previousAvailability);
+    }
+
+    public static bool TilesAvailableForBuild(int size, Vector2Int bottomLeftCoords)
+    {
+        // Defines respectively the coordinates of the building's preview location bottom left & top right corners.
+        Vector2Int _previewMin = bottomLeftCoords;
+        Vector2Int _previewMax = new Vector2Int(_previewMin.x + size - 1, _previewMin.y + size - 1);
+
+        // If the building steps outside of the map.
+        for (int x = _previewMin.x; x <= _previewMax.x; ++x)
+            for (int y = _previewMin.y; y <= _previewMax.y; ++y)
+            {
+                LogicalTile tile;
+
+                if (!_instance._tiles.TryGetValue(new Vector2Int(x, y), out tile) || /*!tile.IsFree(NetworkManager.Me)*/ !(tile.State == TileState.Free))
+                    return false;
+            }
+
+        return true;
     }
 
     public static void AddBuildingBlueprint(int size, Vector2 position)

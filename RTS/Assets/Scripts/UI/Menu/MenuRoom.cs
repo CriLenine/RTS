@@ -13,7 +13,7 @@ public class MenuRoom : MonoBehaviour
         Room = room;
 
         _name.text = room.Name;
-        _playersCount.text = $"{room.Players.Count}/4";
+        _playersCount.text = $"1/4";
         _map.text = "Dry Arabia";
     }
 }

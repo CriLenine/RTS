@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.Video;
 
 public class SliderValue : MonoBehaviour
@@ -16,6 +14,16 @@ public class SliderValue : MonoBehaviour
     [SerializeField]
     private VideoPlayer _videoBackground;
 
+    public void Setup()
+    {
+        if (PlayerPrefs.HasKey("volume")) 
+        {
+            AudioListener.volume = PlayerPrefs.GetFloat("volume");
+            _videoBackground.SetDirectAudioVolume(0, PlayerPrefs.GetFloat("volume") * .5f);
+            _slider.value = PlayerPrefs.GetFloat("volume");
+        }
+    }
+
     public void UpdateValue()
     {
         int value = (int)(_slider.value * 100);
@@ -24,5 +32,7 @@ public class SliderValue : MonoBehaviour
         AudioListener.volume = _slider.value;
 
         _videoBackground.SetDirectAudioVolume(0, _slider.value * .5f);
+
+        PlayerPrefs.SetFloat("volume", _slider.value);
     }
 }
