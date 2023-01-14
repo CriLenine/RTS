@@ -32,7 +32,7 @@ public partial class NetworkManager : MonoBehaviour
     public static bool IsReady => _instance._me.IsReady;
 
     // Suis-je le host de cette room ?
-    public bool AmIHost { get; private set; } = false;
+    public static bool AmIHost { get; private set; } = false;
 
     // Evénement pour suivre l'évolution d'une room
     public static event OnRoomUpdateHandler OnRoomUpdate
@@ -167,7 +167,7 @@ public partial class NetworkManager : MonoBehaviour
                         style.normal.textColor = _room.AiCount == i ? Color.green : Color.red;
 
                         if (GUILayout.Button($"{i}", style))
-                            _server.Send("AICount", i);
+                            SendAICount(i);
 
                         style.normal.textColor = color;
                     }
@@ -200,7 +200,7 @@ public partial class NetworkManager : MonoBehaviour
                 style.normal.textColor = IsReady ? Color.green : Color.red;
 
                 if (GUILayout.Button("Pret", style))
-                    _server.Send("Ready");
+                    Ready();
 
                 style.normal.textColor = color;
             }
@@ -548,6 +548,16 @@ public partial class NetworkManager : MonoBehaviour
         );
     }
 
+    public static void Ready()
+    {
+        _instance._server.Send("Ready");
+    }
+
+    public static void SendAICount(int count)
+    {
+        _instance._server.Send("AICount", count);
+    }
+
     public static void GetRooms(Action<RoomInfo[]> callback)
     {
         _instance._multiplayer.ListRooms("Game", null, 0, 0,
@@ -561,7 +571,7 @@ public partial class NetworkManager : MonoBehaviour
         {
             _instance._loading = false;
 
-            _instance.AmIHost = true;
+            AmIHost = true;
         });
     }
 
@@ -575,7 +585,7 @@ public partial class NetworkManager : MonoBehaviour
 
             _instance._rooms = null;
 
-            _instance.AmIHost = false;
+            AmIHost = false;
         });
     }
 
