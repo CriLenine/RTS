@@ -18,6 +18,8 @@ public class Harvest : Action
     {
         if (_isHarvesting)
         {
+            _character.Animator.Play(GetHarvestAnimationName());
+
             if (!ResourcesManager.Harvestable(_coords))
                 _isHarvesting = false;
 
