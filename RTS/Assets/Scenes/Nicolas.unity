@@ -2282,6 +2282,8 @@ MonoBehaviour:
   _dataCharacters:
   - {fileID: 11400000, guid: 9df2187d31b10f34590a9ef2f8a8f08b, type: 2}
   - {fileID: 11400000, guid: be317d5903b8baf4fa60812b492ab4a9, type: 2}
+  - {fileID: 11400000, guid: 737c63a2a8a4ba545a15fa03755665b4, type: 2}
+  - {fileID: 11400000, guid: 0219a9761ee5a4b43bd17cf31c9e1d3e, type: 2}
   _dataBuildings:
   - {fileID: 11400000, guid: a38b74e07f3507944833f3363e4dc786, type: 2}
   - {fileID: 11400000, guid: 814a8be8610529843a94f8eb9fa8acb7, type: 2}

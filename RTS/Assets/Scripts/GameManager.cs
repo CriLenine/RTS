@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private TickedList<Character> _characters = new TickedList<Character>();
     private TickedList<Character> _myCharacters = new TickedList<Character>();
+    private Dictionary<int, List<Character>> _charactersPerformer = new Dictionary<int, List<Character>>();
 
     public TickedList<Character>[] _aiCharacters;
 
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
     public static TickedList<Character> MyCharacters => _instance._myCharacters;
 
     public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.AICount];
+
+    public static  Dictionary<int, List<Character>> CharactersPerformer => _instance._charactersPerformer;
 
     private TickedList<Building> _buildings = new TickedList<Building>();
     private TickedList<Building> _myBuildings = new TickedList<Building>();
@@ -60,8 +63,8 @@ public class GameManager : MonoBehaviour
     private Dictionary<ResourceType, int[]> _playerResources = new Dictionary<ResourceType, int[]>();
     public static Dictionary<ResourceType, int[]> PlayerResources => _instance._playerResources;
 
-    private int _housing;
-    public static int Housing => _instance._housing;
+    private Dictionary<int, int> _housing = new Dictionary<int, int>();
+    public static Dictionary<int, int> Housing => _instance._housing;
 
     private void Awake()
     {
@@ -134,12 +137,11 @@ public class GameManager : MonoBehaviour
                     if (!IsPerformerAbleToSpawn(input.Performer, input.Prefab)) break;
 
                     if(_instance._entities[input.ID] is Building building)
-                        building.QueueSpawn((Character.Type)input.Prefab);
+                        building.QueueSpawn((Character.Type)input.Prefab, input.Position);
 
                     break;
 
                 case InputType.UnqueueSpawn:
-                    if (!IsPerformerAbleToSpawn(input.Performer, input.Prefab)) break;
 
                     if (_instance._entities[input.ID] is Building spawner)
                         spawner.UnqueueSpawn(input.Prefab);
@@ -253,6 +255,7 @@ public class GameManager : MonoBehaviour
             if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
+                _instance._charactersPerformer[entity.Performer].Remove(character);
                 _instance._myCharacters.Remove(ID);
 
                 if (aiId >= 0)
@@ -278,12 +281,13 @@ public class GameManager : MonoBehaviour
 
             Destroy(entity);
             EliminationManager.CheckForElimination();
+
+            HUDManager.UpdateHousing(entity.Performer);
         }
 
         if (_instance._entitiesToDestroy.Count > 0)
         {
             HUDManager.UpdateHUD();
-            HUDManager.UpdateHousing();
             ToolTipManager.HideToolTip();
         }
 
@@ -296,12 +300,12 @@ public class GameManager : MonoBehaviour
         foreach(var (performer, spawnerID, type, rallyPoint) in _instance._characterToSpawn)
         {
             CreateCharacter(performer, spawnerID, (int)type, rallyPoint);
+            HUDManager.UpdateHousing(performer);
         }
 
         if (_instance._characterToSpawn.Count > 0)
         {
             HUDManager.UpdateHUD();
-            HUDManager.UpdateHousing();
             ToolTipManager.HideToolTip();
         }
 
@@ -436,7 +440,7 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    #region Attack methods
+    #region Move& Methods
     private static void MoveAndAttack(int performer, Vector2 position, int[] attackers, TickedBehaviour target)
     {
         Dictionary<List<Character>, List<Vector2>> groupsAndPathfindings = RetrieveGroupsAndPathfindings(performer, target, attackers);
@@ -551,11 +555,13 @@ public class GameManager : MonoBehaviour
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
+        _instance._charactersPerformer[performer].Add(character);
 
         if (performer == NetworkManager.Me)
         {
             _instance._myEntities.Add(character);
             _instance._myCharacters.Add(character);
+            HUDManager.UpdateHousing(performer);
         }
 
         int aiId = performer - NetworkManager.PlayerCount;
@@ -609,7 +615,7 @@ public class GameManager : MonoBehaviour
         }
 
         TileMapManager.AddBuildingBlueprint(data.Size, position);
-
+        GameManager.UpdateHousing(performer, building.Data.HousingProvided);
         building.SetPosition(position);
 
         if(data.CanSpawnUnits)
@@ -627,8 +633,8 @@ public class GameManager : MonoBehaviour
 
         StatsManager.IncreaseBuildingsLost(performer);
 
-        if (performer == NetworkManager.Me)
-            _instance._housing -= building.Data.HousingProvided;
+        
+        UpdateHousing(performer,-building.Data.HousingProvided);
 
         DestroyEntity(buildingID);
     }
@@ -660,8 +666,12 @@ public class GameManager : MonoBehaviour
         _instance._myEntities.Clear();
         _instance._aiEntities = null;
 
+        _instance._charactersPerformer.Clear();
+
         _instance._characters.Clear();
         _instance._myCharacters.Clear();
+        foreach (var performer in _instance._charactersPerformer)
+            performer.Value.Clear();
         _instance._aiCharacters = null;
 
         _instance._buildings.Clear();
@@ -675,10 +685,10 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    public static void UpdateHousing(int delta)
+    public static void UpdateHousing(int performer, int delta)
     {
-        _instance._housing += delta;
-        HUDManager.UpdateHousing();
+        _instance._housing[performer] += delta;
+        HUDManager.UpdateHousing(performer);
     }
 
     public static Vector2Int startCoords;

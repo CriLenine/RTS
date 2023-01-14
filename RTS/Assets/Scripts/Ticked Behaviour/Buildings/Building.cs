@@ -84,9 +84,9 @@ public class Building : TickedBehaviour, IDamageable
     #region SpawnerSpecs
 
     private Vector2 _rallyPoint;
-    public List<CharacterData> QueuedSpawnCharacters { get; private set; } = new();
+    public List<(CharacterData data,Vector2 rallyPoint)> QueuedSpawnCharacters { get; private set; } = new();
 
-    public CharacterData OnGoingSpawnCharacterData { get; private set; } = null;
+    public (CharacterData data, Vector2 rallyPoint) OnGoingSpawnCharacterData { get; private set; } = (null,Vector2.zero);
 
     public int SpawningTicks { get; private set; }
     public bool OnGoingSpawn { get; private set; } = false;
@@ -157,7 +157,7 @@ public class Building : TickedBehaviour, IDamageable
         {
             SpawningTicks++;
 
-            if (SpawningTicks >= OnGoingSpawnCharacterData.SpawnTicks && GameManager.MyCharacters.Count < GameManager.Housing)
+            if (SpawningTicks >= OnGoingSpawnCharacterData.data.SpawnTicks && GameManager.CharactersPerformer[Performer].Count < GameManager.Housing[Performer])
             {
                 SpawningTicks = 0;
                 OnGoingSpawn = false;
@@ -166,9 +166,9 @@ public class Building : TickedBehaviour, IDamageable
                 if (QueuedSpawnCharacters.Count == 0 && SelectionManager.SelectedBuilding == this)
                     HUDManager.UpdateSpawnPreview();
 
-                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.Type, _rallyPoint);
+                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.data.Type, OnGoingSpawnCharacterData.rallyPoint);
                 
-                OnGoingSpawnCharacterData = null;
+                OnGoingSpawnCharacterData = (null,Vector2.zero);
             }
         }
 
@@ -206,8 +206,6 @@ public class Building : TickedBehaviour, IDamageable
 
             _backgroundSprite.color = Performer == NetworkManager.Me ? _backgroundColor : _enemyBackgroundColor;
 
-            if (GameManager.MyBuildings.Contains(ID))
-                GameManager.UpdateHousing(Data.HousingProvided);
 
             if(Data.CanSpawnUnits)
                 _rallyPoint = (Vector2)transform.position + new Vector2(1.1f * TileMapManager.TileSize * Data.Size / 2, 0);
@@ -312,12 +310,12 @@ public class Building : TickedBehaviour, IDamageable
 
     public void EnqueueSpawningCharas(CharacterData data) // BeforeNetworking
     {
-        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID));
+        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID, _rallyPoint));
     }
 
-    public void QueueSpawn(Character.Type charaType) // After networking
+    public void QueueSpawn(Character.Type charaType, Vector2 rallyPoint) // After networking
     {
-        QueuedSpawnCharacters.Add(DataManager.GetCharacterData(charaType));
+        QueuedSpawnCharacters.Add((DataManager.GetCharacterData(charaType),rallyPoint));
 
         if (Performer != NetworkManager.Me) return;
 
@@ -329,14 +327,14 @@ public class Building : TickedBehaviour, IDamageable
     }
     public void UnqueueSpawn(int index)// After networking
     {
-        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].Cost)
+        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].data.Cost)
             GameManager.AddResource(cost.Type, cost.Value, Performer);
 
         if (index == 0)
         {
             SpawningTicks = 0;
             OnGoingSpawn = false;
-            OnGoingSpawnCharacterData = null;
+            OnGoingSpawnCharacterData = (null,Vector2.zero);
         }
         QueuedSpawnCharacters.RemoveAt(index);
 

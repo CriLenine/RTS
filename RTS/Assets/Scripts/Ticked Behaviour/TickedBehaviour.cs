@@ -18,13 +18,14 @@ public abstract class TickedBehaviour : MonoBehaviour
     public static TickedBehaviour Create<T>(int performer, T data, TickedBehaviorType type) where T : TickedBehaviorData
     {
         TickedBehaviour tickedBehaviour = Instantiate(type == TickedBehaviorType.Building ? DataManager.BuildingPrefab : DataManager.CharacterPrefab) as TickedBehaviour;
-        tickedBehaviour.InitData(data);
+
 
         if (performer != NetworkManager.Me)
             tickedBehaviour.DisableViewRadius();
 
         tickedBehaviour.ID = NextID;
         tickedBehaviour.Performer = performer;
+        tickedBehaviour.InitData(data);
 
         return tickedBehaviour;
     }

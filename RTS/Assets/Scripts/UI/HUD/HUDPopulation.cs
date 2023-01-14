@@ -12,6 +12,6 @@ public class HUDPopulation : HUD
 
     public void UpdateHousing()
     {
-        _supplyBlockIndicatorUI.text = $"{GameManager.MyCharacters.Count}/{GameManager.Housing}";
+        _supplyBlockIndicatorUI.text = $"{GameManager.MyCharacters.Count}/{GameManager.Housing[NetworkManager.Me]}";
     }
 }

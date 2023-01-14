@@ -186,8 +186,9 @@ public class HUDManager : MonoBehaviour
             }
     }
 
-    public static void UpdateHousing()
+    public static void UpdateHousing(int performer)
     {
+        if(performer == NetworkManager.Me)
         _instance._population.UpdateHousing();
     }
 

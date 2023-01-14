@@ -41,15 +41,24 @@ public class SetupManager : MonoBehaviour
         {
             PlayerSpawnSetup currentSetup = _instance._spawnSetups[i];
 
+            GameManager.CharactersPerformer.Add(i, new List<Character>());
+            GameManager.Housing.Add(i, 0);
+
             foreach (TickedBehaviorSpawnSetup spawnSetup in currentSetup.TickedBehaviorSpawnSetups)
                 if (spawnSetup.Type == TickedBehaviorType.Character)
                     GameManager.CreateCharacter(i, -1, (int)spawnSetup.CharacterData.Type, Vector2.zero, true, spawnSetup.SpawnPoint.position);
                 else
                     GameManager.CreateBuilding(i, (int)spawnSetup.BuildingData.Type, spawnSetup.SpawnPoint.position, true);
 
+            //DEBUG
+            GameManager.CreateCharacter(i, -1, (int)Character.Type.Bowman, Vector2.zero, true, new Vector2(0,i));
+            //
+
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(currentSetup.TickedBehaviorSpawnSetups.Count > 0 ? 
                     currentSetup.TickedBehaviorSpawnSetups[0].SpawnPoint.position : Vector2.zero);
+
+
         }
 
         HUDManager.StartTimer();
