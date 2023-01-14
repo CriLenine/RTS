@@ -32,8 +32,6 @@ public class HUDSelection : HUD
 
     public static void UpdatePulse()
     {
-        Debug.Log("HERE");
-
         int pulseElementIndex = 0;
 
         if (SelectionManager.SelectedType != Character.Type.All)
