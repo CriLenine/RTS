@@ -9,7 +9,7 @@ public class HUDSpawnPreview : HUD
     private Building _currentBuilding;
 
     private CharacterData _spawningCharacterData;
-    private CharacterData[] _spawnQueue;
+    private (CharacterData data,Vector2)[] _spawnQueue;
 
     public void UpdateSpawnPreview()
     {
@@ -25,7 +25,7 @@ public class HUDSpawnPreview : HUD
             {
                 int index = 0;
 
-                foreach (CharacterData data in _spawnQueue)
+                foreach (var item in _spawnQueue)
                 {
                     if (index >= _spawnPreviewSlots.Count)
                         break;
@@ -34,14 +34,14 @@ public class HUDSpawnPreview : HUD
 
                     if (index == 0)
                     {
-                        _spawningCharacterData = _currentBuilding.OnGoingSpawnCharacterData;
+                        _spawningCharacterData = _currentBuilding.OnGoingSpawnCharacterData.data;
 
                         Color color = _spawningCharacterData.Color;
                         _spawnPreviewSlots[0].Fill.color = new Color(color.r, color.g, color.b, .2f);
                     }
 
-                    _spawnPreviewSlots[index].PreviewSprite.sprite = data.Icon;
-                    _spawnPreviewSlots[index].PreviewSprite.color = data.Color;
+                    _spawnPreviewSlots[index].PreviewSprite.sprite = item.data.Icon;
+                    _spawnPreviewSlots[index].PreviewSprite.color = item.data.Color;
 
                     index++;
                 }

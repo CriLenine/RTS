@@ -44,6 +44,9 @@ public class Character : TickedBehaviour, IDamageable
     private GameObject HoverMarker;
 
     [SerializeField]
+    private SpriteRenderer _teamOwnerRenderer;
+
+    [SerializeField]
     private GameObject SelectionMarker; 
 
     [Separator("UI")]
@@ -72,6 +75,7 @@ public class Character : TickedBehaviour, IDamageable
         _iconSprite.sprite = _data.CharacterSprite;
         _currentHealth = _data.MaxHealth;
         HealthBar.SetHealth(1);
+        _teamOwnerRenderer.color = GameManager.Colors[Performer];
     }
 
     protected override void Awake()
@@ -223,7 +227,8 @@ public class Character : TickedBehaviour, IDamageable
             if (chara.Performer == Performer || (chara.transform.position - transform.position).sqrMagnitude >= attackRange) continue; //Si trop loin ou meme team => next
 
             //Sinon on renvois l'action d'attaque
-            SetAction(new Attack(this, chara, false));
+            SetAction(new MoveAttack(this, chara.Position, chara));
+            AddAction(new Attack(this, chara, false));
             return false;
         }
 

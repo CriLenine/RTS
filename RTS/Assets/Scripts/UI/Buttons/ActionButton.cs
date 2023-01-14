@@ -132,6 +132,7 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
         foreach (Resource.Amount cost in _data.Cost)
             if (GameManager.PlayerResources[cost.Type][NetworkManager.Me] < cost.Value)
                 return false;
+
         return true;
     }
 

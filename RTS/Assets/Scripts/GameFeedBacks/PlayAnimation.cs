@@ -25,8 +25,6 @@ public class PlayAnimation : GameFeedback
 
         if (!gameObject.TryGetComponent(out Character character)) return;
 
-        if (character.Data.Type != Character.Type.Bowman) return;
-
         character.Animator.Play(_charaAnimationName);
     }
 

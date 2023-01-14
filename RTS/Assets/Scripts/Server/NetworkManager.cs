@@ -374,7 +374,7 @@ public partial class NetworkManager : MonoBehaviour
         switch (input.Type)
         {
             case InputType.QueueSpawn:
-                message.Add(input.ID,input.Prefab);
+                message.Add(input.ID,input.Prefab,input.Position.x,input.Position.y);
 
                 break;
             case InputType.UnqueueSpawn:

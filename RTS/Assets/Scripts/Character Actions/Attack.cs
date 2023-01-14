@@ -43,12 +43,12 @@ public class Attack : Action
         if (_target is Building building && building.CurrentHealth == 0)
             return true;
 
-        if (_isbuilding && (_target.Position - _character.Position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
+        if (!_isbuilding && (_target.Position - _character.Position).sqrMagnitude > _attackRange) // si trop loin on arrete d'attaquer 
         {
-            if (_isOrder)//Si on a cliquer a la mano sur lennemie on le suit jusqua la mort
+            if (_isOrder)//Si on a cliquer a la mano sur l'ennemi on le suit jusqua la mort
             {
                 SetAction(new MoveAttack(_character, _target.transform.position, _target));
-                AddAction(new Attack(_character, _target, _isbuilding));
+                AddAction(new Attack(_character,_target,_isbuilding));
             }
 
             return true;
@@ -59,7 +59,9 @@ public class Attack : Action
             if (_character.Data.Type is Character.Type.Bowman)
                 GameEventsManager.PlayEvent("ShootArrow",_character.gameObject);
             else
+            {
                 GameEventsManager.PlayEvent("AttackSword", _character.gameObject);
+            }
 
             if (Itarget.TakeDamage(_attackDamage)) //sinon tant qu'il n'est pas mort on attaque
             {
@@ -67,9 +69,6 @@ public class Attack : Action
                 {
                     StatsManager.IncreaseBuildingsDestroyed(_character.Performer);
                     StatsManager.IncreaseBuildingsLost(build.Performer);
-
-                    if (_target.Performer == NetworkManager.Me)
-                        GameManager.UpdateHousing(-build.Data.HousingProvided);
                 }
 
                 if (_target is Character chara)
