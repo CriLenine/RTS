@@ -25,8 +25,6 @@ public class AExplore : ActionNode
 
             GameManager.dCoords = nearestTree;
 
-            Debug.Log($"Look for trees {nearestTree.x} {nearestTree.y}");
-
             context.Inputs.Add(TickInput.Harvest(nearestTree, context.AllyIds, context.Performer));
 
             context.cuttedTree = nearestTree;
@@ -35,8 +33,6 @@ public class AExplore : ActionNode
         }
 
         Vector2Int? fogCoords = TileMapManager.GetNearestFogCoords(context.Performer, context.BalancePosition);
-
-        Debug.Log("Look for fog");
 
         if (fogCoords is null)
             return State.Failure;

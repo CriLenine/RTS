@@ -84,8 +84,11 @@ public class Harvest : Action
     {
         Building closestBuilding = null;
         float shortestDistance = float.MaxValue;
-        foreach (Building building in GameManager.MyBuildings)
+        foreach (Building building in GameManager.Buildings)
         {
+            if (building.Performer != _character.Performer)
+                continue;
+
             if (building.BuildCompletionRatio >= 1 && building.Data.CanCollectResources)
             {
                 if (!building.Data.CollectableResources.Contains(type))
