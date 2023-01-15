@@ -311,7 +311,7 @@ public class Building : TickedBehaviour, IDamageable
         _structureSprite.color = Color.Lerp(Performer == NetworkManager.Me ? _completionStartColor : _enemyCompletionStartColor,
             Performer == NetworkManager.Me ? _completionEndColor : _enemyCompletionEndColor, BuildCompletionRatio);
 
-        if (_buildComplete && NetworkManager.CurrentTick > 1)
+        if (_buildComplete && NetworkManager.CurrentTick > 1 && Performer == NetworkManager.Me)
             AudioManager.PlayBuildingSound();
         return _buildComplete;
     }
