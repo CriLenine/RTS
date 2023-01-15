@@ -299,6 +299,7 @@ public class Building : TickedBehaviour, IDamageable
                 _rallyPoint = (Vector2)transform.position + new Vector2(1.1f * TileMapManager.TileSize * Data.Size / 2, 0);
 
             _buildComplete = true;
+            AudioManager.PlayNewSound(Data.OnSpawnAudio);
 
             if (SelectionManager.SelectedBuilding == this)
                 HUDManager.UpdateHUD();

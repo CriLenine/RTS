@@ -32,6 +32,7 @@ public class AudioManager : MonoBehaviour
             AudioSource newSource = _instance._audioEmitter.AddComponent<AudioSource>();
             _instance._audioSources.Add(newSource);
         }
+        StartGame();
     }
 
     private void Update()

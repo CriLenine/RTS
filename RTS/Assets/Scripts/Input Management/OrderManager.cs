@@ -54,6 +54,8 @@ public class OrderManager : MonoBehaviour
                 }
                 return;
             }
+        }
+    }
 
     private static bool IsMouseOnTickedBehavior(Vector3 worldMousePos)
     {
@@ -88,7 +90,7 @@ public class OrderManager : MonoBehaviour
             AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
         }
 
-        NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds();));
+        NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();
     }
@@ -103,7 +105,7 @@ public class OrderManager : MonoBehaviour
             AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
         }
 
-        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds();));
+        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();
     }
@@ -113,7 +115,17 @@ public class OrderManager : MonoBehaviour
         Vector3 worldMousePos = _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue());
 
         if (!IsMouseOnTickedBehavior(worldMousePos))
+        {
+            foreach (Character.Type type in SelectionManager.SelectedTypes)
+            {
+                List<AudioClip> characterClips = DataManager.GetCharacterData(type).GenericOrderAudios;
+                if (characterClips.Count == 0)
+                    continue;
+                AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+            }
+
             NetworkManager.Input(TickInput.GuardPosition(worldMousePos, SelectionManager.GetSelectedIds()));
+        }
     }
 
     public static void TrySetBuildingRallyPoint()
