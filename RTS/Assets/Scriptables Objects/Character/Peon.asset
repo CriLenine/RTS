@@ -36,7 +36,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2ac17c87e9d192449af6bd104935f0e6, type: 3}
   _type: 0
   _subType: 0
-  _spawnTicks: 100
+  _spawnTicks: 50
   _cost:
   - _type: 3
     _value: 50

@@ -27,9 +27,13 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _onSpawnAudio: {fileID: 0}
+  _onSelectionAudios: []
+  _genericOrderAudios: []
+  _attackOrderAudios: []
   _type: 1
   _subType: 1
-  _spawnTicks: 150
+  _spawnTicks: 75
   _cost:
   - _type: 3
     _value: 120

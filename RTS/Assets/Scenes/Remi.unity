@@ -7834,6 +7834,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 34.1
       objectReference: {fileID: 0}
+    - target: {fileID: 755003451, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 922782382, guid: 440d04a1cf21d9b4ca8a6ed6ced3666a, type: 3}
       propertyPath: _currentCamera
       value: 

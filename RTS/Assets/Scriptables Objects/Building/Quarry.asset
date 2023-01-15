@@ -27,10 +27,13 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _onSpawnAudio: {fileID: 0}
+  _onSelectionAudios: []
+  _onBlueprintSpawnAudio: {fileID: 0}
   _type: 4
   _subType: 0
   _size: 3
-  _requiredBuildTicks: 1000
+  _requiredBuildTicks: 500
   _cost:
   - _type: 0
     _value: 50

@@ -34,7 +34,7 @@ MonoBehaviour:
   _type: 0
   _subType: 0
   _size: 6
-  _requiredBuildTicks: 1500
+  _requiredBuildTicks: 750
   _cost:
   - _type: 0
     _value: 400

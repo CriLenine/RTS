@@ -34,7 +34,7 @@ MonoBehaviour:
   _attackOrderAudios: []
   _type: 2
   _subType: 1
-  _spawnTicks: 175
+  _spawnTicks: 100
   _cost:
   - _type: 3
     _value: 60

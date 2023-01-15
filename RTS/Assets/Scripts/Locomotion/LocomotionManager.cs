@@ -65,7 +65,7 @@ public class LocomotionManager : MonoBehaviour
 
         projectedPosition = character.Position + characterMove.LastDir;
 
-        Vector2 targetPosition = Vector2.MoveTowards(character.Position, projectedPosition.Value, TileMapManager.TileSize / 10f);
+        Vector2 targetPosition = Vector2.MoveTowards(character.Position, projectedPosition.Value, 2f * TileMapManager.TileSize / 10f);
         character.SetPosition(targetPosition);
 
         return character.Position == position;

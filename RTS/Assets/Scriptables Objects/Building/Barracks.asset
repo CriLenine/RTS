@@ -27,10 +27,13 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _onSpawnAudio: {fileID: 0}
+  _onSelectionAudios: []
+  _onBlueprintSpawnAudio: {fileID: 0}
   _type: 5
   _subType: 1
   _size: 3
-  _requiredBuildTicks: 2000
+  _requiredBuildTicks: 1000
   _cost:
   - _type: 0
     _value: 150
@@ -51,4 +54,4 @@ MonoBehaviour:
     ButtonPosition: {x: 1, y: 0}
   - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
     ButtonPosition: {x: 4, y: 2}
-  CanSpawnUnits: 0
+  CanSpawnUnits: 1
