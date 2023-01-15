@@ -109,10 +109,8 @@ public class Building : TickedBehaviour, IDamageable
             return _lastKey++;
         }
 
-        public void Remove(int index)
+        public void Remove(int key)
         {
-            int key = GetNthMinKey(index);
-
             _dictionnary.Remove(key);
 
             _keys.Remove(key);
@@ -140,6 +138,10 @@ public class Building : TickedBehaviour, IDamageable
         {
             return _keys.Count > 0 ? _dictionnary[_keys.Min] : default(T);
         }
+        public bool As(int key)
+        {
+            return _dictionnary.ContainsKey(key);
+        }
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -152,31 +154,27 @@ public class Building : TickedBehaviour, IDamageable
             return GetEnumerator();
         }
 
-        private int GetNthMinKey(int index)
+        public int GetNthMinKey(int index)
         {
             if (index < 0 || index >= _keys.Count)
                 throw new IndexOutOfRangeException();
 
-            int[] saves = new int[index];
+            SortedSet<int> _keysCopy = new SortedSet<int>(_keys);
+
 
             for (int i = 0; i < index; ++i)
-                _keys.Remove(saves[i] = _keys.Min);
+                _keysCopy.Remove(_keysCopy.Min);
 
-            int key = _keys.Min;
-
-            for (int i = 0; i < index; ++i)
-                _keys.Add(saves[i]);
-
-            return key;
+            return _keysCopy.Min;
         }
 
-        public T this[int index] => _dictionnary[GetNthMinKey(index)];
+        public T this[int key] => _dictionnary[key];
     }
 
     private Vector2 _rallyPoint;
-    public DictionnaryQueue<(CharacterData data,Vector2 rallyPoint)> QueuedSpawnCharacters { get; private set; } = new();
+    public DictionnaryQueue<CharacterData> QueuedSpawnCharacters { get; private set; } = new();
 
-    public (CharacterData data, Vector2 rallyPoint) OnGoingSpawnCharacterData { get; private set; } = (null,Vector2.zero);
+    public CharacterData OnGoingSpawnCharacterData { get; private set; } = null;
 
     public int SpawningTicks { get; private set; }
     public bool OnGoingSpawn { get; private set; } = false;
@@ -246,7 +244,7 @@ public class Building : TickedBehaviour, IDamageable
         {
             SpawningTicks++;
 
-            if (SpawningTicks >= OnGoingSpawnCharacterData.data.SpawnTicks && GameManager.CharactersPerformer[Performer].Count < GameManager.Housing[Performer])
+            if (SpawningTicks >= OnGoingSpawnCharacterData.SpawnTicks && GameManager.PerformersCharaNbr[Performer] < GameManager.Housing[Performer])
             {
                 SpawningTicks = 0;
                 OnGoingSpawn = false;
@@ -255,9 +253,9 @@ public class Building : TickedBehaviour, IDamageable
                 if (QueuedSpawnCharacters.Count == 0 && SelectionManager.SelectedBuilding == this)
                     HUDManager.UpdateSpawnPreview();
 
-                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.data.Type, OnGoingSpawnCharacterData.rallyPoint);
+                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.Type, _rallyPoint);
                 
-                OnGoingSpawnCharacterData = (null,Vector2.zero);
+                OnGoingSpawnCharacterData = null;
             }
         }
         else if (QueuedSpawnCharacters.Count > 0)
@@ -403,42 +401,41 @@ public class Building : TickedBehaviour, IDamageable
 
     public void EnqueueSpawningCharas(CharacterData data) // BeforeNetworking
     {
-        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID, _rallyPoint));
+        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID));
     }
 
-    public void QueueSpawn(Character.Type charaType, Vector2 rallyPoint) // After networking
+    public void QueueSpawn(Character.Type charaType) // After networking
     {
         foreach (Resource.Amount cost in DataManager.GetCharacterData(charaType).Cost)
             GameManager.Pay(cost.Type, cost.Value, Performer);
 
-        QueuedSpawnCharacters.Queue((DataManager.GetCharacterData(charaType),rallyPoint));
+        QueuedSpawnCharacters.Queue((DataManager.GetCharacterData(charaType)));
 
         if (Performer != NetworkManager.Me) return;
 
         HUDManager.UpdateSpawnPreview();
     }
-    public void CancelSpawn(int index)// BeforeNetworking
+    public void CancelSpawn(int key)// BeforeNetworking
     {
-        NetworkManager.Input(TickInput.UnqueueSpawn(index, ID));
+        NetworkManager.Input(TickInput.UnqueueSpawn(key, ID));
     }
-    public void UnqueueSpawn(int index)// After networking
+    public void UnqueueSpawn(int key)// After networking
     {
-        if (index >= QueuedSpawnCharacters.Count)
+        if (!QueuedSpawnCharacters.As(key))
             return;
 
-        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].data.Cost)
+        foreach (Resource.Amount cost in QueuedSpawnCharacters[key].Cost)
             GameManager.AddResource(cost.Type, cost.Value, Performer);
 
-        if (index == 0)
+        if (key == QueuedSpawnCharacters.GetNthMinKey(0))
         {
             SpawningTicks = 0;
             OnGoingSpawn = false;
-            OnGoingSpawnCharacterData = (null,Vector2.zero);
+            OnGoingSpawnCharacterData = null;
         }
 
-        QueuedSpawnCharacters.Remove(index);
+        QueuedSpawnCharacters.Remove(key);
 
-        if (Performer != NetworkManager.Me) return;
         HUDManager.UpdateSpawnPreview();
     }
 

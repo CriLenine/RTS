@@ -22,7 +22,7 @@ public class ASpawn : ActionNode
         {
             if (building.Data.CanSpawnUnits && building.SpawnableTypes.Contains(_characterType))
             {
-                context.Inputs.Add(TickInput.QueueSpawn((int)_characterType, building.ID, context.Leader.Position, context.Performer));
+                context.Inputs.Add(TickInput.QueueSpawn((int)_characterType, building.ID, context.Performer));
 
                 if (log)
                     Debug.Log($"Spawn {_characterType}");
