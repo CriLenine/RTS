@@ -37,14 +37,12 @@ public class GameManager : MonoBehaviour
     private TickedList<Character> _characters = new TickedList<Character>();
     private TickedList<Character> _myCharacters = new TickedList<Character>();
     private Dictionary<int, List<Character>> _charactersPerformer = new Dictionary<int, List<Character>>();
-
     public TickedList<Character>[] _aiCharacters;
 
     public static TickedList<Character> Characters => _instance._characters;
     public static TickedList<Character> MyCharacters => _instance._myCharacters;
 
     public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.AICount];
-
     public static  Dictionary<int, List<Character>> CharactersPerformer => _instance._charactersPerformer;
 
     private TickedList<Building> _buildings = new TickedList<Building>();
@@ -572,8 +570,6 @@ public class GameManager : MonoBehaviour
             _instance._aiCharacters[aiId].Add(character);
         }
 
-        HUDManager.UpdateHousing();
-
         character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
 
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
@@ -613,7 +609,6 @@ public class GameManager : MonoBehaviour
             _instance._aiEntities[aiId].Add(building);
             _instance._aiBuildings[aiId].Add(building);
         }
-
         TileMapManager.AddBuildingBlueprint(data.Size, position);
         GameManager.UpdateHousing(performer, building.Data.HousingProvided);
         building.SetPosition(position);
@@ -668,10 +663,13 @@ public class GameManager : MonoBehaviour
 
         _instance._charactersPerformer.Clear();
 
+        _instance._charactersPerformer.Clear();
+
         _instance._characters.Clear();
         _instance._myCharacters.Clear();
         foreach (var performer in _instance._charactersPerformer)
             performer.Value.Clear();
+            
         _instance._aiCharacters = null;
 
         _instance._buildings.Clear();
