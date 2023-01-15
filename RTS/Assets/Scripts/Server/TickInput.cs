@@ -16,7 +16,7 @@ public enum InputType
     GuardPosition,
     Destroy,
     CancelConstruction,
-    UpdateRallyPoint
+    UpdateRallyPoint,
     Deposit
 }
 
