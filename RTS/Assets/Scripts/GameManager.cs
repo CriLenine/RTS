@@ -36,14 +36,12 @@ public class GameManager : MonoBehaviour
 
     private TickedList<Character> _characters = new TickedList<Character>();
     private TickedList<Character> _myCharacters = new TickedList<Character>();
-    private Dictionary<int, List<Character>> _charactersPerformer = new Dictionary<int, List<Character>>();
     public TickedList<Character>[] _aiCharacters;
 
     public static TickedList<Character> Characters => _instance._characters;
     public static TickedList<Character> MyCharacters => _instance._myCharacters;
 
     public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.AICount];
-    public static  Dictionary<int, List<Character>> CharactersPerformer => _instance._charactersPerformer;
 
     private TickedList<Building> _buildings = new TickedList<Building>();
     private TickedList<Building> _myBuildings = new TickedList<Building>();
@@ -261,7 +259,7 @@ public class GameManager : MonoBehaviour
             if (entity is Character character)
             {
                 _instance._characters.Remove(ID);
-                _instance._charactersPerformer[entity.Performer].Remove(character);
+                _instance._performersCharaNbr[entity.Performer]--;
                 _instance._myCharacters.Remove(ID);
 
                 if (aiId >= 0)
@@ -561,7 +559,6 @@ public class GameManager : MonoBehaviour
 
         _instance._entities.Add(character);
         _instance._characters.Add(character);
-        _instance._charactersPerformer[performer].Add(character);
 
         if (performer == NetworkManager.Me)
         {
@@ -585,6 +582,8 @@ public class GameManager : MonoBehaviour
 
         if (!inPlace)
             MoveCharacters(performer, rallyPoint, -1, new int[1] { character.ID }, MoveType.ToPosition);
+        else
+            _instance._performersCharaNbr[performer]++;
     }
 
     private static void Kill(int performer, int[] targets)
@@ -670,15 +669,13 @@ public class GameManager : MonoBehaviour
         _instance._myEntities.Clear();
         _instance._aiEntities = null;
 
-        _instance._charactersPerformer.Clear();
 
-        _instance._charactersPerformer.Clear();
 
         _instance._characters.Clear();
         _instance._myCharacters.Clear();
-        foreach (var performer in _instance._charactersPerformer)
-            performer.Value.Clear();
-            
+
+        _instance._characterToSpawn.Clear();
+
         _instance._aiCharacters = null;
 
         _instance._buildings.Clear();
@@ -686,8 +683,13 @@ public class GameManager : MonoBehaviour
         _instance._aiBuildings = null;
     }
 
+    private Dictionary<int, int> _performersCharaNbr = new();
+    public static Dictionary<int, int> PerformersCharaNbr => _instance._performersCharaNbr;
     public static void AddEntity(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)
     {
+        if (_instance._performersCharaNbr[performer] >= _instance._housing[performer]) return;
+
+        _instance._performersCharaNbr[performer]++;
         _instance._characterToSpawn.Add((performer,spawnerID,type,rallyPoint));
     }
     #endregion

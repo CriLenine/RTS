@@ -20,6 +20,12 @@ public class PreviewSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Image PreviewSprite;
     public Button Cancel;
 
+    private int _currentKey;
+    public int CurrentKey { 
+        get => _currentKey;  
+        set => _currentKey = value; 
+    }
+
     public void SetActive()
     {
         gameObject.SetActive(true);
@@ -36,8 +42,8 @@ public class PreviewSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         Cancel.gameObject.SetActive(false);
     }
 
-    public void CancelSpawn(int index)
+    public void CancelSpawn()
     {
-        SelectionManager.SelectedBuilding.CancelSpawn(index);
+        SelectionManager.SelectedBuilding.CancelSpawn(_currentKey);
     }
 }

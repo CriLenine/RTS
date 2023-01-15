@@ -41,8 +41,8 @@ public class SetupManager : MonoBehaviour
         {
             PlayerSpawnSetup currentSetup = _instance._spawnSetups[i];
 
-            GameManager.CharactersPerformer.Add(i, new List<Character>());
             GameManager.Housing.Add(i, 0);
+            GameManager.PerformersCharaNbr.Add(i, 0);
 
             foreach (TickedBehaviorSpawnSetup spawnSetup in currentSetup.TickedBehaviorSpawnSetups)
                 if (spawnSetup.Type == TickedBehaviorType.Character)

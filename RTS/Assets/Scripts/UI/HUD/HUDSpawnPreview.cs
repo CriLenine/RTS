@@ -9,7 +9,6 @@ public class HUDSpawnPreview : HUD
     private Building _currentBuilding;
 
     private CharacterData _spawningCharacterData;
-    private CharacterData[] _spawnQueue;
 
     public void UpdateSpawnPreview()
     {
@@ -30,6 +29,7 @@ public class HUDSpawnPreview : HUD
                         break;
 
                     _spawnPreviewSlots[index].SetActive();
+                    _spawnPreviewSlots[index].CurrentKey = index < _currentBuilding.QueuedSpawnCharacters.Count ? _currentBuilding.QueuedSpawnCharacters.GetNthMinKey(index) : -1;
 
                     if (index == 0)
                     {
