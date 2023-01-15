@@ -31,12 +31,12 @@ MonoBehaviour:
   _subType: 1
   _spawnTicks: 175
   _cost:
-  - _type: 0
-    _value: 60
-  - _type: 0
-    _value: 70
+  - _type: 3
+    _value: 300
+  - _type: 2
+    _value: 90
   _icon: {fileID: 21300000, guid: 242105fce5414db4aabce715c5bf75c0, type: 3}
-  _color: {r: 0.3490566, g: 0.0115254605, b: 0.015009328, a: 1}
+  _color: {r: 0.65882355, g: 0.15686275, b: 0.12156863, a: 1}
   _toolTip: {fileID: 11400000, guid: 1293e4fe5767fec42b91a20845e961c0, type: 2}
   _selectionToolTip: {fileID: 11400000, guid: 233fa2e953834a148a8b2c17a56f5dab, type: 2}
   _animator: {fileID: 9100000, guid: 46f931830b583bb4d975b17a7f0062de, type: 2}

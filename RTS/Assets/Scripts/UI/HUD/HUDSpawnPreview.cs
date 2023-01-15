@@ -19,13 +19,12 @@ public class HUDSpawnPreview : HUD
         if (SelectionManager.SelectedBuilding?.Performer == NetworkManager.Me)
         {
             _currentBuilding = SelectionManager.SelectedBuilding;
-            _spawnQueue = _currentBuilding.QueuedSpawnCharacters.ToArray();
 
             if (_currentBuilding.OnGoingSpawn)
             {
                 int index = 0;
 
-                foreach (var item in _spawnQueue)
+                foreach (var item in _currentBuilding.QueuedSpawnCharacters)
                 {
                     if (index >= _spawnPreviewSlots.Count)
                         break;

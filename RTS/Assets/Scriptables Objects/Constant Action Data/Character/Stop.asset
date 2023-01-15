@@ -17,7 +17,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1340314902019757624, guid: 35c5d689ab54d084788c40ac80704c47, type: 3}
         m_TargetAssemblyTypeName: ActionsManager, Assembly-CSharp
-        m_MethodName: StopTrigger
+        m_MethodName: Stop
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

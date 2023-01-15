@@ -136,6 +136,7 @@ public class HUDStats : HUD
                     {
                         _bottomSeparator.SetActive(true);
                         _resourceCollected.text = $"{_character.HarvestedResource.Value}";
+                        _resource.sprite = HUDManager.ResourceSprites[_character.HarvestedResource.Type];
                         _resource.gameObject.SetActive(true);
                         return;
                     }
