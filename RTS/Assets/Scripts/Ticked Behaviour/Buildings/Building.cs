@@ -240,20 +240,8 @@ public class Building : TickedBehaviour, IDamageable
         }
     }
 
-
-    public override void PlayOnSelectedAudio()
-    {
-        if (_nTicksFromLastAudio < AUDIO_COOLDOWN)
-            return;
-        _nTicksFromLastAudio = 0;
-
-        AudioSource.clip = Data.OnSelectionAudios[(int)Random.value * (Data.OnSelectionAudios.Count - 1)];
-        AudioSource.Play();
-    }
-
     public override void Tick()
     {
-        base.Tick();
         if (OnGoingSpawn)
         {
             SpawningTicks++;
@@ -328,9 +316,6 @@ public class Building : TickedBehaviour, IDamageable
     public void Select()
     {
         _isSelected = true;
-
-        AudioSource.clip = Data.OnSelectionAudios[(int) Random.value * (Data.OnSelectionAudios.Count - 1)];
-        AudioSource.Play();
 
         HoverMarker.SetActive(false);
         SelectionMarker.SetActive(true);

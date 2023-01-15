@@ -38,11 +38,6 @@ public abstract class TickedBehaviour : MonoBehaviour
     public Vector2 Position { get; protected set; }
     public Vector2Int Coords { get; protected set; }
 
-    [SerializeField]
-    private AudioSource _audioSource;
-
-    public AudioSource AudioSource => _audioSource;
-
     [Separator("View Specs")]
 
     [SerializeField]
@@ -68,13 +63,9 @@ public abstract class TickedBehaviour : MonoBehaviour
         }
     }
 
-    protected const int AUDIO_COOLDOWN = 120; // In ticks
-    protected int _nTicksFromLastAudio = 121;
-
     protected virtual void Awake()
     {
         ApplyViewRadius();
-        _audioSource = GetComponent<AudioSource>();
     }
 
     private void ApplyViewRadius()
@@ -88,11 +79,7 @@ public abstract class TickedBehaviour : MonoBehaviour
         _currentView.gameObject.SetActive(false);
     }
 
-    public abstract void PlayOnSelectedAudio();
-    public virtual void Tick()
-    {
-        ++_nTicksFromLastAudio;
-    }
+    public abstract void Tick();
 
     public virtual Hash128 GetHash128()
     {

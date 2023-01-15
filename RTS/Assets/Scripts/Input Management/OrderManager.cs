@@ -1,5 +1,6 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class OrderManager : MonoBehaviour
 {
@@ -36,10 +37,18 @@ public class OrderManager : MonoBehaviour
             {
                 if (ResourcesManager.Harvestable(rallyPointCoords))
                 {
-                    Character ch = (Character)GameManager.Entities[ids[0]];
+                    int[] ids = new int[SelectionManager.SelectedCharacters.Count];
 
-                    ch.AudioSource.clip = ch.Data.GenericOrderAudio;
-                    ch.AudioSource.Play();
+                    for (int i = 0; i < SelectionManager.SelectedCharacters.Count; ++i)
+                        ids[i] = SelectionManager.SelectedCharacters[i].ID;
+
+                    foreach (Character.Type type in SelectionManager.SelectedTypes)
+                    {
+                        List<AudioClip> characterClips = DataManager.GetCharacterData(type).GenericOrderAudios;
+                        if (characterClips.Count == 0)
+                            continue;
+                        AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+                    }
 
                     NetworkManager.Input(TickInput.Harvest(rallyPointCoords, SelectionManager.GetSelectedIds()));
                 }
@@ -71,19 +80,30 @@ public class OrderManager : MonoBehaviour
 
     public static void OrderBuild(Building building)
     {
+        foreach (Character.Type type in SelectionManager.SelectedTypes)
+        {
+            List<AudioClip> characterClips = DataManager.GetCharacterData(type).GenericOrderAudios;
+            if (characterClips.Count == 0)
+                continue;
+            AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+        }
 
-        Character builder = (Character)GameManager.Entities[builderIDs[0]];
-
-        builder.AudioSource.clip = builder.Data.GenericOrderAudio;
-        builder.AudioSource.Play();
-        NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds()));
+        NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds();));
 
         SelectionManager.DeselectAll();
     }
 
     public static void OrderAttack(TickedBehaviour entity)
     {
-        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds()));
+        foreach (Character.Type type in SelectionManager.SelectedTypes)
+        {
+            List<AudioClip> characterClips = DataManager.GetCharacterData(type).AttackOrderAudios;
+            if (characterClips.Count == 0)
+                continue;
+            AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+        }
+
+        NetworkManager.Input(TickInput.Attack(entity.ID, entity.transform.position, SelectionManager.GetSelectedIds();));
 
         SelectionManager.DeselectAll();
     }

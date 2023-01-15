@@ -106,19 +106,8 @@ public class Character : TickedBehaviour, IDamageable
             _pathRenderer.gameObject.SetActive(false);
     }
 
-    public override void PlayOnSelectedAudio()
-    {
-        if (_nTicksFromLastAudio < AUDIO_COOLDOWN)
-            return;
-        _nTicksFromLastAudio = 0;
-
-        AudioSource.clip = Data.OnSelectionAudios[(int)Random.value * (Data.OnSelectionAudios.Count - 1)];
-        AudioSource.Play();
-    }
-
     public sealed override void Tick()
     {
-        base.Tick();
         if (CurrentAction is null)
             if (_isGuardingPosition)
                 CheckSurrounding();

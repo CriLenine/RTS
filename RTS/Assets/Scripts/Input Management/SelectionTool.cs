@@ -1,6 +1,7 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
 
 public class SelectionTool : MonoBehaviour
 {
@@ -138,9 +139,19 @@ public class SelectionTool : MonoBehaviour
                         SelectionManager.AddCharacterToSelection(character);
         }
 
-        if (SelectionManager.SelectedCharacters.Count > 0)
+        foreach (Character.Type type in SelectionManager.SelectedTypes)
         {
-            SelectionManager.SelectedCharacters[0].PlayOnSelectedAudio();
+            List<AudioClip> characterClips = DataManager.GetCharacterData(type).OnSelectionAudios;
+            if (characterClips.Count == 0)
+                continue;
+            AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+        }
+
+        if (SelectionManager.SelectedBuilding != null)
+        {
+            List<AudioClip> clips = SelectionManager.SelectedBuilding.Data.OnSelectionAudios;
+            if (clips.Count > 0)
+                AudioManager.PlayNewSound(clips[(int)(Random.value * (clips.Count - 1))]);
         }
 
         _startpos = Vector2.zero;
