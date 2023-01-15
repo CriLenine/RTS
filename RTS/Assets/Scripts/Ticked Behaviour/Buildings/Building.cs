@@ -2,6 +2,7 @@ using MyBox;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.VersionControl;
 using UnityEngine;
 
@@ -83,6 +84,8 @@ public class Building : TickedBehaviour, IDamageable
     public float BuildCompletionRatio => (float)_completedBuildTicks / _data.RequiredBuildTicks;
 
     private bool _isSelected;
+
+    public HashSet<Character.Type> SpawnableTypes { get; private set; } = new HashSet<Character.Type>();
 
     #region SpawnerSpecs
 
@@ -185,10 +188,11 @@ public class Building : TickedBehaviour, IDamageable
         _data = data as BuildingData;
 
         foreach (ButtonDataHUDParameters parameter in _data.Actions)
-            if (parameter.ButtonData is CharacterData)
+            if (parameter.ButtonData is CharacterData characterData)
             {
                 _data.CanSpawnUnits = true;
-                break;
+
+                SpawnableTypes.Add(characterData.Type);
             }
 
         float scale = .9f * TileMapManager.TileSize * Data.Size;
@@ -197,8 +201,6 @@ public class Building : TickedBehaviour, IDamageable
         _boxCollider.size = new Vector2(scale, scale);
 
         _healthBarTransform.transform.position += new Vector3(0, .5f * scale);
-
-       
 
         _completedBuildTicks = 0;
         _buildComplete = false;

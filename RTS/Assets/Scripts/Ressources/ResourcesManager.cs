@@ -43,6 +43,7 @@ public class ResourcesManager : MonoBehaviour
     }
 
     #region HasResource
+
     public static bool HasTree(Vector2Int coords)
     {
         return _instance._treesTilemap.HasTile(new Vector3Int(coords.x, coords.y));

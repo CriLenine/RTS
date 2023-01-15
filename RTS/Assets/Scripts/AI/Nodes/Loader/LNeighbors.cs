@@ -17,6 +17,11 @@ public class LNeighbors : DecoratorNode
 
     protected override State OnUpdate()
     {
+        if (context.Characters.Count == 0)
+            return State.Failure;
+
+        context.Leader = context.Characters.At(0);
+
         context.Enemies.Clear();
 
         context.PeonCount = 0;
@@ -43,12 +48,15 @@ public class LNeighbors : DecoratorNode
         {
             Character neighbor = GameManager.Characters[id];
 
-            if (neighbor.Performer != context.Performer)
-            {
-                enemmies.Add(id);
+            if (neighbor.Performer == context.Performer)
+                continue;
 
-                context.Enemies.Add(neighbor);
-            }
+            if (Vector2.SqrMagnitude(neighbor.Position - context.Leader.Position) > 16f)
+                continue;
+
+            enemmies.Add(id);
+
+            context.Enemies.Add(neighbor);
         }
 
         context.AllyIds = allies.ToArray();

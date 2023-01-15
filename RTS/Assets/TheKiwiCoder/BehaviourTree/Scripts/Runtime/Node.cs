@@ -20,6 +20,7 @@ namespace TheKiwiCoder {
         [HideInInspector] public Blackboard blackboard;
         [TextArea] public string description;
         public bool drawGizmos = false;
+        public bool log = false;
 
         public State Update() {
 
@@ -48,8 +49,8 @@ namespace TheKiwiCoder {
 
         public virtual void OnDrawGizmos() { }
 
-        protected abstract void OnStart();
-        protected abstract void OnStop();
+        protected virtual void OnStart() { }
+        protected virtual void OnStop() { }
         protected abstract State OnUpdate();
     }
 }

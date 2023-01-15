@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,9 +16,15 @@ namespace TheKiwiCoder {
 
         public List<TickInput> Inputs = new List<TickInput>();
 
+        #region Neighbors
+
+        public Character Leader;
+
         public GameManager.TickedList<TickedBehaviour> Entities => GameManager.GetAIEntities(Performer);
         public GameManager.TickedList<Character> Characters => GameManager.GetAICharacters(Performer);
         public GameManager.TickedList<Building> Buildings => GameManager.GetAIBuildings(Performer);
+
+        public List<Character> Enemies = new List<Character>();
 
         public int[] AllyIds = new int[0];
         public int[] EnemyIds = new int[0];
@@ -25,21 +32,43 @@ namespace TheKiwiCoder {
         public int PeonCount;
         public int SoldierCount;
 
-        public List<Character> Enemies = new List<Character>();
+        #endregion
+
+        #region Environment
+
+        public int GetResourceAmount(ResourceType resourceType) => GameManager.PlayerResources[resourceType][Performer];
+
+        public Dictionary<ResourceType, ResourceQueue<Vector2Int>> KnownResources = new Dictionary<ResourceType, ResourceQueue<Vector2Int>>();
+
+        #endregion
+
+        #region Movements
 
         public Vector2 TargetMovePosition;
         public Vector2? StartPosition = null;
         public Vector2Int StartCoords;
         public Vector2 BalancePosition;
 
-        public ResourceQueue<Vector2Int> Trees = new ResourceQueue<Vector2Int>();
-        public ResourceQueue<Vector2Int> Crystals = new ResourceQueue<Vector2Int>();
+        #endregion
 
-        public Vector2Int? cuttedTree;
+        #region Buildings
+
+        public int Housing => GameManager.Housing[Performer];
+
+        #endregion
+
+        #region Actions
+
+        public ResourceType? HarvestedResource;
+
+        #endregion
 
         public Context(int performer)
         {
             Performer = performer;
+
+            foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+                KnownResources[type] = new ResourceQueue<Vector2Int>();
         }
     }
 }

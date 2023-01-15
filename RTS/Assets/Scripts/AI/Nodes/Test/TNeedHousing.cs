@@ -4,10 +4,10 @@ using UnityEngine;
 using TheKiwiCoder;
 
 [System.Serializable]
-public class TNearbyEnemy : ActionNode
+public class TNeedHousing : ActionNode
 {
     protected override State OnUpdate()
     {
-        return context.Enemies.Count > 0 ? State.Success : State.Failure;
+        return context.Housing >= context.Characters.Count ? State.Failure : State.Success;
     }
 }
