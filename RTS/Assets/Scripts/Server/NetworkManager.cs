@@ -456,6 +456,13 @@ public partial class NetworkManager : MonoBehaviour
 
                 break;
 
+            case InputType.Deposit:
+                message.Add(input.ID);
+
+                Spread(message, input.Targets);
+
+                break;
+
             case InputType.Destroy:
                 message.Add(input.ID);
 

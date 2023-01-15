@@ -15,6 +15,12 @@ public class AudioManager : MonoBehaviour
     [SerializeField]
     private AudioSource _musicSource;
 
+    [SerializeField]
+    private AudioSource _spawnBlueprintSource;
+
+    [SerializeField]
+    private AudioSource _spawnBuildingSource;
+
     private List<AudioSource> _audioSources = new List<AudioSource>();
 
     private bool _alert = false;
@@ -32,12 +38,11 @@ public class AudioManager : MonoBehaviour
             AudioSource newSource = _instance._audioEmitter.AddComponent<AudioSource>();
             _instance._audioSources.Add(newSource);
         }
-        StartGame();
     }
 
     private void Update()
     {
-        if ((_timeSinceAlert += Time.deltaTime) > 2f)
+        if ((_timeSinceAlert += Time.deltaTime) > 5f)
         {
             EndAlert();
         }        
@@ -46,6 +51,7 @@ public class AudioManager : MonoBehaviour
     public static void StartGame()
     {
         _instance._musicSource.Play();
+        _instance._alertSource.Play();
     }
 
     public static void PlayNewSound(AudioClip clip)
@@ -65,6 +71,18 @@ public class AudioManager : MonoBehaviour
         _instance._audioSources.Add(newSource);
         newSource.clip = clip;
         newSource.Play();
+    }
+
+    public static void PlayBuildingSound()
+    {
+        _instance._spawnBuildingSource.Stop();
+        _instance._spawnBuildingSource.Play();
+    }
+
+    public static void PlayBlueprintSound()
+    {
+        _instance._spawnBlueprintSource.Stop();
+        _instance._spawnBlueprintSource.Play();
     }
 
     public static void TriggerAlert()

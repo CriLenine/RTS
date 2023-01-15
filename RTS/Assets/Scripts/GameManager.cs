@@ -169,6 +169,11 @@ public class GameManager : MonoBehaviour
                     AssignBuild(input.ID, input.Targets);
                     break;
 
+                case InputType.Deposit:
+                    MoveCharacters(input.Performer, Vector2.zero, input.ID, input.Targets, MoveType.ToBuilding);
+                    AssignDeposit(input.ID, input.Targets);
+                    break;
+
                 case InputType.Destroy:
                     DestroyBuilding(input.Performer, input.ID);
                     break;
@@ -495,7 +500,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (int ID in targets)
         {
-            Character builder = _instance._entities[ID] as Character;
+            Character builder = _instance._characters[ID];
 
             if (!builder)
                 continue;
@@ -504,9 +509,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private static void AssignDeposit(int buildingID, int[] targets)
+    {
+        foreach (int ID in targets)
+        {
+            Character harvester = _instance._characters[ID];
+
+            if (!harvester)
+                continue;
+
+            harvester.AddAction(new Deposit(harvester, Buildings[buildingID]));
+        }
+    }
+
     private static void Harvest(Vector2 position, int[] targets, int performer)
     {
-        Resource resource = null;
+        Resource resource;
         Vector2Int inputCoords = new Vector2Int((int)position.x, (int)position.y);
 
         if (ResourcesManager.HasTree(position))

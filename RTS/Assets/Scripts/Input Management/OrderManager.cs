@@ -54,6 +54,16 @@ public class OrderManager : MonoBehaviour
                 }
                 return;
             }
+
+            foreach (Character.Type type in SelectionManager.SelectedTypes)
+            {
+                List<AudioClip> characterClips = DataManager.GetCharacterData(type).GenericOrderAudios;
+                if (characterClips.Count == 0)
+                    continue;
+                AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);
+            }
+
+            NetworkManager.Input(TickInput.Move(SelectionManager.GetSelectedIds(), worldMousePos));
         }
     }
 
@@ -69,6 +79,10 @@ public class OrderManager : MonoBehaviour
             if (GameManager.MyBuildings.Contains(building))
                 if (building.BuildCompletionRatio < 1)
                     OrderBuild(building);
+                else if (building.Data.CanCollectResources 
+                    && (SelectionManager.SelectedType == Character.Type.Peon 
+                        || SelectionManager.SelectedTypes.Comparer == (new HashSet<Character.Type> { Character.Type.Peon }).Comparer))
+                    OrderDeposit(building);
                 else
                     Debug.Log("Right click on a built ally building not yet implemented.");
             else
@@ -91,6 +105,17 @@ public class OrderManager : MonoBehaviour
         }
 
         NetworkManager.Input(TickInput.Build(building.ID, SelectionManager.GetSelectedIds()));
+
+        SelectionManager.DeselectAll();
+    }
+
+    public static void OrderDeposit(Building building)
+    {
+            List<AudioClip> characterClips = DataManager.GetCharacterData(Character.Type.Peon).GenericOrderAudios;
+            if (characterClips.Count != 0)
+                AudioManager.PlayNewSound(characterClips[(int)(Random.value * (characterClips.Count - 1))]);        
+
+        NetworkManager.Input(TickInput.Deposit(building.ID, SelectionManager.GetSelectedIds()));
 
         SelectionManager.DeselectAll();
     }
