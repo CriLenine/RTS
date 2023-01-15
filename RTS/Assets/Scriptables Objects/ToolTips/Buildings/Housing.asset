@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Housing facilities provide 5 additional Housing Spaces.
 
 
-    Build
-    and protect housing facilities to increase your maximum population.'
+    <u>Hint</u>
+    : build and protect housing facilities to increase your maximum population'
   _buildingData: {fileID: 11400000, guid: 814a8be8610529843a94f8eb9fa8acb7, type: 2}
   _data: {fileID: 0}

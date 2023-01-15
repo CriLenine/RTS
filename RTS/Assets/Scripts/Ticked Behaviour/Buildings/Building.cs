@@ -8,9 +8,11 @@ public class Building : TickedBehaviour, IDamageable
     {
         HeadQuarters,
         Housing,
+        Refinery,
         Sawmill,
         Quarry,
-        Barracks
+        Barracks,
+        ArcheryRange
     }
 
     [Separator("Base Data")]

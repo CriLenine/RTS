@@ -15,7 +15,7 @@ MonoBehaviour:
   _type: 3
   _harvestingTime: 2
   _amountPerHarvest: 5
-  _nMaxHarvestPerTile: 5
+  _nMaxHarvestPerTile: 25
   _tileAspects:
   - {fileID: 11400000, guid: 1a68554d407e6f34dbbb8d0bb48f054f, type: 2}
   - {fileID: 11400000, guid: 0f1ba6689e5d9384ab463943736d656c, type: 2}

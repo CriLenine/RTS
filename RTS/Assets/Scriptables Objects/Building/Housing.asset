@@ -32,8 +32,8 @@ MonoBehaviour:
   _size: 2
   _requiredBuildTicks: 500
   _cost:
-  - _type: 1
-    _value: 50
+  - _type: 0
+    _value: 100
   _maxHealth: 100
   _housingProvided: 5
   _meleeArmor: 5
@@ -42,7 +42,7 @@ MonoBehaviour:
   _collectableResources:
     Value: 
   Icon: {fileID: 21300000, guid: 929a4355de5ffc242a0eb3b27ffc5849, type: 3}
-  _color: {r: 0.8, g: 0.5411765, b: 0.16862746, a: 1}
+  _color: {r: 0.24292453, g: 0.27246952, b: 0.9716981, a: 1}
   _toolTip: {fileID: 11400000, guid: 19144cc5196424c44b7a17fa15ea2c29, type: 2}
   _actions:
   - ButtonData: {fileID: 11400000, guid: 9c59f6eb2bb9eef499c6015523a012eb, type: 2}
