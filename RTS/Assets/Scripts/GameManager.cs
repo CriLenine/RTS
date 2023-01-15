@@ -176,6 +176,11 @@ public class GameManager : MonoBehaviour
                     AssignBuild(input.ID, input.Targets);
                     break;
 
+                case InputType.Deposit:
+                    MoveCharacters(input.Performer, Vector2.zero, input.ID, input.Targets, MoveType.ToBuilding);
+                    AssignDeposit(input.ID, input.Targets);
+                    break;
+
                 case InputType.Destroy:
                     DestroyBuilding(input.Performer, input.ID);
                     break;
@@ -503,18 +508,36 @@ public class GameManager : MonoBehaviour
     {
         foreach (int ID in targets)
         {
-            Character builder = _instance._entities[ID] as Character;
+            Character builder = _instance._characters[ID];
 
-            if (!builder)
+            if (builder?.Data.CanBuild != true)
                 continue;
 
             builder.AddAction(new Build(builder, Buildings[buildingID]));
         }
     }
 
+    private static void AssignDeposit(int buildingID, int[] targets)
+    {
+        foreach (int ID in targets)
+        {
+            Character harvester = _instance._characters[ID];
+
+            if (harvester?.Data.CanHarvestResources != true)
+                continue;
+
+            Building building = Buildings[buildingID];
+
+            if (!building.Data.CollectableResources.Contains(harvester.HarvestedResource.Type))
+                continue;
+
+            harvester.AddAction(new Deposit(harvester, building));
+        }
+    }
+
     private static void Harvest(Vector2 position, int[] targets, int performer)
     {
-        Resource resource = null;
+        Resource resource;
         Vector2Int inputCoords = new Vector2Int((int)position.x, (int)position.y);
 
         if (ResourcesManager.HasTree(position))
@@ -531,6 +554,8 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < targets.Length; ++i)
         {
             Character harvester = _instance._characters[targets[i]];
+            if (!harvester.Data.CanHarvestResources)
+                continue;
 
             Vector2Int? harvestingCoords = resource.GetHarvestingPosition(inputCoords, harvester.Coords, performer);
             if (harvestingCoords == null)
@@ -538,7 +563,7 @@ public class GameManager : MonoBehaviour
 
             List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
 
-            if (waypoints is null || waypoints.Count == 0)
+            if (!(waypoints?.Count != 0))
                 continue;
 
             Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);

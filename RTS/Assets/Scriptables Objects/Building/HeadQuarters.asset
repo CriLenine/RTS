@@ -27,6 +27,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _onSpawnAudio: {fileID: 0}
+  _onSelectionAudios:
+  - {fileID: 8300000, guid: 2b801e93917f55e4a9f4694325f6ec94, type: 3}
+  _onBlueprintSpawnAudio: {fileID: 0}
   _type: 0
   _subType: 0
   _size: 6

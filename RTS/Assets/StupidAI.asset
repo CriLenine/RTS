@@ -538,7 +538,7 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         log: 0
-        _minPeonCount: 25
+        _minPeonCount: 6
     - rid: 1133590247794540552
       type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
       data:
@@ -566,7 +566,7 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         log: 0
-        _minSoliderCount: 25
+        _minSoliderCount: 2
     - rid: 1133590247794540554
       type: {class: ASpawn, ns: , asm: Assembly-CSharp}
       data:

@@ -7,6 +7,10 @@ using System;
 
 public class BuildingData : TickedBehaviorData
 {
+
+    [SerializeField]
+    private AudioClip _onBlueprintSpawnAudio;
+
     [Separator("Spawn Data")]
     [Space]
 
