@@ -1,5 +1,6 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class OrderManager : MonoBehaviour
 {
@@ -91,6 +92,9 @@ public class OrderManager : MonoBehaviour
     public static void TrySetBuildingRallyPoint()
     {
         if (SelectionManager.SelectedBuilding.Performer == NetworkManager.Me && SelectionManager.SelectedBuilding.Data.CanSpawnUnits)
-            SelectionManager.SelectedBuilding.SetRallyPoint(_instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue()));
+            NetworkManager.Input(
+                TickInput.UpdateRallyPoint(
+                    SelectionManager.SelectedBuilding.ID, _instance._camera.ScreenToWorldPoint(_instance._mouse.position.ReadValue())
+                    ));
     }
 }

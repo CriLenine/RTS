@@ -122,6 +122,8 @@ public class Character : TickedBehaviour, IDamageable
 
     private void UpdateAnimation()
     {
+        if (Animator == null) return;
+
         if (_currentHealth > 0 && CurrentAction is null)
             _animator.Play("Idle");
 

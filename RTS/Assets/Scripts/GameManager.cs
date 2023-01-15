@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
                     if (!IsPerformerAbleToSpawn(input.Performer, input.Prefab)) break;
 
                     if(_instance._entities[input.ID] is Building building)
-                        building.QueueSpawn((Character.Type)input.Prefab, input.Position);
+                        building.QueueSpawn((Character.Type)input.Prefab);
 
                     break;
 
@@ -145,6 +145,14 @@ public class GameManager : MonoBehaviour
                         spawner.UnqueueSpawn(input.Prefab);
 
                     break;
+
+                case InputType.UpdateRallyPoint:
+
+                    if (_instance._entities[input.ID] is Building build)
+                        build.SetRallyPoint(input.Position);
+
+                    break;
+
 
                 case InputType.Stop:
                     Stop(input.Targets);
@@ -614,8 +622,8 @@ public class GameManager : MonoBehaviour
         GameManager.UpdateHousing(performer, building.Data.HousingProvided);
         building.SetPosition(position);
 
-        if(data.CanSpawnUnits)
-            building.SetRallyPoint(position + new Vector2(-1f, 1f));
+        if (data.CanSpawnUnits)
+            NetworkManager.Input(TickInput.UpdateRallyPoint(building.ID, position + new Vector2(-1f, 1f)));
 
         if (autoComplete)
             building.CompleteBuild(building.Data.RequiredBuildTicks);

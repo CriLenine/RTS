@@ -15,7 +15,8 @@ public enum InputType
     Kill,
     GuardPosition,
     Destroy,
-    CancelConstruction
+    CancelConstruction,
+    UpdateRallyPoint
 }
 
 public class TickInput
@@ -31,7 +32,7 @@ public class TickInput
 
     public Vector2 Position;
 
-    public static TickInput QueueSpawn(int prefab, int spawnerID,Vector2 rallyPoint , int performer = 0)
+    public static TickInput QueueSpawn(int prefab, int spawnerID, int performer = 0)
     {
         return new TickInput()
         {
@@ -39,7 +40,6 @@ public class TickInput
 
             ID = spawnerID,
             Prefab = prefab,
-            Position = rallyPoint,
 
             Performer = performer
         };
@@ -52,6 +52,18 @@ public class TickInput
 
             ID = spawnerID,
             Prefab = prefab,
+
+            Performer = performer
+        };
+    }
+    public static TickInput UpdateRallyPoint(int spawnerID,Vector2 newRallyPoint, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.UpdateRallyPoint,
+
+            ID = spawnerID,
+            Position = newRallyPoint,
 
             Performer = performer
         };

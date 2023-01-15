@@ -84,9 +84,9 @@ public class Building : TickedBehaviour, IDamageable
     #region SpawnerSpecs
 
     private Vector2 _rallyPoint;
-    public List<(CharacterData data,Vector2 rallyPoint)> QueuedSpawnCharacters { get; private set; } = new();
+    public List<CharacterData> QueuedSpawnCharacters { get; private set; } = new();
 
-    public (CharacterData data, Vector2 rallyPoint) OnGoingSpawnCharacterData { get; private set; } = (null,Vector2.zero);
+    public CharacterData OnGoingSpawnCharacterData { get; private set; } = null;
 
     public int SpawningTicks { get; private set; }
     public bool OnGoingSpawn { get; private set; } = false;
@@ -157,7 +157,7 @@ public class Building : TickedBehaviour, IDamageable
         {
             SpawningTicks++;
 
-            if (SpawningTicks >= OnGoingSpawnCharacterData.data.SpawnTicks && GameManager.CharactersPerformer[Performer].Count < GameManager.Housing[Performer])
+            if (SpawningTicks >= OnGoingSpawnCharacterData.SpawnTicks && GameManager.CharactersPerformer[Performer].Count < GameManager.Housing[Performer])
             {
                 SpawningTicks = 0;
                 OnGoingSpawn = false;
@@ -166,9 +166,9 @@ public class Building : TickedBehaviour, IDamageable
                 if (QueuedSpawnCharacters.Count == 0 && SelectionManager.SelectedBuilding == this)
                     HUDManager.UpdateSpawnPreview();
 
-                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.data.Type, OnGoingSpawnCharacterData.rallyPoint);
+                GameManager.AddEntity(Performer, ID, OnGoingSpawnCharacterData.Type, _rallyPoint);
                 
-                OnGoingSpawnCharacterData = (null,Vector2.zero);
+                OnGoingSpawnCharacterData = null;
             }
         }
 
@@ -310,12 +310,12 @@ public class Building : TickedBehaviour, IDamageable
 
     public void EnqueueSpawningCharas(CharacterData data) // BeforeNetworking
     {
-        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID, _rallyPoint));
+        NetworkManager.Input(TickInput.QueueSpawn((int)data.Type, ID));
     }
 
-    public void QueueSpawn(Character.Type charaType, Vector2 rallyPoint) // After networking
+    public void QueueSpawn(Character.Type charaType) // After networking
     {
-        QueuedSpawnCharacters.Add((DataManager.GetCharacterData(charaType),rallyPoint));
+        QueuedSpawnCharacters.Add((DataManager.GetCharacterData(charaType)));
 
         if (Performer != NetworkManager.Me) return;
 
@@ -327,14 +327,14 @@ public class Building : TickedBehaviour, IDamageable
     }
     public void UnqueueSpawn(int index)// After networking
     {
-        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].data.Cost)
+        foreach (Resource.Amount cost in QueuedSpawnCharacters[index].Cost)
             GameManager.AddResource(cost.Type, cost.Value, Performer);
 
         if (index == 0)
         {
             SpawningTicks = 0;
             OnGoingSpawn = false;
-            OnGoingSpawnCharacterData = (null,Vector2.zero);
+            OnGoingSpawnCharacterData = null;
         }
         QueuedSpawnCharacters.RemoveAt(index);
 
