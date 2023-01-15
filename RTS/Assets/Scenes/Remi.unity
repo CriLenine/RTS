@@ -2275,7 +2275,11 @@ MonoBehaviour:
   _dataBuildings:
   - {fileID: 11400000, guid: a38b74e07f3507944833f3363e4dc786, type: 2}
   - {fileID: 11400000, guid: 814a8be8610529843a94f8eb9fa8acb7, type: 2}
+  - {fileID: 11400000, guid: c41235cab1571b94d8118059a8104498, type: 2}
   - {fileID: 11400000, guid: def745a44e8024c4d9b8a1ca636cadcf, type: 2}
+  - {fileID: 11400000, guid: 5518da49c78ef7944bf6e136ef87177b, type: 2}
+  - {fileID: 11400000, guid: 6578dd183a611574884a12901f28a9ba, type: 2}
+  - {fileID: 11400000, guid: 000b41a1ef14358448d10ac08ebd97c9, type: 2}
 --- !u!114 &594557530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4295,6 +4299,70 @@ PrefabInstance:
     - target: {fileID: 7456065522055592036, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: _enemyColor.r
       value: 0.5882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _militaryBuildings.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[2].ButtonData
+      value: 
+      objectReference: {fileID: 11400000, guid: c41235cab1571b94d8118059a8104498, type: 2}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[3].ButtonData
+      value: 
+      objectReference: {fileID: 11400000, guid: def745a44e8024c4d9b8a1ca636cadcf, type: 2}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[4].ButtonData
+      value: 
+      objectReference: {fileID: 11400000, guid: 5518da49c78ef7944bf6e136ef87177b, type: 2}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _militaryBuildings.Array.data[0].ButtonData
+      value: 
+      objectReference: {fileID: 11400000, guid: 6578dd183a611574884a12901f28a9ba, type: 2}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _militaryBuildings.Array.data[1].ButtonData
+      value: 
+      objectReference: {fileID: 11400000, guid: 000b41a1ef14358448d10ac08ebd97c9, type: 2}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[1].ButtonPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[1].ButtonPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[2].ButtonPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[2].ButtonPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[3].ButtonPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[3].ButtonPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[4].ButtonPosition.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _economyBuildings.Array.data[4].ButtonPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7456065522055592038, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
+      propertyPath: _militaryBuildings.Array.data[1].ButtonPosition.x
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7456065522055592039, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: _blueprintActions.Array.size

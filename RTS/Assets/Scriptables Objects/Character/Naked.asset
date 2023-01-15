@@ -31,10 +31,10 @@ MonoBehaviour:
   _subType: 1
   _spawnTicks: 150
   _cost:
-  - _type: 0
-    _value: 50
+  - _type: 3
+    _value: 120
   - _type: 2
-    _value: 50
+    _value: 80
   _icon: {fileID: 21300000, guid: d2cf4e699cbe59e4481b0397845507d9, type: 3}
   _color: {r: 0.65882355, g: 0.15686275, b: 0.12156863, a: 1}
   _toolTip: {fileID: 11400000, guid: e52374740d2c5dc49a5ae8e18389d887, type: 2}
