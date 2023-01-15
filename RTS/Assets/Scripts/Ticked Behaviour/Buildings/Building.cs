@@ -305,6 +305,8 @@ public class Building : TickedBehaviour, IDamageable
 
             if (SelectionManager.SelectedBuilding == this)
                 HUDManager.UpdateHUD();
+
+            GameManager.UpdateHousing(Performer, Data.HousingProvided);
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);

@@ -6,7 +6,7 @@ public class Build : Action
     public Build(Character peon, Building building) : base(peon)
     {
         _building = building;
-        if (NetworkManager.CurrentTick > 1)
+        if (NetworkManager.CurrentTick > 5)
             AudioManager.PlayBlueprintSound();
     }
 

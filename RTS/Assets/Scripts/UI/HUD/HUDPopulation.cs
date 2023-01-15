@@ -8,7 +8,7 @@ public class HUDPopulation : HUD
 
     [SerializeField]
     private TextMeshProUGUI _idleUnitsUI;
-    private int _idleUnits = 0;
+    //private int _idleUnits = 0;
 
     public void UpdateHousing()
     {

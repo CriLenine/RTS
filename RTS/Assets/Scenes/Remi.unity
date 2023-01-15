@@ -574,7 +574,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &96660434
 RectTransform:
   m_ObjectHideFlags: 0
@@ -854,7 +854,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &137112859
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2117,7 +2117,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &469623255
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3254,7 +3254,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3834073417157290732, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3834073417157290733, guid: 19753214e8e0b7e47b3175ddf6f81938, type: 3}
       propertyPath: m_IsActive
@@ -6177,13 +6177,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _status: {fileID: 337878848}
-  _duration: {fileID: 0}
-  _players: {fileID: 0}
-  _unitsKilled: {fileID: 0}
-  _unitsLost: {fileID: 0}
-  _buildingsDestroyed: {fileID: 0}
-  _buildingsLost: {fileID: 0}
-  _crowns: []
+  _duration: {fileID: 180417644}
+  _players: {fileID: 1917458846}
+  _unitsKilled: {fileID: 1356076236}
+  _unitsLost: {fileID: 2036591966}
+  _buildingsDestroyed: {fileID: 1678505636}
+  _buildingsLost: {fileID: 1183914939}
+  _crowns:
+  - {fileID: 96660433}
+  - {fileID: 137112858}
+  - {fileID: 469623254}
+  - {fileID: 1811929639}
   _victoryColorGradient: {fileID: 11400000, guid: d00087b6e6981cd44ad09b5c211dc403, type: 2}
   _defeatColorGradient: {fileID: 11400000, guid: 54d83d7081f4c5a488917a2d8b4d397d, type: 2}
 --- !u!222 &1087261455
@@ -6379,7 +6383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _postGameScreen: {fileID: 1087261453}
-  _eliminationCondition: 0
+  _eliminationCondition: 1
   _buildingType: 0
 --- !u!114 &1103859247
 MonoBehaviour:
@@ -8654,7 +8658,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 139459510890247656, guid: 2c574537e05b1d14f97f8433f48f1fd5, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 139459510890247656, guid: 2c574537e05b1d14f97f8433f48f1fd5, type: 3}
       propertyPath: m_AnchorMax.x
@@ -9768,7 +9772,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1811929640
 RectTransform:
   m_ObjectHideFlags: 0
