@@ -65,6 +65,7 @@ public class SetupManager : MonoBehaviour
         HUDManager.ShowDefaultHUD();
 
         InputActionsManager.EnableInputs();
+        AudioManager.StartGame();
     }
 }
 

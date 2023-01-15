@@ -247,6 +247,9 @@ public class Character : TickedBehaviour, IDamageable
 
         _currentHealth -= damage;
         HealthBar.SetHealth((float)_currentHealth/ Data.MaxHealth);
+
+        if (Performer == NetworkManager.Me)
+            AudioManager.TriggerAlert();
         return _currentHealth <= 0;
     }
 
