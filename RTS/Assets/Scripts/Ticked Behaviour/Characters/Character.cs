@@ -36,8 +36,8 @@ public class Character : TickedBehaviour, IDamageable
     [SerializeField]
     protected HealthBar HealthBar;
 
-    [SerializeField]
-    private LineRenderer _pathRenderer;
+    //[SerializeField]
+    //private LineRenderer _pathRenderer;
 
     [SerializeField]
     private GameObject HoverMarker;
@@ -82,29 +82,29 @@ public class Character : TickedBehaviour, IDamageable
         base.Awake();
     }
 
-    protected virtual void LateUpdate()
-    {
-        if (CurrentAction?.SpecificAction is Move move && move.Positions?.Count > 0)
-        {
-            _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
+    //protected virtual void LateUpdate()
+    //{
+    //    if (CurrentAction?.SpecificAction is Move move && move.Positions?.Count > 0)
+    //    {
+    //        _pathRenderer.positionCount = move.Positions.Count - move.Index + 1;
 
-            int j = 0,  i;
+    //        int j = 0,  i;
 
-            _pathRenderer.SetPosition(j++, transform.position);
+    //        _pathRenderer.SetPosition(j++, transform.position);
 
-            for (i = move.Index; i < move.Positions.Count; ++i, ++j)
-                _pathRenderer.SetPosition(j, move.Positions[i]);
+    //        for (i = move.Index; i < move.Positions.Count; ++i, ++j)
+    //            _pathRenderer.SetPosition(j, move.Positions[i]);
 
-            _pathRenderer.transform.position = move.Positions[^1];
+    //        _pathRenderer.transform.position = move.Positions[^1];
 
-            _pathRenderer.startColor = GameManager.Colors[Performer];
-            _pathRenderer.endColor = GameManager.Colors[Performer];
+    //        _pathRenderer.startColor = GameManager.Colors[Performer];
+    //        _pathRenderer.endColor = GameManager.Colors[Performer];
 
-            _pathRenderer.gameObject.SetActive(true);
-        }
-        else
-            _pathRenderer.gameObject.SetActive(false);
-    }
+    //        _pathRenderer.gameObject.SetActive(true);
+    //    }
+    //    else
+    //        _pathRenderer.gameObject.SetActive(false);
+    //}
 
     public sealed override void Tick()
     {
@@ -249,6 +249,9 @@ public class Character : TickedBehaviour, IDamageable
 
         _currentHealth -= damage;
         HealthBar.SetHealth((float)_currentHealth/ Data.MaxHealth);
+
+        if (Performer == NetworkManager.Me)
+            AudioManager.TriggerAlert();
         return _currentHealth <= 0;
     }
 

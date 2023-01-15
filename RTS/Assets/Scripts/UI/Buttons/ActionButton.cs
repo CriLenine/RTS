@@ -40,8 +40,10 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
             {
                 _isTogglable = constantButtonData.IsTogglable;
 
-                if(_button == null)
+                if (_button == null)
                     _button = gameObject.AddComponent<Button>();
+                else
+                    _button.interactable = true;
 
                 if (data.OnClick != null)
                     _button.onClick = data.OnClick;
@@ -51,6 +53,8 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
             }
             else
             {
+                if (_button != null)
+                    _button.interactable = false;
                 _buttonFill = Instantiate(HUDManager.ButtonFill);
                 _buttonFill.transform.SetParent(transform, false);
 
@@ -71,6 +75,8 @@ public class ActionButton : MonoBehaviour,IPointerClickHandler
 
             if (_button == null)
                 _button = gameObject.AddComponent<Button>();
+            else
+                _button.interactable = true;
 
             _image.color = characterData.Color;
             _image.sprite = characterData.Icon;

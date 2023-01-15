@@ -104,6 +104,17 @@ public partial class NetworkManager
                             break;
                         }
 
+                    case InputType.Deposit:
+                        {
+                            int ID = message.GetInt(i++);
+
+                            int[] ids = Extract<int>(message, i, out i);
+
+                            inputs.Add(TickInput.Deposit(ID, ids, performer));
+
+                            break;
+                        }
+
                     case InputType.Destroy:
                         {
                             int ID = message.GetInt(i++);

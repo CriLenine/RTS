@@ -2,7 +2,6 @@ using MyBox;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class Building : TickedBehaviour, IDamageable
@@ -85,6 +84,8 @@ public class Building : TickedBehaviour, IDamageable
     public float BuildCompletionRatio => (float)_completedBuildTicks / _data.RequiredBuildTicks;
 
     private bool _isSelected;
+
+    public HashSet<Character.Type> SpawnableTypes { get; private set; } = new HashSet<Character.Type>();
 
     #region SpawnerSpecs
 
@@ -185,10 +186,11 @@ public class Building : TickedBehaviour, IDamageable
         _data = data as BuildingData;
 
         foreach (ButtonDataHUDParameters parameter in _data.Actions)
-            if (parameter.ButtonData is CharacterData)
+            if (parameter.ButtonData is CharacterData characterData)
             {
                 _data.CanSpawnUnits = true;
-                break;
+
+                SpawnableTypes.Add(characterData.Type);
             }
 
         float scale = .9f * TileMapManager.TileSize * Data.Size;
@@ -197,8 +199,6 @@ public class Building : TickedBehaviour, IDamageable
         _boxCollider.size = new Vector2(scale, scale);
 
         _healthBarTransform.transform.position += new Vector3(0, .5f * scale);
-
-       
 
         _completedBuildTicks = 0;
         _buildComplete = false;
@@ -297,9 +297,12 @@ public class Building : TickedBehaviour, IDamageable
                 _rallyPoint = (Vector2)transform.position + new Vector2(1.1f * TileMapManager.TileSize * Data.Size / 2, 0);
 
             _buildComplete = true;
+            AudioManager.PlayNewSound(Data.OnSpawnAudio);
 
             if (SelectionManager.SelectedBuilding == this)
                 HUDManager.UpdateHUD();
+
+            GameManager.UpdateHousing(Performer, Data.HousingProvided);
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
@@ -308,6 +311,8 @@ public class Building : TickedBehaviour, IDamageable
         _structureSprite.color = Color.Lerp(Performer == NetworkManager.Me ? _completionStartColor : _enemyCompletionStartColor,
             Performer == NetworkManager.Me ? _completionEndColor : _enemyCompletionEndColor, BuildCompletionRatio);
 
+        if (_buildComplete && NetworkManager.CurrentTick > 1)
+            AudioManager.PlayBuildingSound();
         return _buildComplete;
     }
 
@@ -401,6 +406,9 @@ public class Building : TickedBehaviour, IDamageable
 
     public void QueueSpawn(Character.Type charaType) // After networking
     {
+        foreach (Resource.Amount cost in DataManager.GetCharacterData(charaType).Cost)
+            GameManager.Pay(cost.Type, cost.Value, Performer);
+
         QueuedSpawnCharacters.Queue((DataManager.GetCharacterData(charaType)));
 
         if (Performer != NetworkManager.Me) return;

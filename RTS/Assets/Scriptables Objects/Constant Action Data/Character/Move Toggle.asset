@@ -28,7 +28,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   ButtonType: 0
+  IsTogglable: 0
   HoldTime: 0
   Icon: {fileID: 21300000, guid: b33ac2c23ff8c424b974a05c9feea139, type: 3}
-  Color: {r: 1, g: 1, b: 1, a: 1}
-  ToolTip: {fileID: 11400000, guid: 49e5e3220dbd08b4399d0609bbb6aae0, type: 2}
+  Color: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
+  ToolTip: {fileID: 11400000, guid: c44fd2fca796743498524ccbfdaecd2c, type: 2}

@@ -17,6 +17,7 @@ public enum InputType
     Destroy,
     CancelConstruction,
     UpdateRallyPoint
+    Deposit
 }
 
 public class TickInput
@@ -149,6 +150,20 @@ public class TickInput
         return new TickInput()
         {
             Type = InputType.Build,
+
+            ID = buildingID,
+
+            Targets = targets,
+
+            Performer = performer
+        };
+    }
+    
+    public static TickInput Deposit(int buildingID, int[] targets, int performer = 0)
+    {
+        return new TickInput()
+        {
+            Type = InputType.Deposit,
 
             ID = buildingID,
 

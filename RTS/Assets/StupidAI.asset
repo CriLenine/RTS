@@ -22,12 +22,42 @@ MonoBehaviour:
   - rid: 1133590195510968346
   - rid: 1133590195510968347
   - rid: 1133590195510968348
-  - rid: 1133590195510968349
+  - rid: 1133590241896562688
+  - rid: 1133590241896562691
+  - rid: 1133590241896562692
+  - rid: 1133590241896562693
+  - rid: 1133590241896562694
+  - rid: 1133590241896562696
+  - rid: 1133590241896562697
+  - rid: 1133590241896562698
+  - rid: 1133590241896562699
+  - rid: 1133590241896562701
+  - rid: 1133590241896562702
+  - rid: 1133590241896562703
+  - rid: 1133590241896562704
+  - rid: 1133590241896562706
+  - rid: 1133590241896562707
+  - rid: 1133590241896562708
+  - rid: 1133590241896562709
+  - rid: 1133590241896562710
+  - rid: 1133590241896562711
+  - rid: 1133590241896562712
+  - rid: 1133590241896562713
+  - rid: 1133590247794540545
+  - rid: 1133590247794540546
+  - rid: 1133590247794540547
+  - rid: 1133590247794540548
+  - rid: 1133590247794540550
+  - rid: 1133590247794540552
+  - rid: 1133590247794540554
+  - rid: 1133590247794540555
+  - rid: 1133590247794540556
+  - rid: 1133590247794540557
   treeState: 0
   Blackboard:
     Performer: 0
-  viewPosition: {x: 488.66666, y: 138.66667, z: 0}
-  viewScale: {x: 1, y: 1, z: 1}
+  viewPosition: {x: 422, y: 205, z: 0}
+  viewScale: {x: 0.8695652, y: 0.8695652, z: 1}
   references:
     version: 2
     RefIds:
@@ -42,6 +72,7 @@ MonoBehaviour:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
         child:
           rid: 1133590195510968343
     - rid: 1133590195510968343
@@ -55,6 +86,7 @@ MonoBehaviour:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
         children:
         - rid: 1133590195510968344
         - rid: 1133590195510968348
@@ -64,11 +96,12 @@ MonoBehaviour:
         state: 0
         started: 0
         guid: cce6ffdc40c187b41adc5f7311bc30f2
-        position: {x: -292.8841, y: 302.438}
+        position: {x: -352, y: 260}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
         child:
           rid: 1133590195510968345
     - rid: 1133590195510968345
@@ -77,11 +110,12 @@ MonoBehaviour:
         state: 0
         started: 0
         guid: 5616e410534bc3f4dbb435fbaf130c1c
-        position: {x: -292.6667, y: 419.56064}
+        position: {x: -352, y: 378}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
         children:
         - rid: 1133590195510968346
         - rid: 1133590195510968347
@@ -91,43 +125,472 @@ MonoBehaviour:
         state: 0
         started: 0
         guid: bc750ec5f9e3dcb45ba96ec3c48230db
-        position: {x: -409.9835, y: 537.83167}
+        position: {x: -502, y: 513}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
     - rid: 1133590195510968347
       type: {class: AAttackNearbyEnemies, ns: , asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
         guid: 43cd01654d2a1bd41a2638c5ccedc9a4
-        position: {x: -170.66663, y: 540.6666}
+        position: {x: -202, y: 513}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 1
     - rid: 1133590195510968348
       type: {class: LEnvironment, ns: , asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
         guid: 93915699013a3d944af4314c4aae5206
-        position: {x: 183.01193, y: 382.75354}
+        position: {x: 4, y: 642}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
         child:
-          rid: 1133590195510968349
-    - rid: 1133590195510968349
+          rid: 1133590241896562688
+    - rid: 1133590241896562688
+      type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 4c1de0d96130d9944acb8f14a4761f1f
+        position: {x: 4, y: 764}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590247794540545
+        - rid: 1133590247794540546
+        - rid: 1133590247794540547
+        - rid: 1133590247794540548
+        - rid: 1133590241896562710
+        - rid: 1133590247794540550
+        - rid: 1133590247794540552
+        - rid: 1133590247794540555
+    - rid: 1133590241896562691
+      type: {class: TCheckResource, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 4e3139356c3d59d4b8d98573c296b768
+        position: {x: -2701.049, y: 1047}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _resourceType: 0
+        _minAmount: 350
+        _targetAmount: 600
+    - rid: 1133590241896562692
+      type: {class: AHarvest, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 2d4f14d64a1521d46ae1c1f6bf84f677
+        position: {x: -2626, y: 1176.9998}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _resourceType: 0
+    - rid: 1133590241896562693
+      type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 713ea49da8960b841b24e78f6f01600d
+        position: {x: -2476.0488, y: 1047}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562692
+        - rid: 1133590241896562694
+    - rid: 1133590241896562694
       type: {class: AExplore, ns: , asm: Assembly-CSharp}
       data:
         state: 0
         started: 0
-        guid: 13f3e455d61de9f4bbd34fe8a881714d
-        position: {x: 259.05566, y: 540.92456}
+        guid: 5d5f2cb4529cc1d4e887b568fbc5b5aa
+        position: {x: -2326, y: 1177}
         blackboard:
           Performer: 0
         description: 
         drawGizmos: 0
+        log: 0
+    - rid: 1133590241896562696
+      type: {class: TCheckResource, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: ec727b8887979604bb20e16688c56c47
+        position: {x: -2065.049, y: 1113.0001}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _resourceType: 3
+        _minAmount: 350
+        _targetAmount: 600
+    - rid: 1133590241896562697
+      type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 81a73105318a24a4b8e795f9e31664e5
+        position: {x: -1840.0488, y: 1113.0001}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562698
+        - rid: 1133590241896562699
+    - rid: 1133590241896562698
+      type: {class: AHarvest, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: c8341d90d48717f428e4055ef11df5f5
+        position: {x: -1990, y: 1245}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _resourceType: 3
+    - rid: 1133590241896562699
+      type: {class: AExplore, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 7d0f718c3953fa2419dfbbe10bbff227
+        position: {x: -1689.9998, y: 1245.0001}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+    - rid: 1133590241896562701
+      type: {class: TCheckResource, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 7658e912adbca3c459931b23b027a138
+        position: {x: -1418.1501, y: 1156.8501}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _resourceType: 2
+        _minAmount: 250
+        _targetAmount: 500
+    - rid: 1133590241896562702
+      type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: fb074e150caf46b44b055dd1b5b7c4d4
+        position: {x: -1193.1503, y: 1156.8501}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562703
+        - rid: 1133590241896562704
+    - rid: 1133590241896562703
+      type: {class: AHarvest, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: f05c9cc9dee5e3e4da57e73ee0a4ea05
+        position: {x: -1343.1501, y: 1284.8501}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _resourceType: 2
+    - rid: 1133590241896562704
+      type: {class: AExplore, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: b42961ab14be01f4fa373dc9eb062c14
+        position: {x: -1043.1501, y: 1284.8501}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+    - rid: 1133590241896562706
+      type: {class: TCheckResource, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 0022426ec18710f42bbe6efa490eb2ca
+        position: {x: -763, y: 1157}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _resourceType: 1
+        _minAmount: 0
+        _targetAmount: 250
+    - rid: 1133590241896562707
+      type: {class: Selector, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 88ca0bfcb7c33b44eaca0ef3b3979ec7
+        position: {x: -538, y: 1175}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562708
+        - rid: 1133590241896562709
+    - rid: 1133590241896562708
+      type: {class: AHarvest, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 5210c0285b19b4541972ef585851af32
+        position: {x: -688, y: 1304}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _resourceType: 1
+    - rid: 1133590241896562709
+      type: {class: AExplore, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 898c88bb707ef934dad931553021ae48
+        position: {x: -387.99985, y: 1304}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+    - rid: 1133590241896562710
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 3f5acdf1cd1399a418e835d87b53c161
+        position: {x: -277.00012, y: 1500.4166}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562711
+        - rid: 1133590241896562712
+    - rid: 1133590241896562711
+      type: {class: TNeedHousing, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 7d6a0107e3e72714ab36d371f7827c65
+        position: {x: -427.00018, y: 1657.4166}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+    - rid: 1133590241896562712
+      type: {class: ABuild, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 6af5d9616b8e074459f25008479af5a4
+        position: {x: -159.99974, y: 1657}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _buildingType: 1
+    - rid: 1133590241896562713
+      type: {class: ASpawn, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 3502f61e39e07cb4c8bd2c370bee6ed3
+        position: {x: 154, y: 1919}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _characterType: 0
+    - rid: 1133590247794540545
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 917d87c1cfeb433438c12d9892771a66
+        position: {x: -2551, y: 862.0325}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562691
+        - rid: 1133590241896562693
+    - rid: 1133590247794540546
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: b5fda3dab48490946a07cd512e997135
+        position: {x: -1935.9559, y: 929.97614}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562696
+        - rid: 1133590241896562697
+    - rid: 1133590247794540547
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: d88085d93b68e6544b3719fc83e92820
+        position: {x: -1311.7129, y: 959.0001}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562701
+        - rid: 1133590241896562702
+    - rid: 1133590247794540548
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 079afa78a5d7d3b45bf1072bde306a03
+        position: {x: -613, y: 974}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590241896562706
+        - rid: 1133590241896562707
+    - rid: 1133590247794540550
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 7f41103ee8af0da4cb14bb2fcfa6ffc2
+        position: {x: 4.000228, y: 1771.7646}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590247794540556
+        - rid: 1133590241896562713
+    - rid: 1133590247794540552
+      type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: e36acc6b0a443724d8f807cc9425b986
+        position: {x: 484.0625, y: 1644.1975}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        children:
+        - rid: 1133590247794540557
+        - rid: 1133590247794540554
+    - rid: 1133590247794540554
+      type: {class: ASpawn, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: b24ff3b78c6809348b6b0fbe3a56ca88
+        position: {x: 633.99994, y: 1796}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 1
+        _characterType: 2
+    - rid: 1133590247794540555
+      type: {class: AExplore, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 66d8d2766014f7247b4f54e195330290
+        position: {x: 943.3264, y: 1055.9624}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+    - rid: 1133590247794540556
+      type: {class: TNeedCharacter, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 5b78ae2fc277cc34d80c36acec8db08f
+        position: {x: -146.00003, y: 1919}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _characterType: 0
+        _minCharacterCount: 6
+    - rid: 1133590247794540557
+      type: {class: TNeedCharacter, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 19cb368cd382e9444ad6ea5d37a516f5
+        position: {x: 334.00006, y: 1796}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _characterType: 2
+        _minCharacterCount: 6

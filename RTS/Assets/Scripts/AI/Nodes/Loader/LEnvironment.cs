@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TheKiwiCoder;
+using System;
 
 [System.Serializable]
 public class LEnvironment : DecoratorNode
@@ -26,6 +27,9 @@ public class LEnvironment : DecoratorNode
             context.TargetMovePosition = context.StartPosition.Value;
         }
 
+        if (context.Characters.Count == 0)
+            return State.Failure;
+
         context.BalancePosition = (context.StartPosition.Value + context.Characters.At(0).Position) / 2f;
 
         Vector2Int coordOffset = Vector2Int.zero;
@@ -43,16 +47,16 @@ public class LEnvironment : DecoratorNode
                         float sqrCoordsDistance = Vector2.SqrMagnitude(viewCoords - context.StartCoords);
 
                         if (ResourcesManager.HasTree(viewCoords))
-                            context.Trees.Add(viewCoords, sqrCoordsDistance);
+                            context.KnownResources[ResourceType.Wood].Add(viewCoords, sqrCoordsDistance);
                         else if (ResourcesManager.HasCrystal(viewCoords))
-                            context.Crystals.Add(viewCoords, sqrCoordsDistance);
+                            context.KnownResources[ResourceType.Crystal].Add(viewCoords, sqrCoordsDistance);
+                        else if (ResourcesManager.HasGold(viewCoords))
+                            context.KnownResources[ResourceType.Gold].Add(viewCoords, sqrCoordsDistance);
+                        else if (ResourcesManager.HasRock(viewCoords))
+                            context.KnownResources[ResourceType.Stone].Add(viewCoords, sqrCoordsDistance);
                         else
-                        {
-                            if (context.Trees.Remove(viewCoords, sqrCoordsDistance))
-                                context.cuttedTree = null;
-
-                            context.Crystals.Remove(viewCoords, sqrCoordsDistance);
-                        }
+                            foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+                                context.KnownResources[type].Remove(viewCoords, sqrCoordsDistance);
                     }
                 }
             }

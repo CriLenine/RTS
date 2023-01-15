@@ -74,7 +74,6 @@ public class SelectionManager : MonoBehaviour
 
         NoSpecialization();
     }
-
     public static void RemoveCharacterFromSelection(Character character)
     {
         _instance._allSelectedCharacters.Remove(character);

@@ -1,10 +1,19 @@
-using UnityEngine;
 using MyBox;
+using System.Collections.Generic;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "CharacterData", order = 1)]
 
 public class CharacterData : TickedBehaviorData
 {
+    [SerializeField]
+    private List<AudioClip> _genericOrderAudios;
+    [SerializeField]
+    private List<AudioClip> _attackOrderAudios;
+
+    public List<AudioClip> GenericOrderAudios => _genericOrderAudios;
+    public List<AudioClip> AttackOrderAudios => _attackOrderAudios;
+
     [Separator("Spawn Data")]
     [Space]
 
@@ -86,8 +95,8 @@ public class CharacterData : TickedBehaviorData
 
     [SerializeField, Min(0)]
     private int _rangeArmor;
-    public int RangeArmor => _rangeArmor;   
-    
+    public int RangeArmor => _rangeArmor;
+
     [Space]
 
     [SerializeField]
