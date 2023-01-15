@@ -570,6 +570,7 @@ public class GameManager : MonoBehaviour
             _instance._aiCharacters[aiId].Add(character);
         }
 
+        HUDManager.UpdateHousing(performer);
         character.SetPosition(inPlace ? (Vector3)preconfiguredSpawnPoint : Buildings[spawnerID].transform.position);
 
         QuadTreeNode.RegisterCharacter(character.ID, .3f, .5f, character.transform.position);
