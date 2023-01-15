@@ -53,8 +53,6 @@ public class SetupManager : MonoBehaviour
             if (i == NetworkManager.Me)
                 CameraMovement.SetPosition(currentSetup.TickedBehaviorSpawnSetups.Count > 0 ? 
                     currentSetup.TickedBehaviorSpawnSetups[0].SpawnPoint.position : Vector2.zero);
-
-
         }
 
         HUDManager.StartTimer();

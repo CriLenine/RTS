@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TheKiwiCoder;
 using Unity.VisualScripting;
+using System;
 
 [System.Serializable]
 public class LNeighbors : DecoratorNode
@@ -20,12 +21,16 @@ public class LNeighbors : DecoratorNode
         if (context.Characters.Count == 0)
             return State.Failure;
 
+        foreach (Building building in context.Buildings)
+            if (!building.BuildComplete)
+                return State.Success;
+
+        foreach (Character.Type type in Enum.GetValues(typeof(Character.Type)))
+            context.CharacterCount[type] = 0;
+
         context.Leader = context.Characters.At(0);
 
         context.Enemies.Clear();
-
-        context.PeonCount = 0;
-        context.SoldierCount = 0;
 
         HashSet<int> neighbourIds = new HashSet<int>();
 
@@ -38,10 +43,7 @@ public class LNeighbors : DecoratorNode
 
             allies.Add(character.ID);
 
-            if (character.Data.Type == Character.Type.Peon)
-                ++context.PeonCount;
-            else
-                ++context.SoldierCount;
+            ++context.CharacterCount[character.Data.Type];
         }
 
         foreach (int id in neighbourIds)

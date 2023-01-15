@@ -29,8 +29,7 @@ namespace TheKiwiCoder {
         public int[] AllyIds = new int[0];
         public int[] EnemyIds = new int[0];
 
-        public int PeonCount;
-        public int SoldierCount;
+        public Dictionary<Character.Type, int> CharacterCount = new Dictionary<Character.Type, int>();
 
         #endregion
 

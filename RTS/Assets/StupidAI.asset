@@ -48,16 +48,16 @@ MonoBehaviour:
   - rid: 1133590247794540547
   - rid: 1133590247794540548
   - rid: 1133590247794540550
-  - rid: 1133590247794540551
   - rid: 1133590247794540552
-  - rid: 1133590247794540553
   - rid: 1133590247794540554
   - rid: 1133590247794540555
+  - rid: 1133590247794540556
+  - rid: 1133590247794540557
   treeState: 0
   Blackboard:
     Performer: 0
-  viewPosition: {x: 192, y: -50, z: 0}
-  viewScale: {x: 0.49717674, y: 0.49717674, z: 1}
+  viewPosition: {x: 422, y: 205, z: 0}
+  viewScale: {x: 0.8695652, y: 0.8695652, z: 1}
   references:
     version: 2
     RefIds:
@@ -524,21 +524,8 @@ MonoBehaviour:
         drawGizmos: 0
         log: 0
         children:
-        - rid: 1133590247794540551
+        - rid: 1133590247794540556
         - rid: 1133590241896562713
-    - rid: 1133590247794540551
-      type: {class: TNeedPeon, ns: , asm: Assembly-CSharp}
-      data:
-        state: 0
-        started: 0
-        guid: c5b139c1c897bbe48b465011fad6a950
-        position: {x: -146, y: 1919}
-        blackboard:
-          Performer: 0
-        description: 
-        drawGizmos: 0
-        log: 0
-        _minPeonCount: 6
     - rid: 1133590247794540552
       type: {class: Sequencer, ns: TheKiwiCoder, asm: Assembly-CSharp}
       data:
@@ -552,21 +539,8 @@ MonoBehaviour:
         drawGizmos: 0
         log: 0
         children:
-        - rid: 1133590247794540553
+        - rid: 1133590247794540557
         - rid: 1133590247794540554
-    - rid: 1133590247794540553
-      type: {class: TNeedSoldier, ns: , asm: Assembly-CSharp}
-      data:
-        state: 0
-        started: 0
-        guid: f2c1215741f2a9349b8e8fea11dc8601
-        position: {x: 334, y: 1796}
-        blackboard:
-          Performer: 0
-        description: 
-        drawGizmos: 0
-        log: 0
-        _minSoliderCount: 2
     - rid: 1133590247794540554
       type: {class: ASpawn, ns: , asm: Assembly-CSharp}
       data:
@@ -578,7 +552,7 @@ MonoBehaviour:
           Performer: 0
         description: 
         drawGizmos: 0
-        log: 0
+        log: 1
         _characterType: 2
     - rid: 1133590247794540555
       type: {class: AExplore, ns: , asm: Assembly-CSharp}
@@ -592,3 +566,31 @@ MonoBehaviour:
         description: 
         drawGizmos: 0
         log: 0
+    - rid: 1133590247794540556
+      type: {class: TNeedCharacter, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 5b78ae2fc277cc34d80c36acec8db08f
+        position: {x: -146.00003, y: 1919}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _characterType: 0
+        _minCharacterCount: 6
+    - rid: 1133590247794540557
+      type: {class: TNeedCharacter, ns: , asm: Assembly-CSharp}
+      data:
+        state: 0
+        started: 0
+        guid: 19cb368cd382e9444ad6ea5d37a516f5
+        position: {x: 334.00006, y: 1796}
+        blackboard:
+          Performer: 0
+        description: 
+        drawGizmos: 0
+        log: 0
+        _characterType: 2
+        _minCharacterCount: 6

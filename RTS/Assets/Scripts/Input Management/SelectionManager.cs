@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.TextCore.Text;
-using static MyBox.EditorTools.MyGUI;
 
 public class SelectionManager : MonoBehaviour
 {

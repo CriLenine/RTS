@@ -27,6 +27,9 @@ public class LEnvironment : DecoratorNode
             context.TargetMovePosition = context.StartPosition.Value;
         }
 
+        if (context.Characters.Count == 0)
+            return State.Failure;
+
         context.BalancePosition = (context.StartPosition.Value + context.Characters.At(0).Position) / 2f;
 
         Vector2Int coordOffset = Vector2Int.zero;

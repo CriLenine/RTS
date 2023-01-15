@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<TickedBehaviour> Entities => _instance._entities;
     public static TickedList<TickedBehaviour> MyEntities => _instance._myEntities;
 
-    public static TickedList<TickedBehaviour> GetAIEntities(int performer) => _instance._aiEntities[performer - NetworkManager.AICount];
+    public static TickedList<TickedBehaviour> GetAIEntities(int performer) => _instance._aiEntities[performer - NetworkManager.PlayerCount];
 
     private TickedList<Character> _characters = new TickedList<Character>();
     private TickedList<Character> _myCharacters = new TickedList<Character>();
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<Character> Characters => _instance._characters;
     public static TickedList<Character> MyCharacters => _instance._myCharacters;
 
-    public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.AICount];
+    public static TickedList<Character> GetAICharacters(int performer) => _instance._aiCharacters[performer - NetworkManager.PlayerCount];
 
     public static  Dictionary<int, List<Character>> CharactersPerformer => _instance._charactersPerformer;
 
@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
     public static TickedList<Building> Buildings => _instance._buildings;
     public static TickedList<Building> MyBuildings => _instance._myBuildings;
 
-    public static TickedList<Building> GetAIBuildings(int performer) => _instance._aiBuildings[performer - NetworkManager.AICount];
+    public static TickedList<Building> GetAIBuildings(int performer) => _instance._aiBuildings[performer - NetworkManager.PlayerCount];
 
     private HashSet<TickedBehaviour> _entitiesToDestroy = new HashSet<TickedBehaviour>();
     private HashSet<(int performer, int spawnerID, Character.Type type, Vector2 rallyPoint)> _characterToSpawn = new HashSet<(int, int, Character.Type, Vector2)>();
