@@ -45,8 +45,13 @@ public class Harvest : Action
                 Debug.LogError($"There is no resource storer of {_resource.Data.Type}.");
 
             List<Vector2> wayPointsToDeposit = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, building.GetClosestOutlinePosition(_character));
-            if (wayPointsToDeposit == null)
+
+            if (wayPointsToDeposit is null || wayPointsToDeposit.Count == 0)
+            {
                 Debug.LogError("Pathfinding failed unexpectedly.");
+
+                return true;
+            }
 
             SetAction(new MoveHarvest(_character, wayPointsToDeposit, building, _resource));
             return true;
@@ -73,8 +78,13 @@ public class Harvest : Action
                 return true;
 
             List<Vector2> wayPointsToGo = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, nextCoordsToGo.Value);
-            if (wayPointsToGo == null)
+
+            if (wayPointsToGo is null || wayPointsToGo.Count == 0)
+            {
                 Debug.LogError("Pathfinding failed unexpectedly.");
+
+                return true;
+            }
 
             SetAction(new Move(_character, wayPointsToGo));
         }

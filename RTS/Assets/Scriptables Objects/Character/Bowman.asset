@@ -31,7 +31,7 @@ MonoBehaviour:
   _subType: 1
   _spawnTicks: 175
   _cost:
-  - _type: 0
+  - _type: 3
     _value: 60
   - _type: 2
     _value: 75

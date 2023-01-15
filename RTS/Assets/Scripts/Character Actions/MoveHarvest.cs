@@ -41,7 +41,7 @@ public class MoveHarvest : Move
             {
                 List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(_character.Performer, _character, harvestingPosition.Value);
 
-                if (!(waypoints?.Count != 0))
+                if (waypoints is null || waypoints.Count == 0)
                     return true;
 
                 harvester.SetAction(new Move(_character, waypoints));

@@ -75,7 +75,11 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this);
 
         foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
-            _playerResources[type] = new int[4] { 1000, 1000, 1000, 1000 };
+            _playerResources[type] = new int[4] { 0, 0, 0, 0 };
+
+        _playerResources[ResourceType.Crystal] = new int[4] { 400, 400, 400, 400 };
+        _playerResources[ResourceType.Wood] = new int[4] { 400, 400, 400, 400 };
+        _playerResources[ResourceType.Gold] = new int[4] { 400, 400, 400, 400 };
     }
 
     #endregion
@@ -159,6 +163,9 @@ public class GameManager : MonoBehaviour
                 case InputType.NewBuild:
                     if (!IsPerformerAbleToBuild(input.Performer,input.Prefab)) break;
 
+                    foreach (Resource.Amount cost in DataManager.GetBuildingData((Building.Type)input.Prefab).Cost)
+                        Pay(cost.Type, cost.Value, input.Performer);
+
                     int newBuildingID = CreateBuilding(input.Performer, input.Prefab, input.Position);
                     MoveCharacters(input.Performer, Vector2.zero, newBuildingID, input.Targets, MoveType.ToBuilding);
                     AssignBuild(newBuildingID, input.Targets);
@@ -218,9 +225,10 @@ public class GameManager : MonoBehaviour
         #endregion
 
         #region Update Resources HUD
-
-        HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][NetworkManager.Me], _instance._playerResources[ResourceType.Wood][NetworkManager.Me],
-            _instance._playerResources[ResourceType.Gold][NetworkManager.Me], _instance._playerResources[ResourceType.Stone][NetworkManager.Me]);
+        // fdp
+        HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][1], _instance._playerResources[ResourceType.Wood][1],
+            _instance._playerResources[ResourceType.Gold][1], _instance._playerResources[ResourceType.Stone][1]);
+        //HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][NetworkManager.Me], _instance._playerResources[ResourceType.Wood][NetworkManager.Me], _instance._playerResources[ResourceType.Gold][NetworkManager.Me], _instance._playerResources[ResourceType.Stone][NetworkManager.Me]);
 
         #endregion
 
@@ -530,7 +538,7 @@ public class GameManager : MonoBehaviour
 
             List<Vector2> waypoints = LocomotionManager.RetrieveWayPoints(performer, harvester, (Vector2Int)harvestingCoords);
 
-            if (!(waypoints?.Count != 0))
+            if (waypoints is null || waypoints.Count == 0)
                 continue;
 
             Vector2Int? coordsToHarvest = resource.GetTileToHarvest((Vector2Int)harvestingCoords, inputCoords);

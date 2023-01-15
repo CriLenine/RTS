@@ -20,9 +20,6 @@ public class TCheckResource : ActionNode
         if (context.GetResourceAmount(_resourceType) > _targetAmount)
             return State.Failure;
 
-        if (context.Leader.CurrentAction is Harvest && context.HarvestedResource == _resourceType)
-            return State.Success;
-
         return context.GetResourceAmount(_resourceType) < _minAmount ? State.Success : State.Failure;
     }
 }

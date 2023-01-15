@@ -405,6 +405,9 @@ public class Building : TickedBehaviour, IDamageable
 
     public void QueueSpawn(Character.Type charaType, Vector2 rallyPoint) // After networking
     {
+        foreach (Resource.Amount cost in DataManager.GetCharacterData(charaType).Cost)
+            GameManager.Pay(cost.Type, cost.Value, Performer);
+
         QueuedSpawnCharacters.Queue((DataManager.GetCharacterData(charaType),rallyPoint));
 
         if (Performer != NetworkManager.Me) return;
