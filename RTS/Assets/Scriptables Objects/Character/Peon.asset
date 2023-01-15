@@ -31,9 +31,9 @@ MonoBehaviour:
   _onSelectionAudios:
   - {fileID: 8300000, guid: e6cae0eeef1ec6b4e86d1b70ca08a8ce, type: 3}
   _genericOrderAudios:
-  - {fileID: 8300000, guid: 2ac17c87e9d192449af6bd104935f0e6, type: 3}
-  _attackOrderAudios:
   - {fileID: 8300000, guid: 2bbd268ce57baba469e1b498853cfe21, type: 3}
+  _attackOrderAudios:
+  - {fileID: 8300000, guid: 2ac17c87e9d192449af6bd104935f0e6, type: 3}
   _type: 0
   _subType: 0
   _spawnTicks: 100

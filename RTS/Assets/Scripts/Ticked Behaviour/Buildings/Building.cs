@@ -303,6 +303,8 @@ public class Building : TickedBehaviour, IDamageable
 
             if (SelectionManager.SelectedBuilding == this)
                 HUDManager.UpdateHUD();
+
+            GameManager.UpdateHousing(Performer, Data.HousingProvided);
         }
 
         float completionValue = Mathf.Lerp(.5f, .98f, BuildCompletionRatio);
@@ -311,7 +313,7 @@ public class Building : TickedBehaviour, IDamageable
         _structureSprite.color = Color.Lerp(Performer == NetworkManager.Me ? _completionStartColor : _enemyCompletionStartColor,
             Performer == NetworkManager.Me ? _completionEndColor : _enemyCompletionEndColor, BuildCompletionRatio);
 
-        if (_buildComplete)
+        if (_buildComplete && NetworkManager.CurrentTick > 1)
             AudioManager.PlayBuildingSound();
         return _buildComplete;
     }

@@ -230,10 +230,7 @@ public class GameManager : MonoBehaviour
         #endregion
 
         #region Update Resources HUD
-        // fdp
-        HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][1], _instance._playerResources[ResourceType.Wood][1],
-            _instance._playerResources[ResourceType.Gold][1], _instance._playerResources[ResourceType.Stone][1]);
-        //HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][NetworkManager.Me], _instance._playerResources[ResourceType.Wood][NetworkManager.Me], _instance._playerResources[ResourceType.Gold][NetworkManager.Me], _instance._playerResources[ResourceType.Stone][NetworkManager.Me]);
+        HUDManager.UpdateResources(_instance._playerResources[ResourceType.Crystal][NetworkManager.Me], _instance._playerResources[ResourceType.Wood][NetworkManager.Me], _instance._playerResources[ResourceType.Gold][NetworkManager.Me], _instance._playerResources[ResourceType.Stone][NetworkManager.Me]);
 
         #endregion
 
@@ -570,8 +567,7 @@ public class GameManager : MonoBehaviour
             if (coordsToHarvest == null)
                 break;
 
-            harvester.SetAction(new Move(harvester, waypoints));
-            harvester.AddAction(new Harvest(harvester, inputCoords, resource));
+            harvester.SetAction(new Harvest(harvester, inputCoords, resource));
         }
     }
 
@@ -648,7 +644,6 @@ public class GameManager : MonoBehaviour
         }
 
         TileMapManager.AddBuildingBlueprint(data.Size, position);
-        GameManager.UpdateHousing(performer, building.Data.HousingProvided);
         building.SetPosition(position);
 
         if(data.CanSpawnUnits)
