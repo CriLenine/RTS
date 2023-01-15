@@ -29,17 +29,18 @@ public class HUDSpawnPreview : HUD
                         break;
 
                     _spawnPreviewSlots[index].SetActive();
+                    _spawnPreviewSlots[index].CurrentKey = index < _currentBuilding.QueuedSpawnCharacters.Count ? _currentBuilding.QueuedSpawnCharacters.GetNthMinKey(index) : -1;
 
                     if (index == 0)
                     {
-                        _spawningCharacterData = _currentBuilding.OnGoingSpawnCharacterData.data;
+                        _spawningCharacterData = _currentBuilding.OnGoingSpawnCharacterData;
 
                         Color color = _spawningCharacterData.Color;
                         _spawnPreviewSlots[0].Fill.color = new Color(color.r, color.g, color.b, .2f);
                     }
 
-                    _spawnPreviewSlots[index].PreviewSprite.sprite = item.data.Icon;
-                    _spawnPreviewSlots[index].PreviewSprite.color = item.data.Color;
+                    _spawnPreviewSlots[index].PreviewSprite.sprite = item.Icon;
+                    _spawnPreviewSlots[index].PreviewSprite.color = item.Color;
 
                     index++;
                 }

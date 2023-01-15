@@ -27,9 +27,8 @@ public partial class NetworkManager
                         {
                             int spawnerID = message.GetInt(i++);
                             int prefab = message.GetInt(i++);
-                            Vector2 rallyPoint = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
 
-                            inputs.Add(TickInput.QueueSpawn(prefab,spawnerID, rallyPoint, performer));
+                            inputs.Add(TickInput.QueueSpawn(prefab,spawnerID, performer));
 
                             break;
                         }
@@ -40,6 +39,16 @@ public partial class NetworkManager
                             int prefab = message.GetInt(i++);
 
                             inputs.Add(TickInput.UnqueueSpawn(prefab, spawnerID, performer));
+
+                            break;
+                        }
+
+                    case InputType.UpdateRallyPoint:
+                        {
+                            int spawnerID = message.GetInt(i++);
+                            Vector2 rallyPoint = new Vector2(message.GetFloat(i++), message.GetFloat(i++));
+
+                            inputs.Add(TickInput.UpdateRallyPoint(spawnerID,rallyPoint, performer));
 
                             break;
                         }
