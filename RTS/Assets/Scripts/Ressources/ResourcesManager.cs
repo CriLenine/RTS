@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
 
 public class ResourcesManager : MonoBehaviour
@@ -34,9 +33,12 @@ public class ResourcesManager : MonoBehaviour
         Bake();
     }
 
+    /// <summary>
+    /// Checks if the tile located at <paramref name="coords"/> can be harvested.
+    /// </summary>
     public static bool Harvestable(Vector2Int coords)
     {
-        return HasTree(coords) && GetNearestForest(coords, ResourceType.Wood).IsHarvestable(coords) 
+        return HasTree(coords) && GetNearestForest(coords, ResourceType.Wood).IsHarvestable(coords)
             || HasRock(coords) && GetNearestForest(coords, ResourceType.Stone).IsHarvestable(coords)
             || HasGold(coords) && GetNearestAggregate(coords, ResourceType.Gold).IsHarvestable(coords)
             || HasCrystal(coords) && GetNearestAggregate(coords, ResourceType.Crystal).IsHarvestable(coords);
@@ -90,11 +92,6 @@ public class ResourcesManager : MonoBehaviour
         else if (type == ResourceType.Crystal) tilemap = _instance._crystalsTilemap;
 
         tilemap.SetTile(new Vector3Int(coords.x, coords.y), remove ? null : tileAspects[Mathf.CeilToInt((tileAspects.Length - 1) * harvestProgression)]);
-    }
-
-    public static void RemoveRock(Vector2Int coords)
-    {
-        _instance._rocksTilemap.SetTile(new Vector3Int(coords.x, coords.y), null);
     }
 
     /// <summary>

@@ -21,12 +21,6 @@ public class QuadTreeNode
 
     public readonly string ID = "";
 
-    #region Debug
-    public static Dictionary<int, HashSet<QuadTreeNode>> d_Leaves => _leaves;
-    public int d_NodesCount => 1 + (_IsLeave ? 0 : _leftChild.d_NodesCount + _rightChild.d_NodesCount);
-    public int d_Depth => _IsLeave ? 0 : 1 + Mathf.Max(_leftChild.d_Depth, _rightChild.d_Depth);
-    #endregion
-
     private float XMAX = x0;
     private float XMIN = -x0;
     private float YMAX = y0;
@@ -84,7 +78,7 @@ public class QuadTreeNode
 
     /// <summary>
     /// Called at the creation of the character.
-    /// Puts it in the root node
+    /// Puts it in the root node.
     /// </summary>
     /// <param name="ID"></param>
     /// <param name="width"></param>
@@ -140,7 +134,7 @@ public class QuadTreeNode
         return neighbours;
     }
     /// <summary>
-    /// Called in <see cref="GetNeighbours(CharacterInfo)"/>.
+    /// Called in <see cref="GetNeighbours(int)"/>.
     /// <para>Places the character in its new correct leaves, then updates <see cref="_leaves"/>.</para>
     /// </summary>
     private void UpdateTree(int ID)
@@ -243,7 +237,6 @@ public class QuadTreeNode
         }
 
         //Continue to run through the tree
-        float depthMultiplicator = 1 / Mathf.Pow(2, depth / 2 + 1);
 
         if (depth % 2 == 0) //Discriminate via x
         {

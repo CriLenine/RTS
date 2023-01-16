@@ -121,9 +121,9 @@ public class Harvest : Action
 
     public string GetHarvestAnimationName()
     {
-        if (_resource.Data.Type == ResourceType.Stone || _resource.Data.Type == ResourceType.Gold)
-            return "Mine";
-        else
+        if (_resource.Data.Type == ResourceType.Wood)
             return "Chop";
+        else
+            return "Mine";
     }
 }

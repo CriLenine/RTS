@@ -54,6 +54,10 @@ public class AudioManager : MonoBehaviour
         _instance._alertSource.Play();
     }
 
+    /// <summary>
+    /// Plays <paramref name="clip"/> on an available <see cref="AudioSource"/>, 
+    /// creating one if necessary.
+    /// </summary>
     public static void PlayNewSound(AudioClip clip)
     {
         for (int i = 0; i < _instance._audioSources.Count; i++)
@@ -92,8 +96,8 @@ public class AudioManager : MonoBehaviour
             return;
         _instance._alert = true;
 
-        _instance.StartCoroutine(StartFade(_instance._musicSource, 2f, 0f));
-        _instance.StartCoroutine(StartFade(_instance._alertSource, 2f, 1f));
+        _instance.StartCoroutine(Fade(_instance._musicSource, 2f, 0f));
+        _instance.StartCoroutine(Fade(_instance._alertSource, 2f, 1f));
     }
 
     private static void EndAlert()
@@ -103,18 +107,17 @@ public class AudioManager : MonoBehaviour
 
         _instance._alert = false;
 
-        _instance.StartCoroutine(StartFade(_instance._musicSource, 1f, 1f));
-        _instance.StartCoroutine(StartFade(_instance._alertSource, 1f, 0f));
+        _instance.StartCoroutine(Fade(_instance._musicSource, 1f, 1f));
+        _instance.StartCoroutine(Fade(_instance._alertSource, 1f, 0f));
     }
 
-    private static IEnumerator StartFade(AudioSource audioSource, float duration, float targetVolume)
+    private static IEnumerator Fade(AudioSource audioSource, float targetVolume, float duration)
     {
         float currentTime = 0;
-        float start = audioSource.volume;
-        while (currentTime < duration)
+        float initialVolume = audioSource.volume;
+        while ((currentTime += Time.deltaTime) < duration)
         {
-            currentTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
+            audioSource.volume = Mathf.Lerp(initialVolume, targetVolume, currentTime / duration);
             yield return null;
         }
         yield break;
