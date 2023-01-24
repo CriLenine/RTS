@@ -5,3 +5,7 @@ Project developed with a team of four students (including me) within 10 weeks, t
 # My contribution
 
 I mainly worked on the resources managment / harvesting, as well as on the QuadTree to optimize character moves.
+
+#Known issues
+
+When playing against AI or with a low-performance device, the game quickly begins to lag and some latency is experienced.
